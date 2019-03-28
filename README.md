@@ -40,7 +40,7 @@ Getting and Building from Sources using command line
 ======
 
 git clone  https://github.com/neuroph/NeurophFramework.git
-cd NeurophFramework
+cd neuroph
 mvn
 
 
