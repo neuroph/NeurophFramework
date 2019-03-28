@@ -1,4 +1,4 @@
-Neuroph - Java Neural Network Platform Neuroph
+Neuroph - Java Neural Network Framework
 ======
 
 Neuroph is an open source Java neural network framework and Development Environment for neural networks. 
@@ -32,7 +32,16 @@ Getting and Building from Sources using NetBeans
 
 Click: Main Menu > Team > Git > Clone
 
-For Repository URL enter https://github.com/neuroph/neuroph.git
+For Repository URL enter https://github.com/neuroph/NeurophFramework.git
 
 Click Finish
+
+Getting and Building from Sources using command line
+======
+
+git clone  https://github.com/neuroph/NeurophFramework.git
+cd NeurophFramework
+mvn
+
+
 
