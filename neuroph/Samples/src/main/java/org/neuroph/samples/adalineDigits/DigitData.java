@@ -1,9 +1,11 @@
 package org.neuroph.samples.adalineDigits;
 
-
 import org.neuroph.core.data.DataSetRow;
 
-public class Data {
+/**
+ * Training data for digit recognition adaline example.
+ */
+public class DigitData {
 
     public final static int CHAR_WIDTH = 5;
     public final static int CHAR_HEIGHT = 7;
@@ -16,6 +18,7 @@ public class Data {
             "O   O",
             "O   O",
             " OOO "},
+
            {"  O  ",
             " OO  ",
             "O O  ",
@@ -23,6 +26,7 @@ public class Data {
             "  O  ",
             "  O  ",
             "  O  "},
+
            {" OOO ",
             "O   O",
             "    O",
@@ -30,6 +34,7 @@ public class Data {
             "  O  ",
             " O   ",
             "OOOOO"},
+
            {" OOO ",
             "O   O",
             "    O",
@@ -37,6 +42,7 @@ public class Data {
             "    O",
             "O   O",
             " OOO "},
+
            {"   O ",
             "  OO ",
             " O O ",
@@ -44,6 +50,7 @@ public class Data {
             "OOOOO",
             "   O ",
             "   O "},
+
            {"OOOOO",
             "O    ",
             "O    ",
@@ -51,6 +58,7 @@ public class Data {
             "    O",
             "O   O",
             " OOO "},
+
            {" OOO ",
             "O   O",
             "O    ",
@@ -58,6 +66,7 @@ public class Data {
             "O   O",
             "O   O",
             " OOO "},
+
            {"OOOOO",
             "    O",
             "    O",
@@ -65,6 +74,7 @@ public class Data {
             "  O  ",
             " O   ",
             "O    "},
+
            {" OOO ",
             "O   O",
             "O   O",
@@ -72,6 +82,7 @@ public class Data {
             "O   O",
             "O   O",
             " OOO "},
+
            {" OOO ",
             "O   O",
             "O   O",
@@ -79,16 +90,16 @@ public class Data {
             "    O",
             "O   O",
             " OOO "}};
-    
+
     public static DataSetRow convertImageIntoData(String[] image) {
 
-        DataSetRow dataSetRow = new DataSetRow(Data.CHAR_HEIGHT * Data.CHAR_WIDTH);
+        DataSetRow dataSetRow = new DataSetRow(DigitData.CHAR_HEIGHT * DigitData.CHAR_WIDTH);
 
-        double[] array = new double[Data.CHAR_WIDTH * Data.CHAR_HEIGHT];
+        double[] array = new double[DigitData.CHAR_WIDTH * DigitData.CHAR_HEIGHT];
 
-        for (int row = 0; row < Data.CHAR_HEIGHT; row++) {
-            for (int column = 0; column < Data.CHAR_WIDTH; column++) {
-                int index = (row * Data.CHAR_WIDTH) + column;
+        for (int row = 0; row < DigitData.CHAR_HEIGHT; row++) {
+            for (int column = 0; column < DigitData.CHAR_WIDTH; column++) {
+                int index = (row * DigitData.CHAR_WIDTH) + column;
                 char ch = image[row].charAt(column);
                 array[index] = (ch == 'O' ? 1 : -1);
             }
@@ -99,7 +110,7 @@ public class Data {
 
     public static String[] convertDataIntoImage(double[] data) {
 
-        String[] image = new String[data.length / Data.CHAR_WIDTH];
+        String[] image = new String[data.length / DigitData.CHAR_WIDTH];
         String row = "";
 
         for (int i = 0; i < data.length; i++) {

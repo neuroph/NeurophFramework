@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.neuroph.samples.ml10standard;
+package org.neuroph.samples.standard10ml;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,30 +41,23 @@ import org.neuroph.util.data.norm.Normalizer;
 /*
  INTRODUCTION TO THE PROBLEM AND DATA SET INFORMATION:
 
- 1. Data set that will be used in this experiment: Banknote Dataset
-    The Banknote Dataset involves predicting whether a given banknote is authentic given a number of measures taken from a photograph.
+ 1. Data set that will be used in this experiment: Ionosphere Dataset
+    The Ionosphere Dataset requires the prediction of structure in the atmosphere given radar returns targeting free electrons in the ionosphere.
     The original data set that will be used in this experiment can be found at link: 
-    http://archive.ics.uci.edu/ml/machine-learning-databases/00267/data_banknote_authentication.txt
+    https://archive.ics.uci.edu/ml/machine-learning-databases/ionosphere/ionosphere.data
 
-2. Reference:  University of Applied Sciences, Ostwestfalen-Lippe
-   Owner of database: Volker Lohweg (University of Applied Sciences, Ostwestfalen-Lippe, volker.lohweg '@' hs-owl.de) 
-   Donor of database: Helene DÃ¶rksen (University of Applied Sciences, Ostwestfalen-Lippe, helene.doerksen '@' hs-owl.de) 
- 
- 
-3. Number of instances: 1 372
+2. Reference:  Space Physics Group , Applied Physics Laboratory ,Johns Hopkins University ,Johns Hopkins Road ,Laurel, MD 20723
+   Sigillito, V. G., Wing, S. P., Hutton, L. V., \& Baker, K. B. (1989). Classification of radar returns from the ionosphere using neural networks. Johns Hopkins APL Technical Digest, 10, 262-266. 
 
-4. Number of Attributes: 4 pluss class attributes
+3. Number of instances: 351
+
+4. Number of Attributes: 34 pluss class attributes
 
 5. Attribute Information:    
- Inputs:
- 5 attributes: 
- 4 continuous feature values are computed for each banknote:
- 1) Variance of Wavelet Transformed image (continuous).
- 2) Skewness of Wavelet Transformed image (continuous).
- 3) Kurtosis of Wavelet Transformed image (continuous).
- 4) Entropy of image (continuous).
-
- 5) Output: Class variable (0 or 1). Value 0 indicates that a banknote is authentic.
+   Inputs:
+   34 attributes: 
+   34 continuous features are computed for each radar return.
+   Output: Class variable (0 or 1). Value 1 indicates good radar return.
 
 6. Missing Values: None.
 
@@ -72,17 +65,17 @@ import org.neuroph.util.data.norm.Normalizer;
 
  
  */
-public class Banknote implements LearningEventListener {
+public class Ionosphere implements LearningEventListener {
 
     public static void main(String[] args) {
-        (new Banknote()).run();
+        (new Ionosphere()).run();
     }
 
     public void run() {
         System.out.println("Creating training set...");
         // get path to training set
-        String trainingSetFileName = "data_sets/databanknote.txt";
-        int inputsCount = 4;
+        String trainingSetFileName = "data_sets/ml10standard/ionospheredata.txt";
+        int inputsCount = 34;
         int outputsCount = 1;
 
         // create training set from file
@@ -96,7 +89,7 @@ public class Banknote implements LearningEventListener {
         DataSet testSet = subSets.get(1);
 
         System.out.println("Creating neural network...");
-        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(TransferFunctionType.TANH, inputsCount, 1, outputsCount);
+        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 30, 25, outputsCount);
 
         neuralNet.setLearningRule(new MomentumBackpropagation());
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
@@ -119,7 +112,7 @@ public class Banknote implements LearningEventListener {
         neuralNet.save("nn1.nnet");
 
         System.out.println("Done.");
-
+        
         System.out.println();
         System.out.println("Network outputs for test set");
         testNeuralNetwork(neuralNet, testSet);
@@ -127,7 +120,7 @@ public class Banknote implements LearningEventListener {
 
     // Displays inputs, desired output (from dataset) and actual output (calculated by neural network) for every row from data set.
     public void testNeuralNetwork(NeuralNetwork neuralNet, DataSet testSet) {
-
+        
         System.out.println("Showing inputs, desired output and neural network output for every row in test set.");
 
         for (DataSetRow testSetRow : testSet.getRows()) {
@@ -145,9 +138,9 @@ public class Banknote implements LearningEventListener {
     // Contains calculation of Confusion matrix for classification tasks or Mean Ssquared Error and Mean Absolute Error for regression tasks.
     // Difference in binary and multi class classification are made when adding Evaluator (MultiClass or Binary).
     public void evaluate(NeuralNetwork neuralNet, DataSet dataSet) {
-
+        
         System.out.println("Calculating performance indicators for neural network.");
-
+        
         Evaluation evaluation = new Evaluation();
         evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
 
@@ -172,5 +165,4 @@ public class Banknote implements LearningEventListener {
         MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
         System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
     }
-
 }

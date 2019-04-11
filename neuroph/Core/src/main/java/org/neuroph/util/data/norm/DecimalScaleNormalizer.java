@@ -15,6 +15,7 @@
  */
 package org.neuroph.util.data.norm;
 
+import java.io.Serializable;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
 
@@ -25,15 +26,43 @@ import org.neuroph.core.data.DataSetRow;
  *
  * @author Zoran Sevarac <sevarac@gmail.com>
  */
-public class DecimalScaleNormalizer implements Normalizer {
+public class DecimalScaleNormalizer implements Normalizer, Serializable {
 
-    private double[] maxIn, maxOut; // contains max values for all columns
-    private  double[] scaleFactorIn, scaleFactorOut; // holds scaling values for all columns
+    /**
+     * Max values for input and output vectors
+     */
+    private double[] maxIn, maxOut;
+
+    /**
+     * Scaling values for input and output vectors
+     */
+    private  double[] scaleFactorIn, scaleFactorOut;
+
+    /**
+     * Flag to indicate that normalizer is initialized
+     */
+    private boolean intialized=false;
+
+
+    public DecimalScaleNormalizer() {
+
+    }
+
+    /**
+     * Initializes normalizer, finds right scale factor for each input and output column in vectors.
+     * @param dataSet
+     */
+    @Override
+    public void init(DataSet dataSet) {
+        findMaxVectors(dataSet);
+        findScaleVectors();
+        intialized = true;
+    }
+
 
     @Override
     public void normalize(DataSet dataSet) {
-        findMaxVectors(dataSet);
-        findScaleVectors();
+        if (!intialized) init(dataSet);
 
         for (DataSetRow dataSetRow : dataSet.getRows()) {
             double[] normalizedInput = normalizeScale(dataSetRow.getInput(), scaleFactorIn);
@@ -49,12 +78,13 @@ public class DecimalScaleNormalizer implements Normalizer {
     /**
      * Finds max values for all columns in dataset (inputs and outputs)
      * Sets max column values to maxIn and maxOut fields
-     * @param dataSet 
+     * @param dataSet
      */
     private void findMaxVectors(DataSet dataSet) {
         int inputSize = dataSet.getInputSize();
         int outputSize = dataSet.getOutputSize();
 
+        // init with minimum values
         maxIn = new double[inputSize];
         for (int i = 0; i < inputSize; i++) {
             maxIn[i] = Double.MIN_VALUE;
@@ -64,6 +94,7 @@ public class DecimalScaleNormalizer implements Normalizer {
         for (int i = 0; i < outputSize; i++) {
             maxOut[i] = Double.MIN_VALUE;
         }
+
 
         for (DataSetRow dataSetRow : dataSet.getRows()) {
             double[] input = dataSetRow.getInput();
@@ -118,4 +149,22 @@ public class DecimalScaleNormalizer implements Normalizer {
         }
         return normalizedVector;
     }
+
+    public double[] getMaxIn() {
+        return maxIn;
+    }
+
+    public double[] getMaxOut() {
+        return maxOut;
+    }
+
+    public double[] getScaleFactorIn() {
+        return scaleFactorIn;
+    }
+
+    public double[] getScaleFactorOut() {
+        return scaleFactorOut;
+    }
+
+
 }

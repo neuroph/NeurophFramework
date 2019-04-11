@@ -6,15 +6,17 @@ import org.neuroph.core.data.DataSetRow;
 /**
  * Utility class with methods for calculating dataset statistics
  * TODO: add variance, and std
+ * Calculate everything in one pass and expose as attributes - like summary() in R
+ * Not only for inputs but also for outputs
  */
 public class DataSetStats {
 
     /**
      *
      * @param dataSet Neuroph dataset
-     * @return arithmetic mean for each variable in data set
+     * @return arithmetic mean for each input in data set
      */
-	public static double[] calculateMeanByColumns(DataSet dataSet) {
+	public static double[] inputsMean(DataSet dataSet) {
 		double[] mean = new double[dataSet.getInputSize()];
 
 		for (DataSetRow row : dataSet.getRows()) {
@@ -32,9 +34,9 @@ public class DataSetStats {
     /**
      *
      * @param dataSet Neuroph dataset
-     * @return maximum value for each variable in data set
+     * @return maximum value for each input in data set
      */
-	public static double[] calculateMaxByColumns(DataSet dataSet) {
+	public static double[] inputsMax(DataSet dataSet) {
 
 		int inputSize = dataSet.getInputSize();
 		double[] maxColumnElements = new double[inputSize];
@@ -58,7 +60,7 @@ public class DataSetStats {
      * @param dataSet Neuroph dataset
      * @return minimum value for each variable in data set
      */
-	public static double[] calculateMinByColumns(DataSet dataSet) {
+	public static double[] inputsMin(DataSet dataSet) {
 
 		int inputSize = dataSet.getInputSize();
 		double[] minColumnElements = new double[inputSize];

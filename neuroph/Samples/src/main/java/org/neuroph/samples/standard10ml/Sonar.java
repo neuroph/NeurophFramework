@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.neuroph.samples.ml10standard;
+package org.neuroph.samples.standard10ml;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,12 +22,15 @@ import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
 import org.neuroph.core.events.LearningEvent;
 import org.neuroph.core.events.LearningEventListener;
-import org.neuroph.core.learning.error.MeanAbsoluteError;
 import org.neuroph.core.learning.error.MeanSquaredError;
+import org.neuroph.eval.ClassifierEvaluator;
 import org.neuroph.eval.ErrorEvaluator;
 import org.neuroph.eval.Evaluation;
-import org.neuroph.nnet.Adaline;
-import org.neuroph.nnet.learning.LMS;
+import org.neuroph.eval.classification.ClassificationMetrics;
+import org.neuroph.eval.classification.ConfusionMatrix;
+import org.neuroph.nnet.MultiLayerPerceptron;
+import org.neuroph.nnet.learning.MomentumBackpropagation;
+import org.neuroph.util.TransferFunctionType;
 import org.neuroph.util.data.norm.MaxNormalizer;
 import org.neuroph.util.data.norm.Normalizer;
 
@@ -38,43 +41,49 @@ import org.neuroph.util.data.norm.Normalizer;
 /*
  INTRODUCTION TO THE PROBLEM AND DATA SET INFORMATION:
 
- 1. Data set that will be used in this experiment: Swedish Auto Insurance Dataset
-    The Swedish Auto Insurance Dataset involves predicting the total payment for all claims in thousands of Swedish Kronor, given the total number of claims.
-    The original data set that will be used in this experiment can be found at link:
-    https://www.math.muni.cz/~kolacek/docs/frvs/M7222/data/AutoInsurSweden.txt
+ 1. Data set that will be used in this experiment: Sonar Dataset
+    The Sonar Dataset involves the prediction of whether or not an object is a mine or a rock given the strength of sonar returns at different angles.
+    The original data set that will be used in this experiment can be found at link: 
+    https://archive.ics.uci.edu/ml/machine-learning-databases/undocumented/connectionist-bench/sonar/sonar.all-data
 
-2. Reference: Swedish Committee on Analysis of Risk Premium in Motor Insurance
+2. Reference:  Terry Sejnowski
+   Gorman, R. P., and Sejnowski, T. J. (1988). "Analysis of Hidden Units in a Layered Network Trained to Classify Sonar Targets" in Neural Networks, Vol. 1, pp. 75-89. 
+ 
+ 
+3. Number of instances: 208
 
-3. Number of instances: 63
+4. Number of Attributes: 60 pluss class attributes
 
-4. Number of Attributes: 2 (input is numerical, output is continuous)
+5. Attribute Information:    
+   Inputs:
+   60 attributes: 
+   Each input belongs to a set of 60 numbers in the range 0.0 to 1.0. 
+   Each number represents the energy within a particular frequency band, integrated over a certain period of time.
+   1. - 60. Sonar returns at different angles
 
-5. Attribute Information:
-   In the following data
-   X = number of claims (numerical)
-   Y = total payment for all the claims in thousands of Swedish Kronor (continuous) for geographical zones in Sweden.
+   Output: Class variable (0 or 1). Value 0 indicates that an object is a rock(R), and 1 that is a metal cylinder.
 
-
-6. Missing Values: none
+8. Missing Values: None.
 
 
 
-
+ 
  */
-public class SwedishAutoInsurance implements LearningEventListener {
+public class Sonar implements LearningEventListener {
 
     public static void main(String[] args) {
-        (new SwedishAutoInsurance()).run();
+        (new Sonar()).run();
     }
 
     public void run() {
         System.out.println("Creating training set...");
-        String dataSetFileName = "data_sets/autodata.txt";
-        int inputsCount = 1;
+        // get path to training set
+        String trainingSetFileName = "data_sets/ml10standard/sonardata.txt";
+        int inputsCount = 60;
         int outputsCount = 1;
 
         // create training set from file
-        DataSet dataSet = DataSet.createFromFile(dataSetFileName, inputsCount, outputsCount, ",", false);
+        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, ",", false);
         Normalizer norm = new MaxNormalizer();
         norm.normalize(dataSet);
         dataSet.shuffle();
@@ -84,14 +93,17 @@ public class SwedishAutoInsurance implements LearningEventListener {
         DataSet testSet = subSets.get(1);
 
         System.out.println("Creating neural network...");
-        Adaline neuralNet = new Adaline(1);
+        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 15, 10, outputsCount);
 
-        neuralNet.setLearningRule(new LMS());
-        LMS learningRule = (LMS) neuralNet.getLearningRule();
+        neuralNet.setLearningRule(new MomentumBackpropagation());
+        MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
         learningRule.addListener(this);
 
-        // train the network with training set
+        // set learning rate and max error
+        learningRule.setLearningRate(0.1);
+        learningRule.setMaxError(0.01);
         System.out.println("Training network...");
+        // train the network with training set
         neuralNet.learn(trainingSet);
         System.out.println("Training completed.");
         System.out.println("Testing network...");
@@ -104,7 +116,7 @@ public class SwedishAutoInsurance implements LearningEventListener {
         neuralNet.save("nn1.nnet");
 
         System.out.println("Done.");
-
+        
         System.out.println();
         System.out.println("Network outputs for test set");
         testNeuralNetwork(neuralNet, testSet);
@@ -112,7 +124,7 @@ public class SwedishAutoInsurance implements LearningEventListener {
 
     // Displays inputs, desired output (from dataset) and actual output (calculated by neural network) for every row from data set.
     public void testNeuralNetwork(NeuralNetwork neuralNet, DataSet testSet) {
-
+        
         System.out.println("Showing inputs, desired output and neural network output for every row in test set.");
 
         for (DataSetRow testSetRow : testSet.getRows()) {
@@ -121,39 +133,40 @@ public class SwedishAutoInsurance implements LearningEventListener {
             double[] networkOutput = neuralNet.getOutput();
 
             System.out.println("Input: " + Arrays.toString(testSetRow.getInput()));
-            System.out.println("Output: " + networkOutput[0]);
-            System.out.println("Desired output" + Arrays.toString(networkOutput));
-
+            System.out.println("Output: " + Arrays.toString(networkOutput));
+            System.out.println("Desired output" + Arrays.toString(testSetRow.getDesiredOutput()));
         }
     }
 
-    // Evaluates performance of neural network.
+    // Evaluates performance of neural network. 
     // Contains calculation of Confusion matrix for classification tasks or Mean Ssquared Error and Mean Absolute Error for regression tasks.
     // Difference in binary and multi class classification are made when adding Evaluator (MultiClass or Binary).
     public void evaluate(NeuralNetwork neuralNet, DataSet dataSet) {
-
+        
         System.out.println("Calculating performance indicators for neural network.");
+        
+        Evaluation evaluation = new Evaluation();
+        evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
 
-        MeanSquaredError mse = new MeanSquaredError();
-        MeanAbsoluteError mae = new MeanAbsoluteError();
+        evaluation.addEvaluator(new ClassifierEvaluator.Binary(0.5));
+        evaluation.evaluateDataSet(neuralNet, dataSet);
 
-        for (DataSetRow testSetRow : dataSet.getRows()) {
-            neuralNet.setInput(testSetRow.getInput());
-            neuralNet.calculate();
-            double[] networkOutput = neuralNet.getOutput();
-            double[] desiredOutput = testSetRow.getDesiredOutput();
-            mse.addPatternError(networkOutput, desiredOutput);
-            mae.addPatternError(networkOutput, desiredOutput);
+        ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.Binary.class);
+        ConfusionMatrix confusionMatrix = evaluator.getResult();
+        System.out.println("Confusion matrrix:\r\n");
+        System.out.println(confusionMatrix.toString() + "\r\n\r\n");
+        System.out.println("Classification metrics\r\n");
+        ClassificationMetrics[] metrics = ClassificationMetrics.createFromMatrix(confusionMatrix);
+        ClassificationMetrics.Stats average = ClassificationMetrics.average(metrics);
+        for (ClassificationMetrics cm : metrics) {
+            System.out.println(cm.toString() + "\r\n");
         }
-
-        System.out.println("Mean squared error is: " + mse.getTotalError());
-        System.out.println("Mean absolute error is: " + mae.getTotalError());
+        System.out.println(average.toString());
     }
 
     @Override
     public void handleLearningEvent(LearningEvent event) {
-        LMS bp = (LMS) event.getSource();
+        MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
         System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
     }
-
 }

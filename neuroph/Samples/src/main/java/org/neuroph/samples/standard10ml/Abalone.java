@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.neuroph.samples.ml10standard;
+package org.neuroph.samples.standard10ml;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,52 +41,58 @@ import org.neuroph.util.data.norm.Normalizer;
 /*
  INTRODUCTION TO THE PROBLEM AND DATA SET INFORMATION:
 
- 1. Data set that will be used in this experiment: Banknote Dataset
-    The Banknote Dataset involves predicting whether a given banknote is authentic given a number of measures taken from a photograph.
+ 1. Data set that will be used in this experiment: Abalone Dataset
+    The Abalone Dataset involves predicting the age of abalone given objective measures of individuals.
+    It is a multi-class classification problem, but can also be framed as a regression.
     The original data set that will be used in this experiment can be found at link: 
-    http://archive.ics.uci.edu/ml/machine-learning-databases/00267/data_banknote_authentication.txt
+    https://www.math.muni.cz/~kolacek/docs/frvs/M7222/data/AutoInsurSweden.txt
 
-2. Reference:  University of Applied Sciences, Ostwestfalen-Lippe
-   Owner of database: Volker Lohweg (University of Applied Sciences, Ostwestfalen-Lippe, volker.lohweg '@' hs-owl.de) 
-   Donor of database: Helene DÃ¶rksen (University of Applied Sciences, Ostwestfalen-Lippe, helene.doerksen '@' hs-owl.de) 
+2. Reference: Marine Resources Division, Marine Research Laboratories - Taroona ,Department of Primary Industry and Fisheries, Tasmania ,GPO Box 619F, Hobart, Tasmania 7001, Australia 
+   Warwick J Nash, Tracy L Sellers, Simon R Talbot, Andrew J Cawthorn and Wes B Ford (1994) 
+   "The Population Biology of Abalone (_Haliotis_ species) in Tasmania. I. Blacklip Abalone (_H. rubra_) from the North Coast and Islands of Bass Strait", 
+   Sea Fisheries Division, Technical Report No. 48 (ISSN 1034-3288) 
  
- 
-3. Number of instances: 1 372
+3. Number of instances: 4 177
 
-4. Number of Attributes: 4 pluss class attributes
+4. Number of Attributes: 8 plus class attribute
 
 5. Attribute Information:    
  Inputs:
- 5 attributes: 
- 4 continuous feature values are computed for each banknote:
- 1) Variance of Wavelet Transformed image (continuous).
- 2) Skewness of Wavelet Transformed image (continuous).
- 3) Kurtosis of Wavelet Transformed image (continuous).
- 4) Entropy of image (continuous).
+ 8 attributes: 
+ 8 features are computed for each abalone:
+ 1) Sex (M, F, I), which are represented as numerical values of 1,2,3 respectively.
+ 2) Length. 
+ 3) Diameter.
+ 4) Height.
+ 5) Whole weight.
+ 6) Shucked weight.
+ 7) Viscera weight.
+ 8) Shell weight.
 
- 5) Output: Class variable (0 or 1). Value 0 indicates that a banknote is authentic.
+ 9) Output: Rings mesaurment, numerical value.
 
-6. Missing Values: None.
+
+6. Missing Values: none.
 
 
 
  
  */
-public class Banknote implements LearningEventListener {
+public class Abalone implements LearningEventListener {
 
     public static void main(String[] args) {
-        (new Banknote()).run();
+        (new Abalone()).run();
     }
 
     public void run() {
         System.out.println("Creating training set...");
         // get path to training set
-        String trainingSetFileName = "data_sets/ml10standard/databanknote.txt";
-        int inputsCount = 4;
-        int outputsCount = 1;
+        String trainingSetFileName = "data_sets/ml10standard/abalonerings.txt";
+        int inputsCount = 8;
+        int outputsCount = 29;
 
         // create training set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, ",", false);
+        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, "\t", true);
         Normalizer norm = new MaxNormalizer();
         norm.normalize(dataSet);
         dataSet.shuffle();
@@ -96,7 +102,7 @@ public class Banknote implements LearningEventListener {
         DataSet testSet = subSets.get(1);
 
         System.out.println("Creating neural network...");
-        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(TransferFunctionType.TANH, inputsCount, 1, outputsCount);
+        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 15, 10, outputsCount);
 
         neuralNet.setLearningRule(new MomentumBackpropagation());
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
@@ -104,13 +110,14 @@ public class Banknote implements LearningEventListener {
 
         // set learning rate and max error
         learningRule.setLearningRate(0.1);
-        learningRule.setMaxError(0.01);
+        learningRule.setMaxIterations(5000);
+
         System.out.println("Training network...");
         // train the network with training set
         neuralNet.learn(trainingSet);
         System.out.println("Training completed.");
         System.out.println("Testing network...");
-
+        
         System.out.println("Network performance on the test set");
         evaluate(neuralNet, testSet);
 
@@ -147,14 +154,14 @@ public class Banknote implements LearningEventListener {
     public void evaluate(NeuralNetwork neuralNet, DataSet dataSet) {
 
         System.out.println("Calculating performance indicators for neural network.");
-
         Evaluation evaluation = new Evaluation();
         evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
 
-        evaluation.addEvaluator(new ClassifierEvaluator.Binary(0.5));
+        String classLabels[] = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29"};
+        evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(classLabels));
         evaluation.evaluateDataSet(neuralNet, dataSet);
 
-        ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.Binary.class);
+        ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
         ConfusionMatrix confusionMatrix = evaluator.getResult();
         System.out.println("Confusion matrrix:\r\n");
         System.out.println(confusionMatrix.toString() + "\r\n\r\n");
@@ -172,5 +179,4 @@ public class Banknote implements LearningEventListener {
         MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
         System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
     }
-
 }

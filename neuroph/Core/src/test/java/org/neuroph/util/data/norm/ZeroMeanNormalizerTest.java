@@ -1,4 +1,4 @@
-package org.neuroph.samples.norm;
+package org.neuroph.util.data.norm;
 
 import static org.junit.Assert.assertEquals;
 
@@ -6,6 +6,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
+import org.neuroph.util.DataSetStats;
+import org.neuroph.util.data.norm.ZeroMeanNormalizer;
 
 public class ZeroMeanNormalizerTest {
 
@@ -23,7 +25,7 @@ public class ZeroMeanNormalizerTest {
 		DataSet dataSet = createDataSetFromRows(row1);
 		normalizer.normalize(dataSet);
 
-		double[] columnMeans = DataSetStatistics.calculateMean(dataSet);
+		double[] columnMeans = DataSetStats.inputsMean(dataSet);
 		for (int i = 0; i < dataSet.getInputSize(); i++) {
 			double currentColumnMean = columnMeans[i];
 			assertEquals(0.0, currentColumnMean, 0.01);
@@ -39,7 +41,7 @@ public class ZeroMeanNormalizerTest {
 		DataSet dataSet = createDataSetFromRows(row1, row2);
 		normalizer.normalize(dataSet);
 
-		double[] columnMeans = DataSetStatistics.calculateMean(dataSet);
+		double[] columnMeans = DataSetStats.inputsMean(dataSet);
 		for (int i = 0; i < dataSet.getInputSize(); i++) {
 			double currentColumnMean = columnMeans[i];
 			assertEquals(0.0, currentColumnMean, 0.01);

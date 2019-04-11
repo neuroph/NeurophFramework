@@ -23,6 +23,8 @@ import java.util.List;
 /**
  * Interface for data set sampling  methods.
  *
+ * TODO: enable in-place sampling or returning different datasets for all sampling methods.
+ *
  * @author Zoran Sevarac <sevarac@gmail.com>
  */
 public interface Sampling {

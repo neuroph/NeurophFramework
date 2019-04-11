@@ -13,8 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.neuroph.samples.ml10standard;
+package org.neuroph.samples.standard10ml;
 
+import org.neuroph.samples.standard10ml.Sonar;
 import java.util.Arrays;
 import java.util.List;
 import org.neuroph.core.NeuralNetwork;
@@ -31,6 +32,8 @@ import org.neuroph.eval.classification.ConfusionMatrix;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.MomentumBackpropagation;
 import org.neuroph.util.TransferFunctionType;
+import org.neuroph.util.data.norm.MaxNormalizer;
+import org.neuroph.util.data.norm.Normalizer;
 
 /**
  *
@@ -39,55 +42,51 @@ import org.neuroph.util.TransferFunctionType;
 /*
  INTRODUCTION TO THE PROBLEM AND DATA SET INFORMATION:
 
- 1. Data set that will be used in this experiment: Wheat Seeds Dataset
-    The Wheat Seeds Dataset involves the prediction of species given measurements of seeds from different varieties of wheat.
+ 1. Data set that will be used in this experiment: Sonar Dataset
+    The Sonar Dataset involves the prediction of whether or not an object is a mine or a rock given the strength of sonar returns at different angles.
     The original data set that will be used in this experiment can be found at link: 
-    http://archive.ics.uci.edu/ml/machine-learning-databases/00236/seeds_dataset.txt
+    https://archive.ics.uci.edu/ml/machine-learning-databases/undocumented/connectionist-bench/sonar/sonar.all-data
 
-2. Reference:  Magorzata Charytanowicz, Jerzy Niewczas ,Institute of Mathematics and Computer Science, ,The John Paul II Catholic University of Lublin, KonstantynÃ³w 1 H, ,PL 20-708 Lublin, Poland 
-   Owner of database: Volker Lohweg (University of Applied Sciences, Ostwestfalen-Lippe, volker.lohweg '@' hs-owl.de) 
-   M. Charytanowicz, J. Niewczas, P. Kulczycki, P.A. Kowalski, S. Lukasik, S. Zak, 'A Complete Gradient Clustering Algorithm for Features Analysis of X-ray Images', in: Information Technologies in Biomedicine, Ewa Pietka, Jacek Kawa (eds.), Springer-Verlag, Berlin-Heidelberg, 2010, pp. 15-24.
+2. Reference:  Terry Sejnowski
+   Gorman, R. P., and Sejnowski, T. J. (1988). "Analysis of Hidden Units in a Layered Network Trained to Classify Sonar Targets" in Neural Networks, Vol. 1, pp. 75-89. 
  
  
-3. Number of instances: 210
+3. Number of instances: 208
 
-4. Number of Attributes: 7 pluss class attributes
+4. Number of Attributes: 60 pluss class attributes
 
 5. Attribute Information:    
- Inputs:
- 7 attributes: 
- 7 continuous feature values are computed for each seed:
- 1) Area.
- 2) Perimeter. 
- 3) Compactness
- 4) Length of kernel.
- 5) Width of kernel.
- 6) Asymmetry coefficient.
- 7) Length of kernel groove.
+   Inputs:
+   60 attributes: 
+   Each input belongs to a set of 60 numbers in the range 0.0 to 1.0. 
+   Each number represents the energy within a particular frequency band, integrated over a certain period of time.
+   1. - 60. Sonar returns at different angles
 
- 8) Output: Class variable (1, 2 or 3). Values indicate different varieties of wheat: Kama,Rosa and Canadian.
+   Output: Class variable (0 or 1). Value 0 indicates that an object is a rock(R), and 1 that is a metal cylinder.
 
-6. Missing Values: None.
+8. Missing Values: None.
 
 
 
  
  */
-public class WheatSeeds implements LearningEventListener {
+public class Sonar implements LearningEventListener {
 
     public static void main(String[] args) {
-        (new WheatSeeds()).run();
+        (new Sonar()).run();
     }
 
     public void run() {
         System.out.println("Creating training set...");
         // get path to training set
-        String trainingSetFileName = "data_sets/seeds.txt";
-        int inputsCount = 7;
-        int outputsCount = 3;
+        String trainingSetFileName = "data_sets/sonardata.txt";
+        int inputsCount = 60;
+        int outputsCount = 1;
 
         // create training set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, "\t");
+        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, ",", false);
+        Normalizer norm = new MaxNormalizer();
+        norm.normalize(dataSet);
         dataSet.shuffle();
 
         List<DataSet> subSets = dataSet.split(60, 40);
@@ -95,7 +94,7 @@ public class WheatSeeds implements LearningEventListener {
         DataSet testSet = subSets.get(1);
 
         System.out.println("Creating neural network...");
-        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 15, 2, outputsCount);
+        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 15, 10, outputsCount);
 
         neuralNet.setLearningRule(new MomentumBackpropagation());
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
@@ -104,7 +103,6 @@ public class WheatSeeds implements LearningEventListener {
         // set learning rate and max error
         learningRule.setLearningRate(0.1);
         learningRule.setMaxError(0.01);
-        learningRule.setMaxIterations(5000);
         System.out.println("Training network...");
         // train the network with training set
         neuralNet.learn(trainingSet);
@@ -151,11 +149,10 @@ public class WheatSeeds implements LearningEventListener {
         Evaluation evaluation = new Evaluation();
         evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
 
-        String[] classLabels = new String[]{"1", "2", "3"};
-        evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(classLabels));
+        evaluation.addEvaluator(new ClassifierEvaluator.Binary(0.5));
         evaluation.evaluateDataSet(neuralNet, dataSet);
 
-        ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
+        ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.Binary.class);
         ConfusionMatrix confusionMatrix = evaluator.getResult();
         System.out.println("Confusion matrrix:\r\n");
         System.out.println(confusionMatrix.toString() + "\r\n\r\n");
@@ -173,5 +170,4 @@ public class WheatSeeds implements LearningEventListener {
         MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
         System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
     }
-
 }

@@ -13,8 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.neuroph.samples.ml10standard;
+package org.neuroph.samples.standard10ml;
 
+import org.neuroph.samples.standard10ml.Abalone;
 import java.util.Arrays;
 import java.util.List;
 import org.neuroph.core.NeuralNetwork;
@@ -41,45 +42,58 @@ import org.neuroph.util.data.norm.Normalizer;
 /*
  INTRODUCTION TO THE PROBLEM AND DATA SET INFORMATION:
 
- 1. Data set that will be used in this experiment: Ionosphere Dataset
-    The Ionosphere Dataset requires the prediction of structure in the atmosphere given radar returns targeting free electrons in the ionosphere.
+ 1. Data set that will be used in this experiment: Abalone Dataset
+    The Abalone Dataset involves predicting the age of abalone given objective measures of individuals.
+    It is a multi-class classification problem, but can also be framed as a regression.
     The original data set that will be used in this experiment can be found at link: 
-    https://archive.ics.uci.edu/ml/machine-learning-databases/ionosphere/ionosphere.data
+    https://www.math.muni.cz/~kolacek/docs/frvs/M7222/data/AutoInsurSweden.txt
 
-2. Reference:  Space Physics Group , Applied Physics Laboratory ,Johns Hopkins University ,Johns Hopkins Road ,Laurel, MD 20723
-   Sigillito, V. G., Wing, S. P., Hutton, L. V., \& Baker, K. B. (1989). Classification of radar returns from the ionosphere using neural networks. Johns Hopkins APL Technical Digest, 10, 262-266. 
+2. Reference: Marine Resources Division, Marine Research Laboratories - Taroona ,Department of Primary Industry and Fisheries, Tasmania ,GPO Box 619F, Hobart, Tasmania 7001, Australia 
+   Warwick J Nash, Tracy L Sellers, Simon R Talbot, Andrew J Cawthorn and Wes B Ford (1994) 
+   "The Population Biology of Abalone (_Haliotis_ species) in Tasmania. I. Blacklip Abalone (_H. rubra_) from the North Coast and Islands of Bass Strait", 
+   Sea Fisheries Division, Technical Report No. 48 (ISSN 1034-3288) 
+ 
+3. Number of instances: 4 177
 
-3. Number of instances: 351
-
-4. Number of Attributes: 34 pluss class attributes
+4. Number of Attributes: 8 plus class attribute
 
 5. Attribute Information:    
-   Inputs:
-   34 attributes: 
-   34 continuous features are computed for each radar return.
-   Output: Class variable (0 or 1). Value 1 indicates good radar return.
+ Inputs:
+ 8 attributes: 
+ 8 features are computed for each abalone:
+ 1) Sex (M, F, I), which are represented as numerical values of 1,2,3 respectively.
+ 2) Length. 
+ 3) Diameter.
+ 4) Height.
+ 5) Whole weight.
+ 6) Shucked weight.
+ 7) Viscera weight.
+ 8) Shell weight.
 
-6. Missing Values: None.
+ 9) Output: Rings mesaurment, numerical value.
+
+
+6. Missing Values: none.
 
 
 
  
  */
-public class Ionosphere implements LearningEventListener {
+public class Abalone implements LearningEventListener {
 
     public static void main(String[] args) {
-        (new Ionosphere()).run();
+        (new Abalone()).run();
     }
 
     public void run() {
         System.out.println("Creating training set...");
         // get path to training set
-        String trainingSetFileName = "data_sets/ionospheredata.txt";
-        int inputsCount = 34;
-        int outputsCount = 1;
+        String trainingSetFileName = "data_sets/abalonerings.txt";
+        int inputsCount = 8;
+        int outputsCount = 29;
 
         // create training set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, ",", false);
+        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, "\t", true);
         Normalizer norm = new MaxNormalizer();
         norm.normalize(dataSet);
         dataSet.shuffle();
@@ -89,7 +103,7 @@ public class Ionosphere implements LearningEventListener {
         DataSet testSet = subSets.get(1);
 
         System.out.println("Creating neural network...");
-        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 30, 25, outputsCount);
+        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 15, 10, outputsCount);
 
         neuralNet.setLearningRule(new MomentumBackpropagation());
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
@@ -97,13 +111,14 @@ public class Ionosphere implements LearningEventListener {
 
         // set learning rate and max error
         learningRule.setLearningRate(0.1);
-        learningRule.setMaxError(0.01);
+        learningRule.setMaxIterations(5000);
+
         System.out.println("Training network...");
         // train the network with training set
         neuralNet.learn(trainingSet);
         System.out.println("Training completed.");
         System.out.println("Testing network...");
-
+        
         System.out.println("Network performance on the test set");
         evaluate(neuralNet, testSet);
 
@@ -112,7 +127,7 @@ public class Ionosphere implements LearningEventListener {
         neuralNet.save("nn1.nnet");
 
         System.out.println("Done.");
-        
+
         System.out.println();
         System.out.println("Network outputs for test set");
         testNeuralNetwork(neuralNet, testSet);
@@ -120,7 +135,7 @@ public class Ionosphere implements LearningEventListener {
 
     // Displays inputs, desired output (from dataset) and actual output (calculated by neural network) for every row from data set.
     public void testNeuralNetwork(NeuralNetwork neuralNet, DataSet testSet) {
-        
+
         System.out.println("Showing inputs, desired output and neural network output for every row in test set.");
 
         for (DataSetRow testSetRow : testSet.getRows()) {
@@ -138,16 +153,16 @@ public class Ionosphere implements LearningEventListener {
     // Contains calculation of Confusion matrix for classification tasks or Mean Ssquared Error and Mean Absolute Error for regression tasks.
     // Difference in binary and multi class classification are made when adding Evaluator (MultiClass or Binary).
     public void evaluate(NeuralNetwork neuralNet, DataSet dataSet) {
-        
+
         System.out.println("Calculating performance indicators for neural network.");
-        
         Evaluation evaluation = new Evaluation();
         evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
 
-        evaluation.addEvaluator(new ClassifierEvaluator.Binary(0.5));
+        String classLabels[] = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29"};
+        evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(classLabels));
         evaluation.evaluateDataSet(neuralNet, dataSet);
 
-        ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.Binary.class);
+        ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
         ConfusionMatrix confusionMatrix = evaluator.getResult();
         System.out.println("Confusion matrrix:\r\n");
         System.out.println(confusionMatrix.toString() + "\r\n\r\n");

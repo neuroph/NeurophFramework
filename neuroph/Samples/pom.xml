@@ -5,8 +5,9 @@
    <parent>
       <groupId>org.neuroph</groupId>
       <artifactId>Neuroph</artifactId>
-      <version>2.94</version>
+      <version>${parent.version}</version>
    </parent>
+   
    <artifactId>neuroph-samples</artifactId>
    <packaging>jar</packaging>
 
@@ -22,18 +23,30 @@
       <dependency>
          <groupId>${project.groupId}</groupId>
          <artifactId>neuroph-core</artifactId>
-         <version>2.94</version>
+         <version>${parent.version}</version>
          <type>jar</type>
       </dependency>
       <dependency>
          <groupId>org.neuroph</groupId>
          <artifactId>neuroph-contrib</artifactId>
-         <version>${project.version}</version>
+         <version>${parent.version}</version>
       </dependency>
       <dependency>
          <groupId>nz.ac.waikato.cms.weka</groupId>
          <artifactId>weka-stable</artifactId>
          <version>3.6.6</version>
+      </dependency>
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-api</artifactId>
+         <version>1.7.12</version>
+         <type>jar</type>
+      </dependency>
+      <dependency>
+         <groupId>org.neuroph</groupId>
+         <artifactId>neuroph-imgrec</artifactId>
+         <version>2.96</version>
+         <type>jar</type>
       </dependency>
    </dependencies>
 </project>

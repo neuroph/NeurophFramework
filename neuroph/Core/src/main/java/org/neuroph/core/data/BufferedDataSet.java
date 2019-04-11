@@ -27,7 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class can be used for large training sets, which are partialy read from
+ * This class can be used for large training sets, which are partially read from
  * file during the training. It loads bufferSize rows from file into DataSet,
  * and when it iterates all of them, it takes next bufferSize rows. It can be
  * used everywhere where DataSet class is used since it extends it. The rows
@@ -41,47 +41,47 @@ public class BufferedDataSet extends DataSet implements Iterator<DataSetRow> {
      * Buffer size determines how many data rows will be loaded from file at once
      */
     private int bufferSize = 1000;
-    
+
     /**
      * File with data set rows
      */
     private File file;
-    
+
     /**
      * Number of lines in the file
      */
     private long fileLinesNumber;
-    
+
     /**
      * Current line number that we're reading
      */
-    private long currentFileLineNumber;    
-    
+    private long currentFileLineNumber;
+
     /**
      * Number of rows loaded
      */
     private int rowsLoaded;
-    
+
     /**
      * Delimiter character for values in line
      */
     private String delimiter;
-    
+
     /**
      * File reader used to read from file
      */
     FileReader fileReader = null;
-    
+
     /**
      * Buffered reader used to read from file
      */
     BufferedReader bufferedReader;
-    
+
     /**
      * A reference to the buffered rows (a List collection in superclass)
      */
     List<DataSetRow> bufferedRows;
-    
+
     /**
      * Iterator for buffered rowa
      */
@@ -96,12 +96,12 @@ public class BufferedDataSet extends DataSet implements Iterator<DataSetRow> {
      * Creates new buffered data set with specified file, input and output size.
      * Data set file is assumed to be txt value with data set rows in a single line,
      * with input and output vector values delimited by delimiter.
-     * 
+     *
      * @param file datas et file
      * @param inputSize size of input vector
      * @param outputSize size of outut vector
      * @param delimiter delimiter for vector values
-     * @throws FileNotFoundException 
+     * @throws FileNotFoundException
      */
     public BufferedDataSet(File file, int inputSize, int outputSize, String delimiter) throws FileNotFoundException {
         super(inputSize, outputSize);
@@ -111,7 +111,7 @@ public class BufferedDataSet extends DataSet implements Iterator<DataSetRow> {
         this.fileReader = new FileReader(file);
         this.bufferedReader = new BufferedReader(fileReader);
         fileLinesNumber = countFileLines();
-        
+
         // load first chunk of data into buffer
         loadNextBuffer();
     }
@@ -119,13 +119,13 @@ public class BufferedDataSet extends DataSet implements Iterator<DataSetRow> {
     /**
      * Counts and returns number of lines in a file
      * @return number of lines in a file
-     * @throws FileNotFoundException 
+     * @throws FileNotFoundException
      */
     private long countFileLines() throws FileNotFoundException {
         LineNumberReader lnr = new LineNumberReader(new FileReader(file));
         try {
           //  lnr.skip(Long.MAX_VALUE);
-           while(lnr.skip(Long.MAX_VALUE) > 0) {}; 
+           while(lnr.skip(Long.MAX_VALUE) > 0) {};
         } catch (IOException ex) {
             Logger.getLogger(BufferedDataSet.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -134,7 +134,7 @@ public class BufferedDataSet extends DataSet implements Iterator<DataSetRow> {
 
     /**
      * Returns iterator for buffered data set
-     * @return 
+     * @return
      */
     @Override
     public Iterator<DataSetRow> iterator() {
@@ -155,7 +155,7 @@ public class BufferedDataSet extends DataSet implements Iterator<DataSetRow> {
     }
 
     /**
-     * Returns next data set row. Note that if there are no more buffered rows, 
+     * Returns next data set row. Note that if there are no more buffered rows,
      * this mthod will load next bufferSize rows into buffer.
      * @return next data set row
      */
@@ -165,7 +165,7 @@ public class BufferedDataSet extends DataSet implements Iterator<DataSetRow> {
         if (!bufferIterator.hasNext()) {
             this.loadNextBuffer(); // load next chunk from file into buffer
         }
-        
+
         currentFileLineNumber++; // increase line counter
         return bufferIterator.next(); // and return next data row
     }
@@ -184,7 +184,7 @@ public class BufferedDataSet extends DataSet implements Iterator<DataSetRow> {
             this.clear();    // data set buffer
 
             rowsLoaded = 0;
-            while (rowsLoaded < bufferSize) { // 
+            while (rowsLoaded < bufferSize) { //
 
                 line = bufferedReader.readLine();
                 if (line == null) {

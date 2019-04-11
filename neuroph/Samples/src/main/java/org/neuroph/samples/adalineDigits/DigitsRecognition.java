@@ -9,33 +9,26 @@ import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
 
 /**
+ * In this sample MultiLayerPerceptron network is used for pattern recognition.  The
+ * input pattern must match EXACTLY with what the network was trained with.
+ *
+ * This example trains Adaline network to recognize the 10 digits.
+ *
+ * This is based on a an example from Encog (Encog Examples/org.encog.examples.neural.adaline).
+ * Encog example is based on a an example by Karsten Kutza, written in C on 1996-01-24. http://www.neural-networks-at-your-fingertips.com
  *
  * @author Ivan Petrovic
- */
-/*
- In this sample MultiLayerPerceptron network is used for pattern recognition.  The 
- input pattern must match EXACTLY with what the network was trained with.
-
- This example teaches the adaline to recognize the 10 digits. 
-
-
- This is based on a an example from Encog (Encog Examples/org.encog.examples.neural.adaline).
- 
- Encog example is based on a an example by Karsten Kutza, 
- written in C on 1996-01-24.
- http://www.neural-networks-at-your-fingertips.com
  */
 public class DigitsRecognition {
 
     public static void main(String args[]) {
 
         //create training set from Data.DIGITS
-        DataSet dataSet = generateTraining();
+        DataSet dataSet = generateTrainingSet();
 
-        int inputCount = Data.CHAR_HEIGHT * Data.CHAR_WIDTH;
-        int outputCount = Data.DIGITS.length;
+        int inputCount = DigitData.CHAR_HEIGHT * DigitData.CHAR_WIDTH;
+        int outputCount = DigitData.DIGITS.length;
         int hiddenNeurons = 19;
-        
 
         //create neural network
         MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputCount, hiddenNeurons, outputCount);
@@ -84,35 +77,38 @@ public class DigitsRecognition {
             neuralNet.setInput(testSetRow.getInput());
             neuralNet.calculate();
 
-            int izlaz = maxOutput(neuralNet.getOutput());
+            int outputIdx = maxOutput(neuralNet.getOutput());
 
-            String[] niz = Data.convertDataIntoImage(testSetRow.getInput());
+            String[] inputDigit = DigitData.convertDataIntoImage(testSetRow.getInput());
 
-            for (int i = 0; i < niz.length; i++) {
-                if (i != niz.length - 1) {
-                    System.out.println(niz[i]);
+            for (int i = 0; i < inputDigit.length; i++) {
+                if (i != inputDigit.length - 1) {
+                    System.out.println(inputDigit[i]);
                 } else {
-                    System.out.println(niz[i] + "----> " + izlaz);
+                    System.out.println(inputDigit[i] + "----> " + outputIdx);
                 }
             }
             System.out.println("");
         }
     }
 
-    public static DataSet generateTraining() {
+    /**
+     * Creates and returns training data as instance of DataSet
+     * @return  training data as DataSet instance
+     */
+    public static DataSet generateTrainingSet() {
 
-        DataSet dataSet = new DataSet(Data.CHAR_WIDTH * Data.CHAR_HEIGHT, Data.DIGITS.length);
+        DataSet dataSet = new DataSet(DigitData.CHAR_WIDTH * DigitData.CHAR_HEIGHT, DigitData.DIGITS.length);
 
-        for (int i = 0; i < Data.DIGITS.length; i++) {
-
-            // setup input 
-            DataSetRow inputRow = Data.convertImageIntoData(Data.DIGITS[i]);
+        for (int i = 0; i < DigitData.DIGITS.length; i++) {
+            // setup input
+            DataSetRow inputRow = DigitData.convertImageIntoData(DigitData.DIGITS[i]);
             double[] input = inputRow.getInput();
 
             // setup output
-            double[] output = new double[Data.DIGITS.length];
+            double[] output = new double[DigitData.DIGITS.length];
 
-            for (int j = 0; j < Data.DIGITS.length; j++) {
+            for (int j = 0; j < DigitData.DIGITS.length; j++) {
                 if (j == i) {
                     output[j] = 1;
                 } else {
@@ -127,8 +123,12 @@ public class DigitsRecognition {
         return dataSet;
     }
 
+    /**
+     * Returns index of max element in given array.
+     * @param array array to search for max
+     * @return index of max element
+     */
     public static int maxOutput(double[] array) {
-
         double max = array[0];
         int index = 0;
 

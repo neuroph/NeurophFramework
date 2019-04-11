@@ -1,7 +1,6 @@
 package org.neuroph.samples.cifar10;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.neuroph.core.NeuralNetwork;
@@ -22,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 public class Cifar10Example {
      private static Logger LOG = LoggerFactory.getLogger(Cifar10Example.class);
-    
+
      public static void main(String[] args) throws IOException {
          int maxIter = 20; // Integer.parseInt(args[0]);
          double maxError = 0.03; //Double.parseDouble(args[1]);
@@ -38,7 +37,7 @@ public class Cifar10Example {
          String testImage  = putanja.concat(MNISTDataSet.TEST_IMAGE_NAME);
          DataSet trainSet = MNISTDataSet.createFromFile(labelName,trainImage, 100);
          DataSet testSet = MNISTDataSet.createFromFile(testLabel,testImage, 100);*/
-       
+
        //DataSet trainSet = DataSet.load("C:\\Users\\jecak_000\\Documents\\NetBeansProjects\\PrepoznavanjeSlika_p1\\Training Sets\\cifar_veciSkupTrening.tset");
        //DataSet testSwithPoolingLayeret = trainSet;//DataSet.load("C:\\Users\\jecak_000\\Documents\\NetBeansProjects\\PrepoznavanjeSlika_p1\\Test Sets\\cifar_veciSkupTest.tset");
        List<String> labels = Arrays.asList(new String[]{"airplane","automobile","bird","cat","deer","dog","frog","horse","ship","truck"});
@@ -47,7 +46,7 @@ public class Cifar10Example {
        //testSet.setColumnNames(labels);'
        DataSet trainSet = ImageRecognitionHelper.createImageDataSetFromFile("D:\\Doktorske\\Beograd\\Neuronske mreze - Zoran Sevarac\\Cifar 10\\train\\train_1000\\", labels, "", ColorMode.COLOR_RGB, new Dimension(32, 32), "cifar", 1);
        DataSet testSet = trainSet;
-         
+
        /*  Dimension2D inputDimension = new Dimension2D(32, 32);
          Dimension2D convolutionKernel = new Dimension2D(5, 5);
          Dimension2D poolingKernel = new Dimension2D(2, 2);*/
@@ -69,7 +68,7 @@ public class Cifar10Example {
          convolutionNetwork.setLearningRule(backPropagation);
          convolutionNetwork.learn(trainSet);
         Evaluation.runFullEvaluation(convolutionNetwork, testSet);
-    
+
 }
      private static class LearningListener implements LearningEventListener {
 

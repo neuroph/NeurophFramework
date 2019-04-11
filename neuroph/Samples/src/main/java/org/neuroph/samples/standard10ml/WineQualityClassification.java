@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.neuroph.samples.ml10standard;
+package org.neuroph.samples.standard10ml;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +28,10 @@ import org.neuroph.eval.ErrorEvaluator;
 import org.neuroph.eval.Evaluation;
 import org.neuroph.eval.classification.ClassificationMetrics;
 import org.neuroph.eval.classification.ConfusionMatrix;
+import org.neuroph.nnet.Adaline;
 import org.neuroph.nnet.MultiLayerPerceptron;
+import org.neuroph.nnet.learning.BackPropagation;
+import org.neuroph.nnet.learning.LMS;
 import org.neuroph.nnet.learning.MomentumBackpropagation;
 import org.neuroph.util.TransferFunctionType;
 import org.neuroph.util.data.norm.MaxNormalizer;
@@ -41,55 +44,56 @@ import org.neuroph.util.data.norm.Normalizer;
 /*
  INTRODUCTION TO THE PROBLEM AND DATA SET INFORMATION:
 
- 1. Data set that will be used in this experiment: Abalone Dataset
-    The Abalone Dataset involves predicting the age of abalone given objective measures of individuals.
-    It is a multi-class classification problem, but can also be framed as a regression.
-    The original data set that will be used in this experiment can be found at link: 
-    https://www.math.muni.cz/~kolacek/docs/frvs/M7222/data/AutoInsurSweden.txt
+ 1. Data set that will be used in this experiment: Wine Quality Dataset
+    The Wine Quality Dataset involves predicting the quality of white wines on a scale given chemical measures of each wine.
+    It is a multi-class classification problem, but could also be framed as a regression problem.
+    The original data set that will be used in this experiment can be found at link:
+    http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv
 
-2. Reference: Marine Resources Division, Marine Research Laboratories - Taroona ,Department of Primary Industry and Fisheries, Tasmania ,GPO Box 619F, Hobart, Tasmania 7001, Australia 
-   Warwick J Nash, Tracy L Sellers, Simon R Talbot, Andrew J Cawthorn and Wes B Ford (1994) 
-   "The Population Biology of Abalone (_Haliotis_ species) in Tasmania. I. Blacklip Abalone (_H. rubra_) from the North Coast and Islands of Bass Strait", 
-   Sea Fisheries Division, Technical Report No. 48 (ISSN 1034-3288) 
- 
-3. Number of instances: 4 177
+2. Reference:  National Institute of Diabetes and Digestive and Kidney Diseases
+   Paulo Cortez, University of Minho, Guimarães, Portugal, http://www3.dsi.uminho.pt/pcortez
+   A. CeA. Cerdeira, F. Almeida, T. Matos and J. Reis, Viticulture Commission of the Vinho Verde Region(CVRVV), Porto, Portugal , @ 2009
 
-4. Number of Attributes: 8 plus class attribute
+3. Number of instances: 4 898
 
-5. Attribute Information:    
+4. Number of Attributes: 11 pluss class attributes (inputs are continuous aand numerical values, and output is numerical)
+
+5. Attribute Information:
  Inputs:
- 8 attributes: 
- 8 features are computed for each abalone:
- 1) Sex (M, F, I), which are represented as numerical values of 1,2,3 respectively.
- 2) Length. 
- 3) Diameter.
- 4) Height.
- 5) Whole weight.
- 6) Shucked weight.
- 7) Viscera weight.
- 8) Shell weight.
+ 11 attributes:
+ 11 numerical or continuous features are computed for each wine:
+ 1) Fixed acidity.
+ 2) Volatile acidity.
+ 3) Citric acid.
+ 4) Residual sugar.
+ 5) Chlorides.
+ 6) Free sulfur dioxide.
+ 7) Total sulfur dioxide.
+ 8) Density.
+ 9) pH.
+ 10) Sulphates.
+ 11) Alcohol.
 
- 9) Output: Rings mesaurment, numerical value.
+ 12) Output: Quality (score between 0 and 10).
+
+6. Missing Values: None.
 
 
-6. Missing Values: none.
 
 
-
- 
  */
-public class Abalone implements LearningEventListener {
+public class WineQualityClassification implements LearningEventListener {
 
     public static void main(String[] args) {
-        (new Abalone()).run();
+        (new WineQualityClassification()).run();
     }
 
     public void run() {
         System.out.println("Creating training set...");
         // get path to training set
-        String trainingSetFileName = "data_sets/ml10standard/abalonerings.txt";
-        int inputsCount = 8;
-        int outputsCount = 29;
+        String trainingSetFileName = "data_sets/ml10standard/wine.txt";
+        int inputsCount = 11;
+        int outputsCount = 10;
 
         // create training set from file
         DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, "\t", true);
@@ -102,7 +106,7 @@ public class Abalone implements LearningEventListener {
         DataSet testSet = subSets.get(1);
 
         System.out.println("Creating neural network...");
-        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 15, 10, outputsCount);
+        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 20, 15, outputsCount);
 
         neuralNet.setLearningRule(new MomentumBackpropagation());
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
@@ -117,7 +121,7 @@ public class Abalone implements LearningEventListener {
         neuralNet.learn(trainingSet);
         System.out.println("Training completed.");
         System.out.println("Testing network...");
-        
+
         System.out.println("Network performance on the test set");
         evaluate(neuralNet, testSet);
 
@@ -148,16 +152,17 @@ public class Abalone implements LearningEventListener {
         }
     }
 
-    // Evaluates performance of neural network. 
+    // Evaluates performance of neural network.
     // Contains calculation of Confusion matrix for classification tasks or Mean Ssquared Error and Mean Absolute Error for regression tasks.
     // Difference in binary and multi class classification are made when adding Evaluator (MultiClass or Binary).
     public void evaluate(NeuralNetwork neuralNet, DataSet dataSet) {
 
         System.out.println("Calculating performance indicators for neural network.");
+
         Evaluation evaluation = new Evaluation();
         evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
 
-        String classLabels[] = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29"};
+        String classLabels[] = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
         evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(classLabels));
         evaluation.evaluateDataSet(neuralNet, dataSet);
 

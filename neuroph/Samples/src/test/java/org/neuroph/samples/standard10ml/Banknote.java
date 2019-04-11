@@ -13,8 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.neuroph.samples.ml10standard;
+package org.neuroph.samples.standard10ml;
 
+import org.neuroph.samples.standard10ml.Banknote;
 import java.util.Arrays;
 import java.util.List;
 import org.neuroph.core.NeuralNetwork;
@@ -41,45 +42,48 @@ import org.neuroph.util.data.norm.Normalizer;
 /*
  INTRODUCTION TO THE PROBLEM AND DATA SET INFORMATION:
 
- 1. Data set that will be used in this experiment: Sonar Dataset
-    The Sonar Dataset involves the prediction of whether or not an object is a mine or a rock given the strength of sonar returns at different angles.
+ 1. Data set that will be used in this experiment: Banknote Dataset
+    The Banknote Dataset involves predicting whether a given banknote is authentic given a number of measures taken from a photograph.
     The original data set that will be used in this experiment can be found at link: 
-    https://archive.ics.uci.edu/ml/machine-learning-databases/undocumented/connectionist-bench/sonar/sonar.all-data
+    http://archive.ics.uci.edu/ml/machine-learning-databases/00267/data_banknote_authentication.txt
 
-2. Reference:  Terry Sejnowski
-   Gorman, R. P., and Sejnowski, T. J. (1988). "Analysis of Hidden Units in a Layered Network Trained to Classify Sonar Targets" in Neural Networks, Vol. 1, pp. 75-89. 
+2. Reference:  University of Applied Sciences, Ostwestfalen-Lippe
+   Owner of database: Volker Lohweg (University of Applied Sciences, Ostwestfalen-Lippe, volker.lohweg '@' hs-owl.de) 
+   Donor of database: Helene DÃ¶rksen (University of Applied Sciences, Ostwestfalen-Lippe, helene.doerksen '@' hs-owl.de) 
  
  
-3. Number of instances: 208
+3. Number of instances: 1 372
 
-4. Number of Attributes: 60 pluss class attributes
+4. Number of Attributes: 4 pluss class attributes
 
 5. Attribute Information:    
-   Inputs:
-   60 attributes: 
-   Each input belongs to a set of 60 numbers in the range 0.0 to 1.0. 
-   Each number represents the energy within a particular frequency band, integrated over a certain period of time.
-   1. - 60. Sonar returns at different angles
+ Inputs:
+ 5 attributes: 
+ 4 continuous feature values are computed for each banknote:
+ 1) Variance of Wavelet Transformed image (continuous).
+ 2) Skewness of Wavelet Transformed image (continuous).
+ 3) Kurtosis of Wavelet Transformed image (continuous).
+ 4) Entropy of image (continuous).
 
-   Output: Class variable (0 or 1). Value 0 indicates that an object is a rock(R), and 1 that is a metal cylinder.
+ 5) Output: Class variable (0 or 1). Value 0 indicates that a banknote is authentic.
 
-8. Missing Values: None.
+6. Missing Values: None.
 
 
 
  
  */
-public class Sonar implements LearningEventListener {
+public class Banknote implements LearningEventListener {
 
     public static void main(String[] args) {
-        (new Sonar()).run();
+        (new Banknote()).run();
     }
 
     public void run() {
         System.out.println("Creating training set...");
         // get path to training set
-        String trainingSetFileName = "data_sets/sonardata.txt";
-        int inputsCount = 60;
+        String trainingSetFileName = "data_sets/databanknote.txt";
+        int inputsCount = 4;
         int outputsCount = 1;
 
         // create training set from file
@@ -93,7 +97,7 @@ public class Sonar implements LearningEventListener {
         DataSet testSet = subSets.get(1);
 
         System.out.println("Creating neural network...");
-        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 15, 10, outputsCount);
+        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(TransferFunctionType.TANH, inputsCount, 1, outputsCount);
 
         neuralNet.setLearningRule(new MomentumBackpropagation());
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
@@ -116,7 +120,7 @@ public class Sonar implements LearningEventListener {
         neuralNet.save("nn1.nnet");
 
         System.out.println("Done.");
-        
+
         System.out.println();
         System.out.println("Network outputs for test set");
         testNeuralNetwork(neuralNet, testSet);
@@ -124,7 +128,7 @@ public class Sonar implements LearningEventListener {
 
     // Displays inputs, desired output (from dataset) and actual output (calculated by neural network) for every row from data set.
     public void testNeuralNetwork(NeuralNetwork neuralNet, DataSet testSet) {
-        
+
         System.out.println("Showing inputs, desired output and neural network output for every row in test set.");
 
         for (DataSetRow testSetRow : testSet.getRows()) {
@@ -142,9 +146,9 @@ public class Sonar implements LearningEventListener {
     // Contains calculation of Confusion matrix for classification tasks or Mean Ssquared Error and Mean Absolute Error for regression tasks.
     // Difference in binary and multi class classification are made when adding Evaluator (MultiClass or Binary).
     public void evaluate(NeuralNetwork neuralNet, DataSet dataSet) {
-        
+
         System.out.println("Calculating performance indicators for neural network.");
-        
+
         Evaluation evaluation = new Evaluation();
         evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
 
@@ -169,4 +173,5 @@ public class Sonar implements LearningEventListener {
         MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
         System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
     }
+
 }

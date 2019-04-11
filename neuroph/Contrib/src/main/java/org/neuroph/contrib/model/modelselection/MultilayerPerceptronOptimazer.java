@@ -11,7 +11,6 @@ import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -112,19 +111,19 @@ public class MultilayerPerceptronOptimazer<T extends BackPropagation> implements
             try {
                 architecture.add(0, dataSet.getInputSize());
                 architecture.add(dataSet.getOutputSize());
-                
+
                 LOG.info("Architecture: [{}]", architecture);
-                
+
                 MultiLayerPerceptron network = new MultiLayerPerceptron(architecture);
                 LearningListener listener = new LearningListener(10, learningRule.getMaxIterations());
                 learningRule.addListener(listener);
                 network.setLearningRule(learningRule);
-                
+
                 errorEstimationMethod = new CrossValidation(network, dataSet, 10);
                 errorEstimationMethod.run();
                 // FIX
                 ClassificationMetrics[] result = ClassificationMetrics.createFromMatrix(errorEstimationMethod.getEvaluator(ClassifierEvaluator.MultiClass.class).getResult());
-                
+
                 // nadji onaj sa najmanjim f measure
                 if (optimalResult == null || optimalResult.getFMeasure()< result[0].getFMeasure()) {
                     LOG.info("Architecture [{}] became optimal architecture  with metrics {}", architecture, result);
@@ -132,7 +131,7 @@ public class MultilayerPerceptronOptimazer<T extends BackPropagation> implements
                     optimalClassifier = network;
                     optimalArchitecure = architecture;
                 }
-                
+
                 LOG.info("#################################################################");
             } catch (InterruptedException ex) {
                 java.util.logging.Logger.getLogger(MultilayerPerceptronOptimazer.class.getName()).log(Level.SEVERE, null, ex);

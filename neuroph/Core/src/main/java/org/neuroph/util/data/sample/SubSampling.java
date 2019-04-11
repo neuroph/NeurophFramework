@@ -23,53 +23,51 @@ import java.util.Random;
 import org.neuroph.core.data.DataSet;
 
 /**
- * This class provides subsampling of a data set, and creates a specified number of subsets of a
- * specified number of samples form given data set.
- * 
+ * This class provides sub-sampling of a data set, and creates a specified number of subsets form given data set.
+ *
  * @author Zoran Sevarac <sevarac@gmail.com>
  */
 public class SubSampling implements Sampling {
 
-    
     /**
      * Number of sub sets
      */
     private int subSetCount;
-        
+
     /**
      * Sizes of each subset
      */
     private int[] subSetSizes;
-    
+
     /**
      * True if samples are allowed to repeat in different subsets
      */
     private boolean allowRepetition = false;
-    
-       
+
+
     /**
      * Sampling will produce a specified number of subsets of equal sizes
      * Handy for K Fold subsampling
-     * 
+     *
      * @param subSetCount number of subsets to produce
      */
-    public SubSampling(int subSetCount) { // without repetition        
+    public SubSampling(int subSetCount) { // without repetition
         this.subSetCount = subSetCount;
         this.subSetSizes = null;
     }
-    
-    
+
+
     /**
      * Sampling will produce subsets of specified sizes (in percents)
-     * 
+     *
      * @param subSetSizes size of subsets in percents
      */
-    public SubSampling(int ... subSetSizes) { // without repetition
+    public SubSampling(int ... subSetSizes) { // without repetition, we should use doubles here
         // sum of these must be 100%???
          this.subSetSizes = subSetSizes;
          this.subSetCount = subSetSizes.length;
-    }       
-    
+    }
+
 
     @Override
     public List<DataSet> sample(DataSet dataSet) {
@@ -79,7 +77,7 @@ public class SubSampling implements Sampling {
             for(int i=0; i< subSetCount; i++)
                subSetSizes[i] = singleSubSetSize;
         }
-                
+
         List<DataSet> subSets = new ArrayList<>();
 
         // shuffle dataset in order to randomize rows that will be used to fill subsets
@@ -93,7 +91,7 @@ public class SubSampling implements Sampling {
             // create new sample subset
             DataSet newSubSet = new DataSet(inputSize, outputSize);
             // fill subset with rows
-            
+
             if (!allowRepetition) {
                 int foldSize =  (int)(((double)subSetSizes[s] / 100) * dataSet.size());
                 for (int i = 0; i < foldSize; i++) {
@@ -119,7 +117,7 @@ public class SubSampling implements Sampling {
 
     /**
      * Get flag which indicates if sample repetition is allowed in subsets
-     * @return 
+     * @return
      */
     public boolean getAllowRepetition() {
         return allowRepetition;
@@ -127,12 +125,12 @@ public class SubSampling implements Sampling {
 
     /**
      * Set flag to allow repetition of samples in subsets
-     * @param allowRepetition 
+     * @param allowRepetition
      */
     public void setAllowRepetition(boolean allowRepetition) {
         this.allowRepetition = allowRepetition;
     }
-    
- 
-    
+
+
+
 }

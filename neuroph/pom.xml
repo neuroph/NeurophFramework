@@ -4,7 +4,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.neuroph</groupId>
    <artifactId>Neuroph</artifactId>
-   <version>2.94</version>
+   <version>${parent.version}</version>
    <packaging>pom</packaging>
 
    <name>Neuroph</name>
@@ -37,6 +37,7 @@
       <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
       <encoding>UTF-8</encoding>
       <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
+      <parent.version>2.96</parent.version>
    </properties>
 
    <repositories>

@@ -1,10 +1,11 @@
-package org.neuroph.samples.norm;
+package org.neuroph.util.data.norm;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
+import org.neuroph.util.DataSetStats;
 
 public class StatisticsTest {
 
@@ -14,7 +15,7 @@ public class StatisticsTest {
 	@Test
 	public void testMeanNoInput() {
 		DataSet dataSet = createDataSetWithOneEmtyRow();
-		double[] meanByColumns = DataSetStatistics.calculateMean(dataSet);
+		double[] meanByColumns = DataSetStats.inputsMean(dataSet);
 		assertEquals(0, meanByColumns.length);
 	}
 
@@ -23,7 +24,7 @@ public class StatisticsTest {
 		double value = 3;
 		DataSet dataSet = createDataSetWithOneRowAndOneColumn(value);
 
-		double[] meanByColumns = DataSetStatistics.calculateMean(dataSet);
+		double[] meanByColumns = DataSetStats.inputsMean(dataSet);
 		assertEquals(value, meanByColumns[0], LARGEST_MEAN_ERROR);
 	}
 
@@ -32,7 +33,7 @@ public class StatisticsTest {
 		double value = 3;
 		DataSet dataSet = createDataSetWithOneRowAndManySameValueColumns(value);
 
-		double[] meanByColumns = DataSetStatistics.calculateMean(dataSet);
+		double[] meanByColumns = DataSetStats.inputsMean(dataSet);
 		for (double columnMean : meanByColumns)
 			assertEquals(value, columnMean, LARGEST_MEAN_ERROR);
 	}
@@ -47,7 +48,7 @@ public class StatisticsTest {
 		DataSetRow firstRow = createDataRow(firstRowData);
 		DataSet dataSet = createDataSetFromRows(firstRow);
 
-		double[] meanByColumns = DataSetStatistics.calculateMean(dataSet);
+		double[] meanByColumns = DataSetStats.inputsMean(dataSet);
 		for (int i = 0; i < meanByColumns.length; i++) {
 			assertEquals(firstRowData[i], meanByColumns[i], LARGEST_MEAN_ERROR);
 		}
@@ -76,7 +77,7 @@ public class StatisticsTest {
 		DataSetRow thirdRow = createDataRow(thirdRowData);
 		DataSet dataSet = createDataSetFromRows(firstRow, secondRow, thirdRow);
 
-		double[] meanByColumns = DataSetStatistics.calculateMean(dataSet);
+		double[] meanByColumns = DataSetStats.inputsMean(dataSet);
 		for (int i = 0; i < meanByColumns.length; i++) {
 			assertEquals(firstRowData[i], meanByColumns[i], LARGEST_MEAN_ERROR);
 		}
@@ -105,7 +106,7 @@ public class StatisticsTest {
 		DataSetRow thirdRow = createDataRow(thirdRowData);
 		DataSet dataSet = createDataSetFromRows(firstRow, secondRow, thirdRow);
 
-		double[] meanByColumns = DataSetStatistics.calculateMean(dataSet);
+		double[] meanByColumns = DataSetStats.inputsMean(dataSet);
 		for (int i = 0; i < meanByColumns.length; i++) {
 			assertEquals(secondRowData[i], meanByColumns[i], LARGEST_MEAN_ERROR);
 		}
@@ -114,7 +115,7 @@ public class StatisticsTest {
 	@Test
 	public void testMaxNoInput() {
 		DataSet dataSet = createDataSetWithOneEmtyRow();
-		double[] maxByColumns = DataSetStatistics.calculateMaxByColumns(dataSet);
+		double[] maxByColumns = DataSetStats.inputsMax(dataSet);
 		assertEquals(0, maxByColumns.length);
 	}
 
@@ -123,7 +124,7 @@ public class StatisticsTest {
 		double value = 3;
 		DataSet dataSet = createDataSetWithOneRowAndOneColumn(value);
 
-		double[] maxByColumns = DataSetStatistics.calculateMaxByColumns(dataSet);
+		double[] maxByColumns = DataSetStats.inputsMax(dataSet);
 		assertEquals(value, maxByColumns[0], LARGEST_MIN_MAX_ERROR);
 	}
 
@@ -132,7 +133,7 @@ public class StatisticsTest {
 		double value = 3;
 		DataSet dataSet = createDataSetWithOneRowAndManySameValueColumns(value);
 
-		double[] maxByColumns = DataSetStatistics.calculateMaxByColumns(dataSet);
+		double[] maxByColumns = DataSetStats.inputsMax(dataSet);
 		for (double columnMaxValue : maxByColumns)
 			assertEquals(value, columnMaxValue, LARGEST_MIN_MAX_ERROR);
 	}
@@ -146,7 +147,7 @@ public class StatisticsTest {
 		DataSetRow firstRow = createDataRow(firstRowData);
 		DataSet dataSet = createDataSetFromRows(firstRow);
 
-		double[] maxByColumns = DataSetStatistics.calculateMaxByColumns(dataSet);
+		double[] maxByColumns = DataSetStats.inputsMax(dataSet);
 		for (int i = 0; i < maxByColumns.length; i++)
 			assertEquals(firstRowData[i], maxByColumns[i], LARGEST_MIN_MAX_ERROR);
 	}
@@ -174,7 +175,7 @@ public class StatisticsTest {
 		DataSetRow thirdRow = createDataRow(thirdRowData);
 		DataSet dataSet = createDataSetFromRows(firstRow, secondRow, thirdRow);
 
-		double[] meanByColumns = DataSetStatistics.calculateMaxByColumns(dataSet);
+		double[] meanByColumns = DataSetStats.inputsMax(dataSet);
 		for (int i = 0; i < meanByColumns.length; i++) {
 			assertEquals(firstRowData[i], meanByColumns[i], LARGEST_MEAN_ERROR);
 		}
@@ -203,16 +204,16 @@ public class StatisticsTest {
 		DataSetRow thirdRow = createDataRow(thirdRowData);
 		DataSet dataSet = createDataSetFromRows(firstRow, secondRow, thirdRow);
 
-		double[] meanByColumns = DataSetStatistics.calculateMaxByColumns(dataSet);
+		double[] meanByColumns = DataSetStats.inputsMax(dataSet);
 		for (int i = 0; i < meanByColumns.length; i++) {
 			assertEquals(6, meanByColumns[i], LARGEST_MEAN_ERROR);
 		}
 	}
-	
+
 	@Test
 	public void testMinNoInput() {
 		DataSet dataSet = createDataSetWithOneEmtyRow();
-		double[] maxByColumns = DataSetStatistics.calculateMinByColumns(dataSet);
+		double[] maxByColumns = DataSetStats.inputsMin(dataSet);
 		assertEquals(0, maxByColumns.length);
 	}
 
@@ -221,7 +222,7 @@ public class StatisticsTest {
 		double value = 3;
 		DataSet dataSet = createDataSetWithOneRowAndOneColumn(value);
 
-		double[] maxByColumns = DataSetStatistics.calculateMinByColumns(dataSet);
+		double[] maxByColumns = DataSetStats.inputsMin(dataSet);
 		assertEquals(value, maxByColumns[0], LARGEST_MIN_MAX_ERROR);
 	}
 
@@ -230,7 +231,7 @@ public class StatisticsTest {
 		double value = 3;
 		DataSet dataSet = createDataSetWithOneRowAndManySameValueColumns(value);
 
-		double[] maxByColumns = DataSetStatistics.calculateMinByColumns(dataSet);
+		double[] maxByColumns = DataSetStats.inputsMin(dataSet);
 		for (double columnMaxValue : maxByColumns)
 			assertEquals(value, columnMaxValue, LARGEST_MIN_MAX_ERROR);
 	}
@@ -244,7 +245,7 @@ public class StatisticsTest {
 		DataSetRow firstRow = createDataRow(firstRowData);
 		DataSet dataSet = createDataSetFromRows(firstRow);
 
-		double[] maxByColumns = DataSetStatistics.calculateMinByColumns(dataSet);
+		double[] maxByColumns = DataSetStats.inputsMin(dataSet);
 		for (int i = 0; i < maxByColumns.length; i++)
 			assertEquals(firstRowData[i], maxByColumns[i], LARGEST_MIN_MAX_ERROR);
 	}
@@ -272,7 +273,7 @@ public class StatisticsTest {
 		DataSetRow thirdRow = createDataRow(thirdRowData);
 		DataSet dataSet = createDataSetFromRows(firstRow, secondRow, thirdRow);
 
-		double[] meanByColumns = DataSetStatistics.calculateMinByColumns(dataSet);
+		double[] meanByColumns = DataSetStats.inputsMin(dataSet);
 		for (int i = 0; i < meanByColumns.length; i++) {
 			assertEquals(firstRowData[i], meanByColumns[i], LARGEST_MEAN_ERROR);
 		}
@@ -301,7 +302,7 @@ public class StatisticsTest {
 		DataSetRow thirdRow = createDataRow(thirdRowData);
 		DataSet dataSet = createDataSetFromRows(firstRow, secondRow, thirdRow);
 
-		double[] meanByColumns = DataSetStatistics.calculateMinByColumns(dataSet);
+		double[] meanByColumns = DataSetStats.inputsMin(dataSet);
 		for (int i = 0; i < meanByColumns.length; i++) {
 			assertEquals(2, meanByColumns[i], LARGEST_MEAN_ERROR);
 		}

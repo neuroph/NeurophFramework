@@ -13,8 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.neuroph.samples.ml10standard;
+package org.neuroph.samples.standard10ml;
 
+import org.neuroph.samples.standard10ml.WheatSeeds;
 import java.util.Arrays;
 import java.util.List;
 import org.neuroph.core.NeuralNetwork;
@@ -30,8 +31,7 @@ import org.neuroph.eval.classification.ClassificationMetrics;
 import org.neuroph.eval.classification.ConfusionMatrix;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.MomentumBackpropagation;
-import org.neuroph.util.data.norm.MaxNormalizer;
-import org.neuroph.util.data.norm.Normalizer;
+import org.neuroph.util.TransferFunctionType;
 
 /**
  *
@@ -40,61 +40,55 @@ import org.neuroph.util.data.norm.Normalizer;
 /*
  INTRODUCTION TO THE PROBLEM AND DATA SET INFORMATION:
 
- 1. Data set that will be used in this experiment: Wine Quality Dataset
-    The Wine Quality Dataset involves predicting the quality of white wines on a scale given chemical measures of each wine.
-    It is a multi-class classification problem, but could also be framed as a regression problem.
-    The original data set that will be used in this experiment can be found at link:
-    http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv
+ 1. Data set that will be used in this experiment: Wheat Seeds Dataset
+    The Wheat Seeds Dataset involves the prediction of species given measurements of seeds from different varieties of wheat.
+    The original data set that will be used in this experiment can be found at link: 
+    http://archive.ics.uci.edu/ml/machine-learning-databases/00236/seeds_dataset.txt
 
-2. Reference:  National Institute of Diabetes and Digestive and Kidney Diseases
-   Paulo Cortez, University of Minho, Guimarães, Portugal, http://www3.dsi.uminho.pt/pcortez
-   A. CeA. Cerdeira, F. Almeida, T. Matos and J. Reis, Viticulture Commission of the Vinho Verde Region(CVRVV), Porto, Portugal , @ 2009
+2. Reference:  Magorzata Charytanowicz, Jerzy Niewczas ,Institute of Mathematics and Computer Science, ,The John Paul II Catholic University of Lublin, KonstantynÃ³w 1 H, ,PL 20-708 Lublin, Poland 
+   Owner of database: Volker Lohweg (University of Applied Sciences, Ostwestfalen-Lippe, volker.lohweg '@' hs-owl.de) 
+   M. Charytanowicz, J. Niewczas, P. Kulczycki, P.A. Kowalski, S. Lukasik, S. Zak, 'A Complete Gradient Clustering Algorithm for Features Analysis of X-ray Images', in: Information Technologies in Biomedicine, Ewa Pietka, Jacek Kawa (eds.), Springer-Verlag, Berlin-Heidelberg, 2010, pp. 15-24.
+ 
+ 
+3. Number of instances: 210
 
-3. Number of instances: 4 898
+4. Number of Attributes: 7 pluss class attributes
 
-4. Number of Attributes: 11 pluss class attributes (inputs are continuous aand numerical values, and output is numerical)
-
-5. Attribute Information:
+5. Attribute Information:    
  Inputs:
- 11 attributes:
- 11 numerical or continuous features are computed for each wine:
- 1) Fixed acidity.
- 2) Volatile acidity.
- 3) Citric acid.
- 4) Residual sugar.
- 5) Chlorides.
- 6) Free sulfur dioxide.
- 7) Total sulfur dioxide.
- 8) Density.
- 9) pH.
- 10) Sulphates.
- 11) Alcohol.
+ 7 attributes: 
+ 7 continuous feature values are computed for each seed:
+ 1) Area.
+ 2) Perimeter. 
+ 3) Compactness
+ 4) Length of kernel.
+ 5) Width of kernel.
+ 6) Asymmetry coefficient.
+ 7) Length of kernel groove.
 
- 12) Output: Quality (score between 0 and 10).
+ 8) Output: Class variable (1, 2 or 3). Values indicate different varieties of wheat: Kama,Rosa and Canadian.
 
 6. Missing Values: None.
 
 
 
-
+ 
  */
-public class WineQualityClassification implements LearningEventListener {
+public class WheatSeeds implements LearningEventListener {
 
     public static void main(String[] args) {
-        (new WineQualityClassification()).run();
+        (new WheatSeeds()).run();
     }
 
     public void run() {
         System.out.println("Creating training set...");
         // get path to training set
-        String trainingSetFileName = "data_sets/wine.txt";
-        int inputsCount = 11;
-        int outputsCount = 10;
+        String trainingSetFileName = "data_sets/seeds.txt";
+        int inputsCount = 7;
+        int outputsCount = 3;
 
         // create training set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, "\t", true);
-        Normalizer norm = new MaxNormalizer();
-        norm.normalize(dataSet);
+        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, "\t");
         dataSet.shuffle();
 
         List<DataSet> subSets = dataSet.split(60, 40);
@@ -102,7 +96,7 @@ public class WineQualityClassification implements LearningEventListener {
         DataSet testSet = subSets.get(1);
 
         System.out.println("Creating neural network...");
-        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 20, 15, outputsCount);
+        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 15, 2, outputsCount);
 
         neuralNet.setLearningRule(new MomentumBackpropagation());
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
@@ -110,8 +104,8 @@ public class WineQualityClassification implements LearningEventListener {
 
         // set learning rate and max error
         learningRule.setLearningRate(0.1);
+        learningRule.setMaxError(0.01);
         learningRule.setMaxIterations(5000);
-
         System.out.println("Training network...");
         // train the network with training set
         neuralNet.learn(trainingSet);
@@ -126,7 +120,7 @@ public class WineQualityClassification implements LearningEventListener {
         neuralNet.save("nn1.nnet");
 
         System.out.println("Done.");
-
+        
         System.out.println();
         System.out.println("Network outputs for test set");
         testNeuralNetwork(neuralNet, testSet);
@@ -134,7 +128,7 @@ public class WineQualityClassification implements LearningEventListener {
 
     // Displays inputs, desired output (from dataset) and actual output (calculated by neural network) for every row from data set.
     public void testNeuralNetwork(NeuralNetwork neuralNet, DataSet testSet) {
-
+        
         System.out.println("Showing inputs, desired output and neural network output for every row in test set.");
 
         for (DataSetRow testSetRow : testSet.getRows()) {
@@ -148,17 +142,17 @@ public class WineQualityClassification implements LearningEventListener {
         }
     }
 
-    // Evaluates performance of neural network.
+    // Evaluates performance of neural network. 
     // Contains calculation of Confusion matrix for classification tasks or Mean Ssquared Error and Mean Absolute Error for regression tasks.
     // Difference in binary and multi class classification are made when adding Evaluator (MultiClass or Binary).
     public void evaluate(NeuralNetwork neuralNet, DataSet dataSet) {
-
+        
         System.out.println("Calculating performance indicators for neural network.");
-
+        
         Evaluation evaluation = new Evaluation();
         evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
 
-        String classLabels[] = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
+        String[] classLabels = new String[]{"1", "2", "3"};
         evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(classLabels));
         evaluation.evaluateDataSet(neuralNet, dataSet);
 
@@ -180,4 +174,5 @@ public class WineQualityClassification implements LearningEventListener {
         MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
         System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
     }
+
 }
