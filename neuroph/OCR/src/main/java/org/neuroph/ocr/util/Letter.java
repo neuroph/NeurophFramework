@@ -7,7 +7,7 @@ package org.neuroph.ocr.util;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
-import org.neuroph.ocr.util.histogram.Histogram;
+import org.neuroph.ocr.util.histogram.ImageHistogram;
 
 /**
  *
@@ -42,8 +42,8 @@ public class Letter {
     public Letter(int scanQuality, BufferedImage image) {
         this.scanQuality = scanQuality;
         this.image = image;    
-        heightHistogram = Histogram.heightHistogram(image);
-        gradient = Histogram.gradient(heightHistogram);
+        heightHistogram = ImageHistogram.heightHistogram(image);
+        gradient = ImageHistogram.gradient(heightHistogram);
         calculateSmallestSizeLetter();
         List<Integer> rowHeights = OCRUtilities.rowHeights(gradient, smallestSizeLetter);
         int meanHeight = (int) caluclateMean(rowHeights);

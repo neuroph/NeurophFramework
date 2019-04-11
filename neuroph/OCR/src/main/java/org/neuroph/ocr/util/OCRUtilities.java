@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import javax.imageio.ImageIO;
-import org.neuroph.ocr.util.histogram.Histogram;
+import org.neuroph.ocr.util.histogram.ImageHistogram;
 import org.neuroph.ocr.util.histogram.OCRHistogram;
 
 /**
@@ -51,8 +51,8 @@ public class OCRUtilities {
      * @return list with pixel position of each row
      */
     public static List<Integer> rowPositions(BufferedImage image, int heightThresh) {
-        int[] histogram = Histogram.heightHistogram(image);
-        int[] gradient = Histogram.gradient(histogram);
+        int[] histogram = ImageHistogram.heightHistogram(image);
+        int[] gradient = ImageHistogram.gradient(histogram);
         return linePositions(gradient, heightThresh);
     }
 
