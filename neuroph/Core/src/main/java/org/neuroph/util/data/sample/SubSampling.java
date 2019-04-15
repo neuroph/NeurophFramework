@@ -93,7 +93,7 @@ public class SubSampling implements Sampling {
             // fill subset with rows
 
             if (!allowRepetition) {
-                int foldSize =  (int)(((double)subSetSizes[s] / 100) * dataSet.size());
+                int foldSize =  (int)Math.round(((double)subSetSizes[s] / 100) * dataSet.size());
                 for (int i = 0; i < foldSize; i++) {
                     if(idxCounter >= dataSet.size()) break;
                     newSubSet.addRow(dataSet.getRowAt(idxCounter));

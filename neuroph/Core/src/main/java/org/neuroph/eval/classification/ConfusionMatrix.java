@@ -46,6 +46,10 @@ public class ConfusionMatrix {
         return values;
     }
     
+    public void setValues(int[][] value) {
+        values=value;
+    }
+    
     /**
      * Returns value of confusion matrix at specified position 
      * @param actual actual idx position

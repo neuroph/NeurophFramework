@@ -1,201 +1,238 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package org.neuroph.eval;
 
 import java.util.ArrayList;
-import org.neuroph.core.NeuralNetwork;
-import org.neuroph.core.data.DataSet;
-import org.neuroph.util.data.sample.Sampling;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import org.apache.commons.lang3.SerializationUtils;
-import org.neuroph.core.learning.error.MeanSquaredError;
+import org.neuroph.eval.classification.ClassificationMetrics;
+import org.neuroph.eval.classification.ConfusionMatrix;
 import org.neuroph.util.data.sample.SubSampling;
+import org.neuroph.core.NeuralNetwork;
+import org.neuroph.core.data.DataSet;
+import org.neuroph.core.learning.error.MeanSquaredError;
 
-/**
- * This class implements multithreaded cross validation procedure. 
- * Splits data set into k subsets (folds), trains the network with data from k-1 and tests with one subset
- * Repeats the procedure k times each time using different subset for testing.
- *
- * @author Boris Fulurija
- * @author Lukic Sasa Multithreading
- * @author Zoran Sevarac
- */
+
 public class CrossValidation {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CrossValidation.class.getName());
+    Evaluation evaluation;
+    NeuralNetwork neuralNet;
+    DataSet dataSet;
+    EvaluationResult totalResult;
+    int numfolds;
+    
+    
+    List<ConfusionMatrix> cmlist;
+    List<ClassificationMetrics.Stats> statlist;
+    List<CrossFolds> crosslist;
+    
+   
 
-    /**
-     * Neural network to train
-     */
-    private NeuralNetwork neuralNetwork;
+    public CrossValidation(NeuralNetwork neuralnet, DataSet dataset, int numFolds) {
+        
+        neuralNet = neuralnet;
+        dataSet = dataset;
+        numfolds = numFolds;
+        
+    }
+    
+   
 
-    /**
-     * Data set to use for training
-     */
-    private DataSet dataSet;
+    public EvaluationResult run() throws InterruptedException, ExecutionException {
 
-    /**
-     * Data set sampling algorithm used. By default uses random subsampling
-     * without repetition
-     */
-    private Sampling sampling;
+         int sizePercent = 100 / numfolds;
+        int numberargs = 100 / sizePercent;
 
-    private int numberOfFolds;
-    private int foldSize;
-
-    /**
-     * Evaluation procedure. Holds a collection of evaluators which can be
-     * automatically added
-     */
-    private final Evaluation evaluation = new Evaluation();
-
-    private CrossValidationResult results;
-
-    private void initialize(NeuralNetwork neuralNetwork, DataSet dataSet, int numberOfFolds) {
-        this.neuralNetwork = neuralNetwork;
-        this.numberOfFolds = numberOfFolds;
-        this.dataSet = dataSet;
-        if (neuralNetwork.getOutputsCount() == 1) {
-            this.evaluation.addEvaluator(new ClassifierEvaluator.Binary(0.5));
-        } else {
-            this.evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(dataSet.getColumnNames()));
+        int[] varint = new int[numberargs];
+        for (int i = 0; i <= numberargs - 1; i++) {
+            if (numberargs - 1 == i) {
+                int sizelast = 100 - (numberargs - 1) * sizePercent;
+                varint[i] = sizelast;
+            } else {
+                varint[i] = sizePercent;
+            }
         }
-        this.evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
-    }
 
-    /**
-     * Creates a new instance of crrossvalidation for specified neural network, data set and number of folds.
-     *
-     * @param neuralNetwork
-     * @param dataSet
-     * @param foldCount number of folds to use
-     */
-    public CrossValidation(NeuralNetwork neuralNetwork, DataSet dataSet, int foldCount) { // number of folds/subsets
-        initialize(neuralNetwork, dataSet, foldCount);
-        this.sampling = new SubSampling(foldCount); // new RandomSamplingWithoutRepetition(numberOfSamples   
-    }
+        SubSampling s = new SubSampling(varint);
+        List<DataSet> foldSetList = s.sample(dataSet);
+        
 
-    public Sampling getSampling() {
-        return sampling;
-    }
-
-    public void setSampling(Sampling sampling) {
-        this.sampling = sampling;
-    }
-
-    public Evaluation getEvaluation() {
-        return evaluation;
-    }
-
-    public void run() throws InterruptedException, ExecutionException {
-
-        results = new CrossValidationResult();
-        this.results.numberOfFolds = this.numberOfFolds;
-        this.results.numberOfInstances = this.dataSet.getRows().size();
-
-        dataSet.shuffle();
-        foldSize = dataSet.size() / numberOfFolds;
-
+        cmlist = new ArrayList<>();
+        statlist = new ArrayList<>();
+        crosslist=new ArrayList<>();
+        
         ArrayList<CrossValidationWorker> workersTasks = new ArrayList<>();
-        for (int foldIdx = 0; foldIdx < numberOfFolds; foldIdx++) {
-            workersTasks.add(new CrossValidationWorker(neuralNetwork, dataSet, foldIdx)); // invokeAll Futire
+        
+        for (DataSet validationSet : foldSetList) {
+           DataSet learningSet=returnSet(dataSet,validationSet);
+           CrossValidationWorker cw= new CrossValidationWorker(neuralNet,learningSet,validationSet);
+           workersTasks.add(cw);
         }
-
+        
         ExecutorService executor = Executors.newFixedThreadPool(4);
-        List<Future<EvaluationResult>> evaluationResults = executor.invokeAll(workersTasks);
+        List<Future<CrossFolds>> evaluationResults = executor.invokeAll(workersTasks);
         executor.shutdown();
+        
+        List<CrossFolds> results=new ArrayList<>();
 
-        for (Future<EvaluationResult> evaluationResult : evaluationResults) {
-            results.addEvaluationResult(evaluationResult.get());
+        for (Future<CrossFolds> evaluationResult : evaluationResults) {
+            results.add(evaluationResult.get());
         }
 
-        results.calculateStatistics();
+         int foldNumber=1;
+        for (CrossFolds crossfolds: results){
+         showResults(crossfolds.getConfusionMatrix(),foldNumber);
+         cmlist.add(crossfolds.getConfusionMatrix());
+         crosslist.add(crossfolds);
+         ClassificationMetrics.Stats average = ClassificationMetrics.average(ClassificationMetrics.createFromMatrix(crossfolds.getConfusionMatrix()));
+          statlist.add(average);
+          foldNumber++;}
+           
+        ConfusionMatrix sumMatrix = sumConfusionMatrix(cmlist, dataSet);
+
+        System.out.println();
+        System.out.println("All folds results:");
+        System.out.println();
+
+        EvaluationResult sumEval = new EvaluationResult();
+        sumEval.setConfusionMatrix(sumMatrix);
+        showResults(sumMatrix,0);
+        
+
+       ClassificationMetrics.Stats allstat = averageStats(statlist);
+       showResults(dataSet, allstat, numfolds);
+       
+       return sumEval;
     }
 
-    public void addEvaluator(Evaluator eval) {
-        evaluation.addEvaluator(eval);
-    }
+    public ConfusionMatrix sumConfusionMatrix(List<ConfusionMatrix> cmlist, DataSet dataset) {
+ 
+        ConfusionMatrix cm = new ConfusionMatrix(cmlist.get(0).getClassLabels());
+        int[][] ar = new int[dataset.getOutputSize()][dataset.getOutputSize()];
+        for (ConfusionMatrix c : cmlist) {
 
-    public <T extends Evaluator> T getEvaluator(Class<T> type) {
-        return evaluation.getEvaluator(type);
-    }
+            for (int i = 0; i < dataset.getOutputSize(); ++i) {
 
-    public CrossValidationResult getResult() {
-        return results;
-    }
-
-    private class CrossValidationWorker implements Callable<EvaluationResult> {
-
-        private final NeuralNetwork neuralNetwork;
-        private final DataSet dataSet;
-        private final int foldIndex;
-
-        public CrossValidationResult getResults() {
-            return results;
-        }
-
-        public Evaluation getEvaluation() {
-            return evaluation;
-        }
-
-        public CrossValidationWorker(NeuralNetwork neuralNetwork, DataSet dataSet, int foldIndex) {
-            this.neuralNetwork = neuralNetwork;
-            this.dataSet = dataSet;
-            this.foldIndex = foldIndex;
-        }
-
-        @Override
-        public EvaluationResult call() {
-            NeuralNetwork neuralNet = SerializationUtils.clone(this.neuralNetwork);
-
-            DataSet trainingSet = new DataSet(dataSet.size() - foldSize);
-            DataSet testSet = new DataSet(foldSize);
-
-            int startIndex = foldSize * foldIndex;
-            int endIndex = foldSize * (foldIndex + 1);
-
-            for (int i = 0; i < dataSet.size(); i++) {
-                if (i >= startIndex && i < endIndex) {
-                    testSet.add(dataSet.getRowAt(i));
-                } else {
-                    trainingSet.add(dataSet.getRowAt(i));
+                for (int j = 0; j < dataset.getOutputSize(); ++j) {
+                    ar[i][j] += c.get(i, j);
                 }
             }
-            neuralNet.learn(trainingSet);
-            EvaluationResult evaluationResult = new EvaluationResult();
-            evaluationResult.setNeuralNetwork(neuralNet);
-            evaluationResult = evaluation.evaluateDataSet(neuralNet, testSet);
-            return evaluationResult;
         }
 
-        /*private void testNetwork(NeuralNetwork<BackPropagation> neuralNetwork, DataSet testSet) {
-        EvaluationResult evaluationResult = evaluation.evaluateDataSet(neuralNetwork, testSet); // this method should return all evaluation results
-        
-        results.addEvaluationResult(evaluationResult);
-        //mean square error
-        System.out.println("MeanSquare Error: " + evaluation.getEvaluator(ErrorEvaluator.class).getResult());
-        ClassifierEvaluator evaluator;
-        if (neuralNetwork.getOutputsCount() == 1) {
-        evaluator = evaluation.getEvaluator(ClassifierEvaluator.Binary.class);
-        } else {
-        evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
-        }
-        
-        //confusion matrix
-        ConfusionMatrix confusionMatrix = evaluator.getResult();
-        System.out.println("Confusion Matrix: \r\n" + confusionMatrix.toString());
-        
-        //classifivation metrics
-        ClassificationMetrics[] metrics = ClassificationMetrics.createFromMatrix(confusionMatrix);     // add all of these to result
-        
-        for (ClassificationMetrics cm : metrics) {
-        System.out.println(cm.toString());
-        }
-        }*/
+        cm.setValues(ar);
+        return cm;
     }
+    
+    public static ClassificationMetrics.Stats averageStats(List<ClassificationMetrics.Stats> metricsList) {
+       
+         ClassificationMetrics.Stats average = metricsList.get(0);
+          double count = 1;
+            for (ClassificationMetrics.Stats st : metricsList) {
+                if (!st.equals(average)){
+                average.accuracy += st.accuracy;
+                average.precision += st.precision;
+                average.recall += st.recall;
+                average.fScore += st.fScore;}
+            }
+            count++;
+        
+        count = metricsList.size(); 
+        average.accuracy = average.accuracy / count;
+        average.precision = average.precision / count;
+        average.recall = average.recall / count;
+        average.fScore = average.fScore / count;
+       
+        return average;
+    }
+
+    public void showResults(DataSet dataset, ClassificationMetrics.Stats nst, int numfolds) {
+        System.out.println();
+        System.out.println("=== Cross validation result ===");
+        System.out.println("Instances: " + dataset.size());
+        System.out.println("Number of folds: " + numfolds);
+        System.out.println("\n");
+        System.out.println("=== Summary ===");
+        System.out.println("Accuracy: " + nst.accuracy);
+        System.out.println("Precision: " + nst.precision);
+        System.out.println("Recall: " + nst.recall);
+        System.out.println("FScore: " + nst.fScore);
+        System.out.println("Correlation coefficient: " + nst.correlationCoefficient);
+    }
+
+    public void showResults(ConfusionMatrix confusionMatrix, int foldIndex){
+     
+        System.out.println();
+            System.out.println("Fold " + foldIndex);
+            System.out.println();
+        System.out.println("Confusion matrrix:\r\n");
+        System.out.println(confusionMatrix.toString() + "\r\n\r\n");
+        System.out.println("Classification metrics\r\n");
+        ClassificationMetrics[]  metrics = ClassificationMetrics.createFromMatrix(confusionMatrix);
+         ClassificationMetrics.Stats stat = ClassificationMetrics.average(metrics);
+        for (ClassificationMetrics cm : metrics) {
+           System.out.println(cm.toString() + "\r\n");
+        }
+        
+       System.out.println(stat.toString());
+    
+    }
+    
+     public void showStats(ConfusionMatrix confusionMatrix){
+     ClassificationMetrics[]  metrics = ClassificationMetrics.createFromMatrix(confusionMatrix);
+     ClassificationMetrics.Stats stat = ClassificationMetrics.average(metrics);
+     System.out.println(stat.toString());
+    }
+     
+     public DataSet returnSet(DataSet dataSet, DataSet validationSet){
+      DataSet learningSet= new DataSet(dataSet.getInputSize(),dataSet.getOutputSize());
+      learningSet.addAll(dataSet);
+     learningSet.removeAll(validationSet);
+     return learningSet;
+     }
+     
+     public class CrossValidationWorker implements Callable<CrossFolds> {
+
+        private final DataSet learningSet;
+        private final DataSet trainingSet;
+
+         
+         
+         public CrossValidationWorker(NeuralNetwork neuralNetwork, DataSet learningSet, DataSet validationSet) {
+           this.trainingSet=validationSet;
+            this.learningSet=learningSet;
+        }
+         
+        
+        @Override
+        public CrossFolds call() throws Exception {
+            Evaluation evaluation = new Evaluation();
+            evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
+            
+            evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(neuralNet.getOutputLabels()));
+           
+            neuralNet.learn(learningSet);
+            
+
+            EvaluationResult evaluationResult = evaluation.evaluateDataSet(neuralNet, trainingSet);
+            CrossFolds crossFolds= new CrossFolds(evaluationResult.getNeuralNetwork(),learningSet,trainingSet);
+           crossFolds.setConfusionMatrix(evaluationResult.getConfusionMatrix());
+          
+           return crossFolds;
+        }
+     }
+     
+     public  void setFoldResults(List<CrossFolds> crosslist){
+     this.crosslist=crosslist;
+     }
+     
+     public List<CrossFolds> getFoldResults(){
+     return crosslist;
+     }
 }
