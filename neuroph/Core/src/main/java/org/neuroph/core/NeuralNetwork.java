@@ -482,6 +482,14 @@ public class NeuralNetwork<L extends LearningRule> implements Serializable {
             outputNeurons.get(i).setLabel(labels[i]);
         }
     }
+    
+    public String[] getOutputLabels() {
+        String[] labels = new String[outputNeurons.size()];
+        for (int i = 0; i < outputNeurons.size(); i++) {
+            labels[i] = outputNeurons.get(i).getLabel();
+        }
+        return labels;
+    }
 
     /**
      * Returns the learning algorithm of this network
