@@ -1,7 +1,6 @@
 package org.neuroph.contrib.model.modelselection;
 
 import org.neuroph.contrib.model.errorestimation.Bootstrapping;
-import org.neuroph.eval.CrossValidation;
 import org.neuroph.eval.classification.ClassificationMetrics;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.data.DataSet;
@@ -18,12 +17,12 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import org.neuroph.eval.ClassifierEvaluator;
-import org.neuroph.eval.CrossValidation;
+import org.neuroph.eval.KFoldCrossValidation;
 
 /**
  * @param <T> Type which defined which LearningRule will be used during model optimization
  */
-public class MultilayerPerceptronOptimazer<T extends BackPropagation> implements NeurophModelOptimizer {
+public class MultilayerPerceptronOptimazer<T extends BackPropagation> {
 
     private static Logger LOG = LoggerFactory.getLogger(MultilayerPerceptronOptimazer.class);
 
@@ -44,7 +43,7 @@ public class MultilayerPerceptronOptimazer<T extends BackPropagation> implements
     /**
      * Method used for classifier error estimation (KFold, Bootstrap)
      */
-    private CrossValidation errorEstimationMethod;
+    private KFoldCrossValidation errorEstimationMethod;
     /**
      * Learning rule used during classifier learning stage
      */
@@ -83,7 +82,7 @@ public class MultilayerPerceptronOptimazer<T extends BackPropagation> implements
     }
 
 
-    public MultilayerPerceptronOptimazer withErrorEstimationMethod(CrossValidation errorEstimationMethod) {
+    public MultilayerPerceptronOptimazer withErrorEstimationMethod(KFoldCrossValidation errorEstimationMethod) {
         this.errorEstimationMethod = errorEstimationMethod;
         return this;
     }
@@ -98,7 +97,6 @@ public class MultilayerPerceptronOptimazer<T extends BackPropagation> implements
      * @param dataSet training set used for error estimation
      * @return neural network model with optimized architecture for provided data set
      */
-    @Override
     public NeuralNetwork createOptimalModel(DataSet dataSet) {
 
         List<Integer> neurons = new ArrayList<>();
@@ -119,10 +117,10 @@ public class MultilayerPerceptronOptimazer<T extends BackPropagation> implements
                 learningRule.addListener(listener);
                 network.setLearningRule(learningRule);
 
-                errorEstimationMethod = new CrossValidation(network, dataSet, 10);
+                errorEstimationMethod = new KFoldCrossValidation(network, dataSet, 10);
                 errorEstimationMethod.run();
                 // FIX
-                ClassificationMetrics[] result = ClassificationMetrics.createFromMatrix(errorEstimationMethod.getEvaluator(ClassifierEvaluator.MultiClass.class).getResult());
+                ClassificationMetrics[] result = null;//ClassificationMetrics.createFromMatrix(errorEstimationMethod.getEvaluator(ClassifierEvaluator.MultiClass.class).getResult());
 
                 // nadji onaj sa najmanjim f measure
                 if (optimalResult == null || optimalResult.getFMeasure()< result[0].getFMeasure()) {

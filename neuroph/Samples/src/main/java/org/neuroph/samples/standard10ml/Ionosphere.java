@@ -43,19 +43,19 @@ import org.neuroph.util.data.norm.Normalizer;
 
  1. Data set that will be used in this experiment: Ionosphere Dataset
     The Ionosphere Dataset requires the prediction of structure in the atmosphere given radar returns targeting free electrons in the ionosphere.
-    The original data set that will be used in this experiment can be found at link: 
+    The original data set that will be used in this experiment can be found at link:
     https://archive.ics.uci.edu/ml/machine-learning-databases/ionosphere/ionosphere.data
 
 2. Reference:  Space Physics Group , Applied Physics Laboratory ,Johns Hopkins University ,Johns Hopkins Road ,Laurel, MD 20723
-   Sigillito, V. G., Wing, S. P., Hutton, L. V., \& Baker, K. B. (1989). Classification of radar returns from the ionosphere using neural networks. Johns Hopkins APL Technical Digest, 10, 262-266. 
+   Sigillito, V. G., Wing, S. P., Hutton, L. V., \& Baker, K. B. (1989). Classification of radar returns from the ionosphere using neural networks. Johns Hopkins APL Technical Digest, 10, 262-266.
 
 3. Number of instances: 351
 
 4. Number of Attributes: 34 pluss class attributes
 
-5. Attribute Information:    
+5. Attribute Information:
    Inputs:
-   34 attributes: 
+   34 attributes:
    34 continuous features are computed for each radar return.
    Output: Class variable (0 or 1). Value 1 indicates good radar return.
 
@@ -63,7 +63,7 @@ import org.neuroph.util.data.norm.Normalizer;
 
 
 
- 
+
  */
 public class Ionosphere implements LearningEventListener {
 
@@ -72,21 +72,23 @@ public class Ionosphere implements LearningEventListener {
     }
 
     public void run() {
-        System.out.println("Creating training set...");
-        // get path to training set
-        String trainingSetFileName = "data_sets/ml10standard/ionospheredata.txt";
+        System.out.println("Creating data set...");
+        String dataSetFile = "data_sets/ml10standard/ionospheredata.txt";
         int inputsCount = 34;
         int outputsCount = 1;
 
-        // create training set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, ",", false);
-        Normalizer norm = new MaxNormalizer();
-        norm.normalize(dataSet);
-        dataSet.shuffle();
+        // create data set from file
+        DataSet dataSet = DataSet.createFromFile(dataSetFile, inputsCount, outputsCount, ",", false);
 
-        List<DataSet> subSets = dataSet.split(60, 40);
-        DataSet trainingSet = subSets.get(0);
-        DataSet testSet = subSets.get(1);
+        // split data into training and test set
+        DataSet[] trainTestSplit = dataSet.split(0.6, 0.4);
+        DataSet trainingSet = trainTestSplit[0];
+        DataSet testSet = trainTestSplit[1];
+
+        // normalize data
+        Normalizer norm = new MaxNormalizer(trainingSet);
+        norm.normalize(trainingSet);
+        norm.normalize(testSet);
 
         System.out.println("Creating neural network...");
         MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 30, 25, outputsCount);
@@ -112,7 +114,7 @@ public class Ionosphere implements LearningEventListener {
         neuralNet.save("nn1.nnet");
 
         System.out.println("Done.");
-        
+
         System.out.println();
         System.out.println("Network outputs for test set");
         testNeuralNetwork(neuralNet, testSet);
@@ -120,7 +122,7 @@ public class Ionosphere implements LearningEventListener {
 
     // Displays inputs, desired output (from dataset) and actual output (calculated by neural network) for every row from data set.
     public void testNeuralNetwork(NeuralNetwork neuralNet, DataSet testSet) {
-        
+
         System.out.println("Showing inputs, desired output and neural network output for every row in test set.");
 
         for (DataSetRow testSetRow : testSet.getRows()) {
@@ -134,18 +136,18 @@ public class Ionosphere implements LearningEventListener {
         }
     }
 
-    // Evaluates performance of neural network. 
+    // Evaluates performance of neural network.
     // Contains calculation of Confusion matrix for classification tasks or Mean Ssquared Error and Mean Absolute Error for regression tasks.
     // Difference in binary and multi class classification are made when adding Evaluator (MultiClass or Binary).
     public void evaluate(NeuralNetwork neuralNet, DataSet dataSet) {
-        
+
         System.out.println("Calculating performance indicators for neural network.");
-        
+
         Evaluation evaluation = new Evaluation();
         evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
 
         evaluation.addEvaluator(new ClassifierEvaluator.Binary(0.5));
-        evaluation.evaluateDataSet(neuralNet, dataSet);
+        evaluation.evaluate(neuralNet, dataSet);
 
         ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.Binary.class);
         ConfusionMatrix confusionMatrix = evaluator.getResult();

@@ -34,22 +34,12 @@ public class MaxMinNormalizer implements Normalizer, Serializable {
     private double[] maxIn, maxOut; // contains max values for in and out columns
     private double[] minIn, minOut; // contains min values for in and out columns
 
-    /**
-     * Flag to indicate that normalizer is initialized
-     */
-    private boolean intialized=false;
-
-    @Override
-    public void init(DataSet dataSet) {
+    public MaxMinNormalizer(DataSet dataSet) {
         findMaxAndMinVectors(dataSet);
-        intialized = true;
     }
 
     @Override
     public void normalize(DataSet dataSet) {
-
-        if (!intialized) init(dataSet);
-
         for (DataSetRow row : dataSet.getRows()) {
             double[] normalizedInput = normalizeMaxMin(row.getInput(), minIn, maxIn);
             row.setInput(normalizedInput);

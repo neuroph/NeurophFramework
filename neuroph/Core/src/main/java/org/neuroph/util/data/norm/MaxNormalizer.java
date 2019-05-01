@@ -24,6 +24,7 @@ import org.neuroph.core.data.DataSetRow;
  * Max normalization method, which normalize data in regard to max element in training set (by columns)
  * Normalization is done according to formula:
  * normalizedVector[i] = vector[i] / abs(max[i])
+ *
  * @author Zoran Sevarac <sevarac@gmail.com>
  */
 public class MaxNormalizer implements Normalizer, Serializable {
@@ -38,16 +39,17 @@ public class MaxNormalizer implements Normalizer, Serializable {
      */
     private boolean intialized=false;
 
-
-    @Override
-    public void init(DataSet dataSet) {
+    /**
+     * Creates new instance of MaxNormalizer initialized with max values from specified data set.
+     * @param dataSet
+     */
+    public MaxNormalizer(DataSet dataSet) {
         findMaxVectors(dataSet);
         intialized = true;
     }
 
     @Override
    public void normalize(DataSet dataSet) {
-        if (!intialized) init(dataSet);
 
         for (DataSetRow row : dataSet.getRows()) {
             double[] normalizedInput = normalizeMax(row.getInput(), maxIn);
@@ -81,21 +83,21 @@ public class MaxNormalizer implements Normalizer, Serializable {
         for (DataSetRow dataSetRow : dataSet.getRows()) {
             double[] input = dataSetRow.getInput();
             for (int i = 0; i < inputSize; i++) {
-                if (input[i] > maxIn[i]) {
-                    maxIn[i] = input[i];
+                if (Math.abs(input[i]) > maxIn[i]) {
+                    maxIn[i] = Math.abs(input[i]);
                 }
              }
 
             double[] output = dataSetRow.getDesiredOutput();
             for (int i = 0; i < outputSize; i++) {
-                if (output[i] > maxOut[i]) {
-                    maxOut[i] = output[i];
+                if (Math.abs(output[i]) > maxOut[i]) {
+                    maxOut[i] = Math.abs(output[i]);
                 }
             }
         }
     }
 
-    public double[] normalizeMax(double[] vector, double[] max) {
+    private double[] normalizeMax(double[] vector, double[] max) {
         double[] normalizedVector = new double[vector.length];
 
         for(int i = 0; i < vector.length; i++) {

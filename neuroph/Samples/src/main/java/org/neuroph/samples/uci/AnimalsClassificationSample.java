@@ -112,12 +112,12 @@ public class AnimalsClassificationSample  implements LearningEventListener {
     public void run() {
 
         System.out.println("Creating training set...");
-        String trainingSetFileName = "data_sets/animals_data.txt";
+        String dataSetFile = "data_sets/animals_data.txt";
         int inputsCount = 20;
         int outputsCount = 7;
 
         // create training set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, "\t", true);
+        DataSet dataSet = DataSet.createFromFile(dataSetFile, inputsCount, outputsCount, "\t", true);
         
         
         System.out.println("Creating neural network...");

@@ -44,19 +44,19 @@ import org.neuroph.util.data.norm.Normalizer;
 
  1. Data set that will be used in this experiment: Iris Flower Dataset
     The Iris Flowers Dataset involves predicting the flower species given measurements of iris flowers.
-    The original data set that will be used in this experiment can be found at link: 
+    The original data set that will be used in this experiment can be found at link:
     http://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data
 
 2. Reference:  R.A. Fisher
-   Fisher,R.A. "The use of multiple measurements in taxonomic problems" Annual Eugenics, 7, Part II, 179-188 (1936); also in "Contributions to Mathematical Statistics" (John Wiley, NY, 1950). 
- 
+   Fisher,R.A. "The use of multiple measurements in taxonomic problems" Annual Eugenics, 7, Part II, 179-188 (1936); also in "Contributions to Mathematical Statistics" (John Wiley, NY, 1950).
+
 3. Number of instances: 150
 
 4. Number of Attributes: 4 pluss class attributes
 
-5. Attribute Information:    
+5. Attribute Information:
  Inputs:
- 4 attributes: 
+ 4 attributes:
  4 numerical features are computed for each flower:
  1) Sepal length in cm.
  2) Sepal width in cm.
@@ -69,7 +69,7 @@ import org.neuroph.util.data.norm.Normalizer;
 
 
 
- 
+
  */
 public class IrisFlowers implements LearningEventListener {
 
@@ -86,11 +86,11 @@ public class IrisFlowers implements LearningEventListener {
 
         // create training set from file
         DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, ",");
-        dataSet.shuffle();
 
-        List<DataSet> subSets = dataSet.split(60, 40);
-        DataSet trainingSet = subSets.get(0);
-        DataSet testSet = subSets.get(1);
+        // splid data into training and test set
+        DataSet[] trainTestSplit = dataSet.split(0.6, 0.4);
+        DataSet trainingSet = trainTestSplit[0];
+        DataSet testSet = trainTestSplit[1];
 
         System.out.println("Creating neural network...");
         MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(TransferFunctionType.TANH, inputsCount, 2, outputsCount);
@@ -138,7 +138,7 @@ public class IrisFlowers implements LearningEventListener {
         }
     }
 
-    // Evaluates performance of neural network. 
+    // Evaluates performance of neural network.
     // Contains calculation of Confusion matrix for classification tasks or Mean Ssquared Error and Mean Absolute Error for regression tasks.
     // Difference in binary and multi class classification are made when adding Evaluator (MultiClass or Binary).
     public void evaluate(NeuralNetwork neuralNet, DataSet dataSet) {
@@ -150,7 +150,7 @@ public class IrisFlowers implements LearningEventListener {
 
         String[] classLabels = new String[]{"Virginica", "Setosa", "Versicolor"};
         evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(classLabels));
-        evaluation.evaluateDataSet(neuralNet, dataSet);
+        evaluation.evaluate(neuralNet, dataSet);
 
         ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
         ConfusionMatrix confusionMatrix = evaluator.getResult();

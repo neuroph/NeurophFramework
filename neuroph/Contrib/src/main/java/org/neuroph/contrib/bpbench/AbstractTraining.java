@@ -61,7 +61,7 @@ public abstract class AbstractTraining {
             classLabels[i] = dataset.getColumnName(dataset.getInputSize() + i);
         }
         eval.addEvaluator(new ClassifierEvaluator.MultiClass(classLabels));
-        return eval.evaluateDataSet(neuralNet, dataset).getConfusionMatrix();
+        return eval.evaluate(neuralNet, dataset).getConfusionMatrix();
     }
 
     /**

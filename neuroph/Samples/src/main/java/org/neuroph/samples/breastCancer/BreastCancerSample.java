@@ -37,38 +37,38 @@ import org.neuroph.util.data.norm.Normalizer;
  INTRODUCTION TO THE PROBLEM AND DATA SET INFORMATION:
 
  *Data set that will be used in this experiment: Wisconsin Diagnostic Breast Cancer (WDBC)
- The original data set that will be used in this experiment can be found at link: 
+ The original data set that will be used in this experiment can be found at link:
  https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.data
 
- *Creators: 
- -   r. William H. Wolberg, General Surgery Dept., University of Wisconsin,  Clinical Sciences Center, 
+ *Creators:
+ -   r. William H. Wolberg, General Surgery Dept., University of Wisconsin,  Clinical Sciences Center,
  Madison, WI 53792 wolberg@eagle.surgery.wisc.edu
-    
- -   W. Nick Street, Computer Sciences Dept., University of Wisconsin, 1210 West Dayton St., 
+
+ -   W. Nick Street, Computer Sciences Dept., University of Wisconsin, 1210 West Dayton St.,
  Madison, WI 53706 treet@cs.wisc.edu  608-262-6619
 
- -   Olvi L. Mangasarian, Computer Sciences Dept., University of Wisconsin, 1210 West Dayton St., 
- Madison, WI 53706 olvi@cs.wisc.edu 
+ -   Olvi L. Mangasarian, Computer Sciences Dept., University of Wisconsin, 1210 West Dayton St.,
+ Madison, WI 53706 olvi@cs.wisc.edu
 
- *See also: 
+ *See also:
  -   http://www.cs.wisc.edu/~olvi/uwmp/mpml.html
  -   http://www.cs.wisc.edu/~olvi/uwmp/cancer.html
 
- *Result: 
- -   predicting field 2, diagnosis: B = benign, M = malignant 
+ *Result:
+ -   predicting field 2, diagnosis: B = benign, M = malignant
  -   sets are linearly separable using all 30 input features
 
- *Relevant information: 
- Features are computed from a digitized image of a fine needle aspirate (FNA) of a breast mass. 
- They describe characteristics of the cell nuclei present in the image. Separating plane described above 
+ *Relevant information:
+ Features are computed from a digitized image of a fine needle aspirate (FNA) of a breast mass.
+ They describe characteristics of the cell nuclei present in the image. Separating plane described above
  was obtained using Multisurface Method-Tree (MSM-T), a classification method which uses linear
- programming to construct a decision tree. Relevant features were selected using an exhaustive search 
+ programming to construct a decision tree. Relevant features were selected using an exhaustive search
  in the space of 1-4	features and 1-3 separating planes.
 
  *Number of instances: 569
 
- *Number of attributes: 
- 31 (30 real-valued input features, 
+ *Number of attributes:
+ 31 (30 real-valued input features,
  1 output feature - 1,0 for M = malignant / benign cancer)
 
  *Missing attribute values: none
@@ -78,7 +78,7 @@ import org.neuroph.util.data.norm.Normalizer;
  ATTRIBUTE INFORMATION:
 
  Inputs:
- 1-30 attributes: 
+ 1-30 attributes:
  Ten real-valued features are computed for each cell nucleus:
  a) radius (mean of distances from center to points on the perimeter)
  b) texture (standard deviation of gray-scale values)
@@ -88,7 +88,7 @@ import org.neuroph.util.data.norm.Normalizer;
  f) compactness (perimeter^2 / area - 1.0)
  g) concavity (severity of concave portions of the contour)
  h) concave points (number of concave portions of the contour)
- i) symmetry 
+ i) symmetry
  j) fractal dimension ("coastline approximation" - 1)
 
  Output:
@@ -102,32 +102,32 @@ public class BreastCancerSample implements LearningEventListener {
 
     // for evaluating classification result
     int total, correct, incorrect;
-    
+
     // if output is greater then this value it is considered as malign
     float classificationThreshold = 0.5f;
 
     public void run() {
 
         System.out.println("Creating training and test set from file...");
-        String trainingSetFileName = "data_sets/breast_cancer.txt";
-        int inputsCount = 30;
-        int outputsCount = 1;
+        String dataSetFile = "data_sets/breast_cancer.txt";
+        int numInputs = 30;
+        int numOutputs = 1;
 
         //Create data set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, ",");
-        dataSet.shuffle();
-
-        //Normalizing data set
-        Normalizer normalizer = new MaxNormalizer();
-        normalizer.normalize(dataSet);
+        DataSet dataSet = DataSet.createFromFile(dataSetFile, numInputs, numOutputs, ",");
 
         //Creatinig training set (70%) and test set (30%)
-        List<DataSet> trainingAndTestSet = dataSet.split(70, 30);
-        DataSet trainingSet = trainingAndTestSet.get(0);
-        DataSet testSet = trainingAndTestSet.get(1);
+        DataSet[] trainTestSplit = dataSet.split(0.7, 0.3);
+        DataSet trainingSet = trainTestSplit[0];
+        DataSet testSet = trainTestSplit[1];
+
+        //Normalizing data set
+        Normalizer normalizer = new MaxNormalizer(trainingSet);
+        normalizer.normalize(trainingSet);
+        normalizer.normalize(testSet);
 
         //Create MultiLayerPerceptron neural network
-        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 16, outputsCount);
+        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(numInputs, 16, numOutputs);
 
         //attach listener to learning rule
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
@@ -191,7 +191,7 @@ public class BreastCancerSample implements LearningEventListener {
         }
     }
 
-    public void countPredictions(int prediction, int target) {        
+    public void countPredictions(int prediction, int target) {
         if (prediction == target) {
             correct++;
         } else {
@@ -204,12 +204,12 @@ public class BreastCancerSample implements LearningEventListener {
     public String formatDecimalNumber(double number) {
         return new BigDecimal(number).setScale(4, RoundingMode.HALF_UP).toString();
     }
-    
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         (new BreastCancerSample()).run();
-    }    
-    
+    }
+
 }

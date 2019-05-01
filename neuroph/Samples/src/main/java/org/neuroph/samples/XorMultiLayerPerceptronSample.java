@@ -40,27 +40,27 @@ public class XorMultiLayerPerceptronSample implements LearningEventListener {
     public static void main(String[] args) {
         new XorMultiLayerPerceptronSample().run();
     }
-    
+
     /**
      * Runs this sample
      */
     public void run() {
-    	
+
         // create training set (logical XOR function)
         DataSet trainingSet = new DataSet(2, 1);
-        trainingSet.addRow(new DataSetRow(new double[]{0, 0}, new double[]{0}));
-        trainingSet.addRow(new DataSetRow(new double[]{0, 1}, new double[]{1}));
-        trainingSet.addRow(new DataSetRow(new double[]{1, 0}, new double[]{1}));
-        trainingSet.addRow(new DataSetRow(new double[]{1, 1}, new double[]{0}));
+        trainingSet.add(new DataSetRow(new double[]{0, 0}, new double[]{0}));
+        trainingSet.add(new DataSetRow(new double[]{0, 1}, new double[]{1}));
+        trainingSet.add(new DataSetRow(new double[]{1, 0}, new double[]{1}));
+        trainingSet.add(new DataSetRow(new double[]{1, 1}, new double[]{0}));
 
         // create multi layer perceptron
         MultiLayerPerceptron myMlPerceptron = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, 2, 3, 1);
         myMlPerceptron.randomizeWeights(new WeightsRandomizer(new Random(123)));
-        
+
         System.out.println(Arrays.toString(myMlPerceptron.getWeights()));
 
         myMlPerceptron.setLearningRule(new BackPropagation());
-      
+
         myMlPerceptron.getLearningRule().setLearningRate(0.5);
         // enable batch if using MomentumBackpropagation
 //        if( myMlPerceptron.getLearningRule() instanceof MomentumBackpropagation )
@@ -68,7 +68,7 @@ public class XorMultiLayerPerceptronSample implements LearningEventListener {
 
         LearningRule learningRule = myMlPerceptron.getLearningRule();
         learningRule.addListener(this);
-        
+
         // learn the training set
         System.out.println("Training neural network...");
         myMlPerceptron.learn(trainingSet);
@@ -104,12 +104,12 @@ public class XorMultiLayerPerceptronSample implements LearningEventListener {
             System.out.println(" Output: " + Arrays.toString( networkOutput) );
         }
     }
-    
+
     @Override
     public void handleLearningEvent(LearningEvent event) {
         BackPropagation bp = (BackPropagation)event.getSource();
         if (event.getEventType() != LearningEvent.Type.LEARNING_STOPPED)
             System.out.println(bp.getCurrentIteration() + ". iteration : "+ bp.getTotalNetworkError());
-    }    
+    }
 
 }

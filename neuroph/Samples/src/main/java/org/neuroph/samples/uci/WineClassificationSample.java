@@ -1,4 +1,3 @@
-
 /**
  * Copyright 2013 Neuroph Project http://neuroph.sourceforge.net
  *
@@ -34,24 +33,24 @@ import org.neuroph.nnet.learning.MomentumBackpropagation;
 /*
 DATA SET INFORMATION:
 
-These data are the results of a chemical analysis of wines grown in the same region in Italy but derived from three different cultivars. The analysis determined the quantities of 13 constituents found in each of the three types of wines. 
+These data are the results of a chemical analysis of wines grown in the same region in Italy but derived from three different cultivars. The analysis determined the quantities of 13 constituents found in each of the three types of wines.
 
-I think that the initial data set had around 30 variables, but for some reason I only have the 13 dimensional version. I had a list of what the 30 or so variables were, but a.) I lost it, and b.), I would not know which 13 variables are included in the set. 
+I think that the initial data set had around 30 variables, but for some reason I only have the 13 dimensional version. I had a list of what the 30 or so variables were, but a.) I lost it, and b.), I would not know which 13 variables are included in the set.
 
 The Input Variables are:
-1) Alcohol 
-2) Malic acid 
-3) Ash 
-4) Alcalinity of ash 
-5) Magnesium 
-6) Total phenols 
-7) Flavanoids 
-8) Nonflavanoid phenols 
-9) Proanthocyanins 
-10)Color intensity 
-11)Hue 
-12)OD280/OD315 of diluted wines 
-13)Proline 
+1) Alcohol
+2) Malic acid
+3) Ash
+4) Alcalinity of ash
+5) Magnesium
+6) Total phenols
+7) Flavanoids
+8) Nonflavanoid phenols
+9) Proanthocyanins
+10)Color intensity
+11)Hue
+12)OD280/OD315 of diluted wines
+13)Proline
 
 In a classification context, this is a well posed problem with "well behaved" class structures. A good data set for first testing of a new classifier, but not very challenging.
 
@@ -59,10 +58,10 @@ Output Variable is type of wine (nominal value).
 
 ATTRIBUTE INFORMATION:
 
-All attributes are continuous 
+All attributes are continuous
 
-No statistics available, but suggest to standardise variables for certain uses (e.g. for us with classifiers which are NOT scale invariant) 
- 
+No statistics available, but suggest to standardise variables for certain uses (e.g. for us with classifiers which are NOT scale invariant)
+
  The original data set that will be used in this experiment can be found at link http://archive.ics.uci.edu/ml/datasets/Wine
  */
 public class WineClassificationSample implements LearningEventListener {
@@ -78,19 +77,17 @@ public class WineClassificationSample implements LearningEventListener {
 
         System.out.println("Creating training set...");
         // get path to training set
-        String trainingSetFileName = "data_sets/wine_classification_data.txt";
+        String dataSetFile = "data_sets/wine_classification_data.txt";
         int inputsCount = 13;
         int outputsCount = 3;
 
         // create training set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, "\t", false);
-       
-        
+        DataSet dataSet = DataSet.createFromFile(dataSetFile, inputsCount, outputsCount, "\t", false);
+
         System.out.println("Creating neural network...");
         // create MultiLayerPerceptron neural network
         MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 22, outputsCount);
-       
-        
+
         // attach listener to learning rule
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
         learningRule.addListener(this);
@@ -127,6 +124,7 @@ public class WineClassificationSample implements LearningEventListener {
         }
     }
 
+    @Override
     public void handleLearningEvent(LearningEvent event) {
         BackPropagation bp = (BackPropagation) event.getSource();
         System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());

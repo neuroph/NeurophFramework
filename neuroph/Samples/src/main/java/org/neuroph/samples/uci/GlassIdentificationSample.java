@@ -83,12 +83,12 @@ public class GlassIdentificationSample implements LearningEventListener {
 
         System.out.println("Creating training set...");
 
-        String trainingSetFileName = "data_sets/glass_identification_data.txt";
+        String dataSetFile = "data_sets/glass_identification_data.txt";
         int inputsCount = 9;
         int outputsCount = 7;
 
         // create training set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, "\t", false);
+        DataSet dataSet = DataSet.createFromFile(dataSetFile, inputsCount, outputsCount, "\t", false);
         //dataSet.normalize();
         
         System.out.println("Creating neural network...");

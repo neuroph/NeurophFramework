@@ -12,10 +12,14 @@ import org.neuroph.util.data.norm.ZeroMeanNormalizer;
 public class ZeroMeanNormalizerTest {
 
 	ZeroMeanNormalizer normalizer;
+        DataSet dataSet;
 
 	@Before
 	public void setUp() {
-		normalizer = new ZeroMeanNormalizer();
+		double[] inputRow1 = new double[] { 0, 2, 3, 4 };
+		DataSetRow row1 = createDataRow(inputRow1);
+		dataSet = createDataSetFromRows(row1);
+		normalizer = new ZeroMeanNormalizer(dataSet);
 	}
 
 	@Test
@@ -51,7 +55,7 @@ public class ZeroMeanNormalizerTest {
 	private DataSet createDataSetFromRows(DataSetRow... rows) {
 		DataSet dataSet = new DataSet(rows[0].getInput().length);
 		for (DataSetRow row : rows) {
-			dataSet.addRow(row);
+			dataSet.add(row);
 		}
 		return dataSet;
 	}

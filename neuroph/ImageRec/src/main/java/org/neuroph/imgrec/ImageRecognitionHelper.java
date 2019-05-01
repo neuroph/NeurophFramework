@@ -47,11 +47,11 @@ import org.neuroph.util.plugins.PluginBase;
  * @author Zoran Sevarac
  */
 public class ImageRecognitionHelper {
-		
+
 	/**
          * Creates and returns new neural network for image recognition.
-	 * Assumes that all of the FractionRgbData objects in the given map have identical 
-	 * length arrays in them so that the input layer of the neural network can be 
+	 * Assumes that all of the FractionRgbData objects in the given map have identical
+	 * length arrays in them so that the input layer of the neural network can be
 	 * created here.
 	 *
          * @param label neural network label
@@ -60,7 +60,7 @@ public class ImageRecognitionHelper {
          * @param layersNeuronsCount neuron counts in hidden layers
 	 * @param transferFunctionType type of transfer function to use for neurons in network
          * @param colorMode color mode
-     * @return 
+     * @return
 	 */
 	public static NeuralNetwork createNewNeuralNetwork(String label, Dimension samplingResolution, ColorMode colorMode, List<String> imageLabels,  List<Integer> layersNeuronsCount, TransferFunctionType transferFunctionType) {
 
@@ -75,9 +75,9 @@ public class ImageRecognitionHelper {
 
 		layersNeuronsCount.add(0, numberOfInputNeurons);
 		layersNeuronsCount.add(numberOfOuputNeurons);
-		
+
 		System.out.println("Neuron layer size counts vector = " + layersNeuronsCount);
-		
+
 		NeuralNetwork neuralNetwork = new MultiLayerPerceptron(layersNeuronsCount, transferFunctionType);
 
 		neuralNetwork.setLabel(label);
@@ -97,7 +97,7 @@ public class ImageRecognitionHelper {
          */
 	private static void assignLabelsToOutputNeurons(NeuralNetwork neuralNetwork, List<String> imageLabels) {
 		List<Neuron> outputNeurons = neuralNetwork.getOutputNeurons();
-		
+
 		for(int i=0; i<outputNeurons.size(); i++) {
 			Neuron neuron = outputNeurons.get(i);
 			String label = imageLabels.get(i);
@@ -105,25 +105,25 @@ public class ImageRecognitionHelper {
 		}
 	}
 
-        
+
         /**
          * Creates training set for the specified image labels and rgb data. Thi method is now forwarded to createRGBTrainingSet
          * @param imageLabels image labels
          * @param rgbDataMap map collection of rgb data
          * @return training set for the specified image data
          * @deprecated Use createRGBTrainingSet instead
-         */        
-        public static DataSet createTrainingSet(List<String> imageLabels, Map<String, FractionRgbData> rgbDataMap) 	{  
+         */
+        public static DataSet createTrainingSet(List<String> imageLabels, Map<String, FractionRgbData> rgbDataMap) 	{
             return createRGBTrainingSet(imageLabels, rgbDataMap);
-        }      
-        
+        }
+
         /**
          * Creates training set for the specified image labels and rgb data
          * @param imageLabels image labels
          * @param rgbDataMap map collection of rgb data
          * @return training set for the specified image data
          */
-	public static DataSet createRGBTrainingSet(List<String> imageLabels, Map<String, FractionRgbData> rgbDataMap) 	{	
+	public static DataSet createRGBTrainingSet(List<String> imageLabels, Map<String, FractionRgbData> rgbDataMap) 	{
                 int inputCount = rgbDataMap.values().iterator().next().getFlattenedRgbValues().length;
                 int outputCount = imageLabels.size();
 		DataSet trainingSet = new DataSet(inputCount, outputCount);
@@ -131,9 +131,9 @@ public class ImageRecognitionHelper {
 		for (Entry<String, FractionRgbData> entry : rgbDataMap.entrySet()) {
 			double[] input = entry.getValue().getFlattenedRgbValues();
 			double[] response = createResponse(entry.getKey(), imageLabels);
-			trainingSet.addRow(new DataSetRow(input, response));
+			trainingSet.add(new DataSetRow(input, response));
 		}
-                
+
                 // set labels for output columns
                 int inputSize = trainingSet.getInputSize();
                 for (int c= 0; c<trainingSet.getOutputSize() ; c++) {
@@ -142,14 +142,14 @@ public class ImageRecognitionHelper {
 
                 return trainingSet;
 	}
-        
+
         /**
          * Creates training set for the specified image labels and hsl data
          * @param imageLabels image labels
          * @param hslDataMap map colletction of hsl data
          * @return training set for the specified image data
-         */        
-        public static DataSet createHSLTrainingSet(List<String> imageLabels, Map<String, FractionHSLData> hslDataMap) 	{	
+         */
+        public static DataSet createHSLTrainingSet(List<String> imageLabels, Map<String, FractionHSLData> hslDataMap) 	{
                 int inputCount = hslDataMap.values().iterator().next().getFlattenedHSLValues().length;
                 int outputCount = imageLabels.size();
 		DataSet trainingSet = new DataSet(inputCount, outputCount);
@@ -157,7 +157,7 @@ public class ImageRecognitionHelper {
 		for (Entry<String, FractionHSLData> entry : hslDataMap.entrySet()) {
 			double[] input = entry.getValue().getFlattenedHSLValues();
 			double[] response = createResponse(entry.getKey(), imageLabels);
-			trainingSet.addRow(new DataSetRow(input, response));
+			trainingSet.add(new DataSetRow(input, response));
 		}
 
                 // set labels for output columns
@@ -165,11 +165,11 @@ public class ImageRecognitionHelper {
                 for (int c= 0; c<trainingSet.getOutputSize() ; c++) {
                     trainingSet.setColumnName(inputSize+c, imageLabels.get(c));
                 }
-                
-                
+
+
                 return trainingSet;
 	}
-        
+
 
         /**
          * Creates binary black and white training set for the specified image labels and rgb data
@@ -189,18 +189,18 @@ public class ImageRecognitionHelper {
 			double[] inputRGB = entry.getValue().getFlattenedRgbValues();
                         double[] inputBW = FractionRgbData.convertRgbInputToBinaryBlackAndWhite(inputRGB);
                         double[] response = createResponse(entry.getKey(), imageLabels);
-			trainingSet.addRow(new DataSetRow(inputBW, response));
+			trainingSet.add(new DataSetRow(inputBW, response));
 		}
-                
+
                 // set labels for output columns
                 int inputSize = trainingSet.getInputSize();
                 for (int c= 0; c<trainingSet.getOutputSize() ; c++) {
                     trainingSet.setColumnName(inputSize+c, imageLabels.get(c));
                 }
-              
+
             return trainingSet;
 	}
-        
+
     /**
      * Loads images from the specified dir, scales to specified resolution and creates RGB data for each image
      * Puts HSL data in a Map using filenames as keys, and returns that map
@@ -213,9 +213,9 @@ public class ImageRecognitionHelper {
 		if(!imgDir.isDirectory()) {
 			throw new IllegalArgumentException("The given file must be a directory.  Argument is: " + imgDir);
 		}
-		
+
 		Map<String, FractionRgbData> rgbDataMap = new HashMap<>();
-		
+
 		ImageFilesIterator imagesIterator = new ImageFilesIterator(imgDir);
 		while (imagesIterator.hasNext()) {
 			File imgFile = imagesIterator.next();
@@ -226,24 +226,24 @@ public class ImageRecognitionHelper {
 			rgbDataMap.put(st.nextToken(), new FractionRgbData(img));
 		}
 		return rgbDataMap;
-	}      
-        
+	}
+
      // creates hsl map from given image files - params should be files List<File> - or even better image files
      public static Map<String, FractionHSLData> getFractionHSLDataForDirectory ( File imgDir, Dimension samplingResolution) throws IOException {
-        
+
 		if(!imgDir.isDirectory()) {
 			throw new IllegalArgumentException("The given file must be a directory.  Argument is: " + imgDir);
-		}         
-         
+		}
+
        Map <String, FractionHSLData> map = new HashMap<>();
        ImageFilesIterator imagesIterator = new ImageFilesIterator(imgDir);
-       
+
         try {
             while (imagesIterator.hasNext()) {
                 File imgFile = imagesIterator.next();
                 BufferedImage img = ImageIO.read(imgFile);
                 BufferedImage image = ImageUtilities.resizeImage(img, samplingResolution.getWidth(), samplingResolution.getHeight());
-                
+
                 String filenameOfCurrentImage = imgFile.getName();
                 //String filenameOfCurrentImage = imagesIterator.getFilenameOfCurrentImage();
                 StringTokenizer st = new StringTokenizer(filenameOfCurrentImage, ".");
@@ -253,8 +253,8 @@ public class ImageRecognitionHelper {
             e.printStackTrace();
         }
 
-        return map;             
-     }        
+        return map;
+     }
 
         /**
          * Creates binary network output vector (response) for the specified list of images
@@ -277,7 +277,7 @@ public class ImageRecognitionHelper {
 		}
 		return response;
 	}
-        
+
     private static List<String> createLabels(HashMap<String,?> map)
     {
         List<String> imageLabels = new ArrayList<String>();
@@ -288,7 +288,7 @@ public class ImageRecognitionHelper {
                 imageLabels.add(imageLabel);
             }
         }
-        Collections.sort(imageLabels); 
+        Collections.sort(imageLabels);
         return imageLabels;
     }
 
@@ -336,14 +336,14 @@ public class ImageRecognitionHelper {
         // create data set
         if (colorMode == ColorMode.COLOR_RGB) {
             dataSet = ImageRecognitionHelper.createRGBTrainingSet(imageLabels, rgbDataMap);
-        } else if (colorMode == ColorMode.COLOR_HSL) {                                    
-            dataSet = ImageRecognitionHelper.createHSLTrainingSet(imageLabels, hslDataMap); 
+        } else if (colorMode == ColorMode.COLOR_HSL) {
+            dataSet = ImageRecognitionHelper.createHSLTrainingSet(imageLabels, hslDataMap);
         } else {
             dataSet = ImageRecognitionHelper.createBlackAndWhiteTrainingSet(imageLabels, rgbDataMap);
         }
 
         dataSet.setLabel(trainingSetName);
-        dataSet.setColumnNames((String[]) imageLabels.toArray());//TODO: setOutputNames() 
+        dataSet.setColumnNames((String[]) imageLabels.toArray());//TODO: setOutputNames()
         dataSet.save("D:\\Doktorske\\Beograd\\Neuronske mreze - Zoran Sevarac\\Cifar 10\\dataset.tset");
 
         return dataSet;

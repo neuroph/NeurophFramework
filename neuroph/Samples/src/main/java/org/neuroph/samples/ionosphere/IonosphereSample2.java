@@ -35,7 +35,7 @@ import org.neuroph.util.data.norm.Normalizer;
  */
 /*
  INTRODUCTION TO THE PROBLEM AND DATA SET INFORMATION:
- The original data set that will be used in this experiment can be found at link: 
+ The original data set that will be used in this experiment can be found at link:
 http://archive.ics.uci.edu/ml/machine-learning-databases/ionosphere/ionosphere.data
 
  1. Title: Johns Hopkins University Ionosphere database
@@ -47,25 +47,25 @@ http://archive.ics.uci.edu/ml/machine-learning-databases/ionosphere/ionosphere.d
               Applied Physics Laboratory
               Johns Hopkins University
               Johns Hopkins Road
-              Laurel, MD 20723 
+              Laurel, MD 20723
 
 3. Past Usage:
    -- Sigillito, V. G., Wing, S. P., Hutton, L. V., \& Baker, K. B. (1989).
-      Classification of radar returns from the ionosphere using neural 
+      Classification of radar returns from the ionosphere using neural
       networks. Johns Hopkins APL Technical Digest, 10, 262-266.
 
       They investigated using backprop and the perceptron training algorithm
       on this database.  Using the first 200 instances for training, which
       were carefully split almost 50% positive and 50% negative, they found
       that a "linear" perceptron attained 90.7%, a "non-linear" perceptron
-      attained 92%, and backprop an average of over 96% accuracy on the 
+      attained 92%, and backprop an average of over 96% accuracy on the
       remaining 150 test instances, consisting of 123 "good" and only 24 "bad"
       instances.  (There was a counting error or some mistake somewhere; there
       are a total of 351 rather than 350 instances in this domain.) Accuracy
       on "good" instances was much higher than for "bad" instances.  Backprop
       was tested with several different numbers of hidden units (in [0,15])
       and incremental results were also reported (corresponding to how well
-      the different variants of backprop did after a periodic number of 
+      the different variants of backprop did after a periodic number of
       epochs).
 
       David Aha (aha@ics.uci.edu) briefly investigated this database.
@@ -79,9 +79,9 @@ http://archive.ics.uci.edu/ml/machine-learning-databases/ionosphere/ionosphere.d
    system consists of a phased array of 16 high-frequency antennas with a
    total transmitted power on the order of 6.4 kilowatts.  See the paper
    for more details.  The targets were free electrons in the ionosphere.
-   "Good" radar returns are those showing evidence of some type of structure 
+   "Good" radar returns are those showing evidence of some type of structure
    in the ionosphere.  "Bad" returns are those that do not; their signals pass
-   through the ionosphere.  
+   through the ionosphere.
 
    Received signals were processed using an autocorrelation function whose
    arguments are the time of a pulse and the pulse number.  There were 17
@@ -95,7 +95,7 @@ http://archive.ics.uci.edu/ml/machine-learning-databases/ionosphere/ionosphere.d
 6. Number of Attributes: 34 plus the class attribute
    -- All 34 predictor attributes are continuous
 
-7. Attribute Information:     
+7. Attribute Information:
    -- All 34 are continuous, as described above
    -- The 35th is the class variable: 0 (absence) or 1 (presence)
 
@@ -124,16 +124,16 @@ public class IonosphereSample2 implements LearningEventListener {
     public void run() {
 
         System.out.println("Creating training and test set from file...");
-        String trainingSetFileName = "data_sets/ionosphere.csv";
+        String dataSetFile = "data_sets/ionosphere.csv";
         int inputsCount = 34;
         int outputsCount = 1;
 
         //Create data set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, ",");
+        DataSet dataSet = DataSet.createFromFile(dataSetFile, inputsCount, outputsCount, ",");
         dataSet.shuffle();
 
         //Normalizing data set
-        Normalizer normalizer = new MaxNormalizer();
+        Normalizer normalizer = new MaxNormalizer(dataSet);
         normalizer.normalize(dataSet);
 
         //Creatinig training set (70%) and test set (30%)
@@ -142,7 +142,7 @@ public class IonosphereSample2 implements LearningEventListener {
         DataSet testSet = trainingAndTestSet[1];
 
         // ovde ubaci u petlju sa hidden neuronima i learning rates
-        
+
         System.out.println("Creating neural network...");
         //Create MultiLayerPerceptron neural network
         MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 10, 8, outputsCount);
@@ -219,7 +219,7 @@ public class IonosphereSample2 implements LearningEventListener {
         }
     }
 
-    //Metod determines the maximum output. Maximum output is network prediction for one row. 
+    //Metod determines the maximum output. Maximum output is network prediction for one row.
     public static int maxOutput(double[] array) {
         double max = array[0];
         int index = 0;
@@ -230,7 +230,7 @@ public class IonosphereSample2 implements LearningEventListener {
                 max = array[i];
             }
         }
-        //If maximum is less than 0.5, that prediction will not count. 
+        //If maximum is less than 0.5, that prediction will not count.
         if (max < 0.5) {
             return 0; //-1;
         }

@@ -76,13 +76,16 @@ public class SwedishAutoInsurance implements LearningEventListener {
 
         // create training set from file
         DataSet dataSet = DataSet.createFromFile(dataSetFileName, inputsCount, outputsCount, ",", false);
-        Normalizer norm = new MaxNormalizer();
-        norm.normalize(dataSet);
-        dataSet.shuffle();
 
-        List<DataSet> subSets = dataSet.split(60, 40);
-        DataSet trainingSet = subSets.get(0);
-        DataSet testSet = subSets.get(1);
+        // split data into train and test set
+        DataSet[] trainTestSplit = dataSet.split(0.6, 0.4);
+        DataSet trainingSet = trainTestSplit[0];
+        DataSet testSet = trainTestSplit[1];
+
+        // normalize training and test set
+        Normalizer norm = new MaxNormalizer(trainingSet);
+        norm.normalize(trainingSet);
+        norm.normalize(testSet);
 
         System.out.println("Creating neural network...");
         Adaline neuralNet = new Adaline(1);

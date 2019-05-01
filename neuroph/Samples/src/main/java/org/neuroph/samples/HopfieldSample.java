@@ -34,14 +34,14 @@ public class HopfieldSample {
 
         // create training set (H and T letter in 3x3 grid)
         DataSet trainingSet = new DataSet(9);
-        trainingSet.addRow(new DataSetRow(new double[]{1, 0, 1, 
+        trainingSet.add(new DataSetRow(new double[]{1, 0, 1,
                                                                 1, 1, 1,
                                                                 1, 0, 1})); // H letter
-        
-        trainingSet.addRow(new DataSetRow(new double[]{1, 1, 1,
+
+        trainingSet.add(new DataSetRow(new double[]{1, 1, 1,
                                                                 0, 1, 0,
                                                                 0, 1, 0})); // T letter
-  
+
         // create hopfield network
         Hopfield myHopfield = new Hopfield(9);
         // learn the training set
@@ -51,7 +51,7 @@ public class HopfieldSample {
         System.out.println("Testing network");
 
         // add one more 'incomplete' H pattern for testing - it will be recognized as H
-        trainingSet.addRow(new DataSetRow(new double[]{1, 0, 0,
+        trainingSet.add(new DataSetRow(new double[]{1, 0, 0,
                                                                 1, 0, 1,
                                                                 1, 0, 1}));
 
@@ -60,7 +60,7 @@ public class HopfieldSample {
         for(DataSetRow trainingSetRow : trainingSet.getRows()) {
             myHopfield.setInput(trainingSetRow.getInput());
             myHopfield.calculate();
-            myHopfield.calculate();   
+            myHopfield.calculate();
             double[] networkOutput = myHopfield.getOutput();
 
             System.out.print("Input: " + Arrays.toString(trainingSetRow.getInput()) );

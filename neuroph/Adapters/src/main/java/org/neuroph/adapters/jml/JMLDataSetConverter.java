@@ -86,7 +86,7 @@ public class JMLDataSetConverter {
                         j++;
                     }
                 }
-                
+
                 for(String cla:outputClasses){
                     if(cla.equals(jmlDataset.get(i).classValue().toString())){
                         outputs[k] = 1;
@@ -99,7 +99,7 @@ public class JMLDataSetConverter {
                 row = new DataSetRow(inputs, outputs);
             }
             row.setLabel(jmlDataset.get(i).classValue().toString());
-            neurophDataset.addRow(row);
+            neurophDataset.add(row);
         }
 
         return neurophDataset;

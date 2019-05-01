@@ -27,12 +27,12 @@ public abstract class AbstractSampling implements Sampling {
      * @return DataSets created using sampling algorithm
      */
     @Override
-    public List<DataSet> sample(DataSet dataSet) {
+    public DataSet[] sample(DataSet dataSet) {
         populateInternalDataStructure(dataSet);
 
-        List<DataSet> dataSets = new ArrayList<>(numberOfSamples);
+        DataSet[] dataSets = new DataSet[numberOfSamples];
         for (int i = 0; i < numberOfSamples; i++) {
-            dataSets.add(createDataSetFold(dataSet));
+            dataSets[i]=createDataSetFold(dataSet);
         }
         return dataSets;
     }
@@ -42,7 +42,7 @@ public abstract class AbstractSampling implements Sampling {
 
         DataSet foldSet = new DataSet(dataSet.getInputSize(), dataSet.getOutputSize());
         for (int j = 0; j < getSampleSize(); j++) {
-            foldSet.addRow(getNextDataSetRow());
+            foldSet.add(getNextDataSetRow());
         }
 
         return foldSet;

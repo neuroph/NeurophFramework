@@ -322,9 +322,9 @@ public class AutoTrainer {
         DataSet trainingSet, testSet; // validationSet;
 
         if (splitTrainTest) {
-            List<DataSet> dataSplit = dataSet.split(splitPercentage, 100-splitPercentage); //opet ne radi Maven za neuroph 2.92
-            trainingSet = dataSplit.get(0);
-            testSet = dataSplit.get(1);
+            DataSet[] dataSplit = dataSet.split(splitPercentage, 100-splitPercentage); //opet ne radi Maven za neuroph 2.92
+            trainingSet = dataSplit[0];
+            testSet = dataSplit[1];
         } else {
             trainingSet = dataSet;
             testSet = dataSet;
@@ -342,7 +342,7 @@ public class AutoTrainer {
             trainingSetting.setTrainingSet(splitPercentage);
             trainingSetting.setTestSet(100 - splitPercentage);
             //int subtrainNo = 0;
-             
+
             for (int subtrainNo = 1; subtrainNo <= repeat; subtrainNo++) {
                 System.out.println("#SubTraining: " + subtrainNo);
 

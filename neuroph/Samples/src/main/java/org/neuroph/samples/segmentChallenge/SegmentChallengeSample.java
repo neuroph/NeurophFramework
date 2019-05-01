@@ -36,10 +36,10 @@ import org.neuroph.util.data.norm.Normalizer;
  INTRODUCTION TO THE PROBLEM AND DATA SET INFORMATION:
 
  *Data set that will be used in this experiment: Wisconsin Diagnostic Breast Cancer (WDBC)
- The original training set that will be used in this experiment can be found at link: 
+ The original training set that will be used in this experiment can be found at link:
  https://archive.ics.uci.edu/ml/machine-learning-databases/image/segmentation.data
 
- The original test set that will be used in this experiment can be found at link: 
+ The original test set that will be used in this experiment can be found at link:
  https://archive.ics.uci.edu/ml/machine-learning-databases/image/segmentation.test
 
  1. Title: Image Segmentation data
@@ -48,14 +48,14 @@ import org.neuroph.util.data.norm.Normalizer;
  -- Creators: Vision Group, University of Massachusetts
  -- Donor: Vision Group (Carla Brodley, brodley@cs.umass.edu)
  -- Date: November, 1990
- 
+
  3. Past Usage: None yet published
 
  4. Relevant Information:
 
- The instances were drawn randomly from a database of 7 outdoor 
+ The instances were drawn randomly from a database of 7 outdoor
  images.  The images were handsegmented to create a classification
- for every pixel.  
+ for every pixel.
 
  Each instance is a 3x3 region.
 
@@ -68,18 +68,18 @@ import org.neuroph.util.data.norm.Normalizer;
  1.  region-centroid-col:  the column of the center pixel of the region.
  2.  region-centroid-row:  the row of the center pixel of the region.
  3.  region-pixel-count:  the number of pixels in a region = 9.
- 4.  short-line-density-5:  the results of a line extractoin algorithm that 
+ 4.  short-line-density-5:  the results of a line extractoin algorithm that
  counts how many lines of length 5 (any orientation) with
  low contrast, less than or equal to 5, go through the region.
  5.  short-line-density-2:  same as short-line-density-5 but counts lines
  of high contrast, greater than 5.
  6.  vedge-mean:  measure the contrast of horizontally
- adjacent pixels in the region.  There are 6, the mean and 
+ adjacent pixels in the region.  There are 6, the mean and
  standard deviation are given.  This attribute is used as
  a vertical edge detector.
  7.  vegde-sd:  (see 6)
  8.  hedge-mean:  measures the contrast of vertically adjacent
- pixels. Used for horizontal line detection. 
+ pixels. Used for horizontal line detection.
  9.  hedge-sd: (see 8).
  10. intensity-mean:  the average over the region of (R + G + B)/3
  11. rawred-mean: the average over the region of the R value.
@@ -96,7 +96,7 @@ import org.neuroph.util.data.norm.Normalizer;
 
  8. Missing Attribute Values: None
 
- 9. Class Distribution: 
+ 9. Class Distribution:
 
  Classes:   1,0,0,0,0,0,0 -- brickface
             0,1,0,0,0,0,0 -- sky
@@ -105,7 +105,7 @@ import org.neuroph.util.data.norm.Normalizer;
             0,0,0,0,1,0,0 -- window
             0,0,0,0,0,1,0 -- path
             0,0,0,0,0,0,1 -- grass
-        
+
  30 instances per class for training data.
  300 instances per class for test data.
 
@@ -131,26 +131,24 @@ public class SegmentChallengeSample implements LearningEventListener {
     public void run() {
 
         System.out.println("Creating training and test set from file...");
-        String trainingSetFileName = "data_sets/segment challenge.txt";
+        String dataSetFile = "data_sets/segment challenge.txt";
         String testSetFileName = "data_sets/segment test.txt";
         int inputsCount = 19;
         int outputsCount = 7;
 
         //Create training data set from file
-        DataSet trainingSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, ",");
+        DataSet trainingSet = DataSet.createFromFile(dataSetFile, inputsCount, outputsCount, ",");
         System.out.println("Training set size: " + trainingSet.getRows().size());
-        trainingSet.shuffle();
         trainingSet.shuffle();
 
         //Normalizing training data set
-        Normalizer normalizer = new MaxNormalizer();
+        Normalizer normalizer = new MaxNormalizer(trainingSet);
         normalizer.normalize(trainingSet);
 
         //Create test data set from file
         DataSet testSet = DataSet.createFromFile(testSetFileName, inputsCount, outputsCount, ",");
         System.out.println("Test set size: " + testSet.getRows().size());
         System.out.println("--------------------------------------------------");
-        testSet.shuffle();
         testSet.shuffle();
 
         //Normalizing training data set
@@ -230,7 +228,7 @@ public class SegmentChallengeSample implements LearningEventListener {
         }
     }
 
-    //Metod determines the maximum output. Maximum output is network prediction for one row. 
+    //Metod determines the maximum output. Maximum output is network prediction for one row.
     public static int maxOutput(double[] array) {
         double max = array[0];
         int index = 0;
@@ -241,7 +239,7 @@ public class SegmentChallengeSample implements LearningEventListener {
                 max = array[i];
             }
         }
-        //If maximum is less than 0.5, that prediction will not count. 
+        //If maximum is less than 0.5, that prediction will not count.
         if (max < 0.5) {
             return -1;
         }

@@ -118,7 +118,7 @@ public class DigitsRecognition {
             //creating new training element with specified input and output
             DataSetRow row = new DataSetRow(input, output);
             //adding row to data set
-            dataSet.addRow(row);
+            dataSet.add(row);
         }
         return dataSet;
     }

@@ -208,9 +208,9 @@ public class BufferedDataSet extends DataSet implements Iterator<DataSetRow> {
                 }
 
                 if (getOutputSize() > 0) {
-                    this.addRow(new DataSetRow(inputs, outputs));
+                    this.add(new DataSetRow(inputs, outputs));
                 } else {
-                    this.addRow(new DataSetRow(inputs));
+                    this.add(new DataSetRow(inputs));
                 }
             }
 

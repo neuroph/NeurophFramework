@@ -35,9 +35,9 @@ public class SigmoidDeltaRuleTest {
 		dataSet = new DataSet(1, 1);
 
 		for (int i = 0; i < x.length; i++) {
-			dataSet.addRow(new DataSetRow(new double[] { x[i] }, new double[] { y[i] }));
+			dataSet.add(new DataSetRow(new double[] { x[i] }, new double[] { y[i] }));
 		}
-		Normalizer n = new MaxMinNormalizer();
+		Normalizer n = new MaxMinNormalizer(dataSet);
 		n.normalize(dataSet);
 		maxError = 0.01;
 		instance.setMaxError(maxError);

@@ -16,9 +16,9 @@ import weka.core.Instances;
 import weka.core.converters.ConverterUtils;
 
 /**
- * Provides methods to convert dataset instances from Neuroph to Weka 
+ * Provides methods to convert dataset instances from Neuroph to Weka
  * and from Weka to Neuroph.
- * 
+ *
  * @author Zoran Sevarac
  */
 public class WekaDataSetConverter {
@@ -31,7 +31,7 @@ public class WekaDataSetConverter {
      * @return Neuroph data set
      */
     public static DataSet convertWekaToNeurophDataset(Instances wekaDataset, int numInputs, int numOutputs) {
-        
+
         if (numInputs <= 0) {
             throw new IllegalArgumentException("Number of inputs  in DataSet cannot be zero or negative!");
         }
@@ -39,22 +39,22 @@ public class WekaDataSetConverter {
         if (numOutputs < 0) {
             throw new IllegalArgumentException("Number of outputs  in DataSet cannot be negative!");
         }
-        
+
         if (numOutputs + numInputs < wekaDataset.numAttributes()) {
             throw new IllegalArgumentException("Number of outputs and inputs should be equal to number of attributes from data set!");
         }
-        
+
         // create supervised or unsupervised data set that will be returned
         DataSet neurophDataset=null;
-        
+
         if(numOutputs > 0){
             neurophDataset = new DataSet(numInputs,numOutputs);
         }else{
             neurophDataset = new DataSet(numInputs);
         }
-        
+
         List<Double> classValues = new ArrayList<Double>();
-        
+
         // get all different class values (as ints) from weka dataset
         for(Instance inst: wekaDataset){
             Double classDouble = inst.classValue();
@@ -62,74 +62,74 @@ public class WekaDataSetConverter {
                 classValues.add(classDouble);
             }
         }
-        
+
         Enumeration en = wekaDataset.enumerateInstances();
         while(en.hasMoreElements()) { // iterate all instances from dataset
-            Instance instance = (Instance) en.nextElement();            
+            Instance instance = (Instance) en.nextElement();
             double[] values = instance.toDoubleArray(); // get all the values from current instance
             if(numOutputs == 0){ // add unsupervised row
                 neurophDataset.addRow(values);
             } else {  // add supervised row
                 double[] inputs = new double[numInputs];
                 double[] outputs = new double[numOutputs];
-                
-                // set inputs 
+
+                // set inputs
                 for(int k = 0; k < values.length; k++){
                     if(k < numInputs){
                         inputs[k] = values[k];
                     }
                 }
-                
+
                 // set binary values for class outputs
                 int k = 0;
-                for(Double entry : classValues){                    
-                    if(entry.doubleValue() == instance.classValue()){ // if the 
+                for(Double entry : classValues){
+                    if(entry.doubleValue() == instance.classValue()){ // if the
                         outputs[k] = 1;
                     }else{
                         outputs[k] = 0;
                     }
                     k++;
                 }
-                
+
                 DataSetRow row = new DataSetRow(inputs, outputs);
                 row.setLabel(instance.stringValue(instance.classIndex()));
-                neurophDataset.addRow(row);
+                neurophDataset.add(row);
             }
         }
-        
+
         return neurophDataset;
     }
-    
-    
+
+
     /**
      * Converts Neuroph data set to Weka data set
      * @param neurophDataset DataSet Neuroph data set
      * @return instances Weka data set
      */
     public static Instances convertNeurophToWekaDataset(DataSet neurophDataset) {
-        
+
         Map<double[], String> classValues = getClassValues(neurophDataset);
-        
+
         Instances instances = createEmptyWekaDataSet(neurophDataset.getInputSize(), neurophDataset.size(), classValues);
-        
+
         int numInputs = neurophDataset.getInputSize();
 //        int numOutputs = neurophDataset.getOutputSize();
-        int numOutputs = 1; // why is this, and the above line is commented? probably because weka 
-        
+        int numOutputs = 1; // why is this, and the above line is commented? probably because weka
+
         instances.setClassIndex(numInputs);
-        
+
         Iterator<DataSetRow> iterator = neurophDataset.iterator();
         while(iterator.hasNext()) { // iterate all dataset rows
             DataSetRow row = iterator.next();
-            
+
             if (numOutputs> 0) { // if it is supervised (has outputs)
                 Instance instance = new DenseInstance(numInputs + numOutputs);
                 for(int i=0; i< numInputs; i++) {
                     instance.setValue(i, row.getInput()[i] );
                 }
-                             
-                instance.setDataset(instances);     
-                
+
+                instance.setDataset(instances);
+
                 // set output attribute, as String and double value of class
                 for(Map.Entry<double[], String> entry : classValues.entrySet()){
                     if(entry.getValue().equals(row.getLabel())){
@@ -145,7 +145,7 @@ public class WekaDataSetConverter {
                     }
                 }
 
-                           
+
                 instances.add(instance);
             } else { // if it is unsupervised - has only inputs
                 // create new instance
@@ -155,14 +155,14 @@ public class WekaDataSetConverter {
                     instance.setValue(i, row.getInput()[i] );
                 }
                 // and add instance to weka dataset
-                instance.setDataset(instances);                        
+                instance.setDataset(instances);
                 instances.add(instance);
             }
         }
-        
+
         return instances;
     }
-    
+
     /**
      * Creates and returns empty weka data set
      * @param numOfAttr int Number of attributes without class attribute
@@ -178,7 +178,7 @@ public class WekaDataSetConverter {
         HashMap classValsDoubleAsKey = new HashMap<Double, String>();
         //ind represents double value for class attribute
         int ind = 0;
-        
+
         //loop through possible class values
         for (Map.Entry<double[], String> values : classValues.entrySet()) {
 
@@ -215,31 +215,31 @@ public class WekaDataSetConverter {
      */
     private static Map<double[], String> getClassValues(DataSet neurophDataset) {
         Map<double[], String> classValues = new HashMap<double[], String>();
-        
+
         for(DataSetRow row : neurophDataset.getRows()){
             if(!classValues.containsValue(row.getLabel())){
                 classValues.put(row.getDesiredOutput(), row.getLabel());
             }
         }
-        
+
         return classValues;
     }
-    
+
        /**
      * Creates neuroph dataset from arff weka file.
-     * 
+     *
      * @param filePath Path to the file.
      * @param numInputs Number of inputs.
      * @return Neuroph dataset.
-     * @throws Exception 
+     * @throws Exception
      */
     public static DataSet createDataSetFromFile(String filePath, int numInputs) throws Exception {
         return createDataSetFromFile(filePath, numInputs, 0);
     }
-    
+
     /**
      * Creates neuroph dataset from arff weka file.
-     * 
+     *
      * @param filePath Path to the file.
      * @param numInputs Number of inputs.
      * @param numOutputs Number of outputs.
@@ -251,16 +251,16 @@ public class WekaDataSetConverter {
             ConverterUtils.DataSource dataSource = new ConverterUtils.DataSource(filePath);
 
             Instances wekaDataset = dataSource.getDataSet();
-            
+
             wekaDataset.setClassIndex(numInputs);
 
             DataSet neurophDataset = WekaDataSetConverter.convertWekaToNeurophDataset(wekaDataset, numInputs, numOutputs);
-            
+
             return neurophDataset;
-            
+
         } catch (Exception e) {
             return new DataSet(0);
         }
     }
-               
+
 }

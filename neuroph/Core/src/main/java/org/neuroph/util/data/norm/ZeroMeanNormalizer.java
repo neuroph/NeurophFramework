@@ -6,29 +6,25 @@ import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
 
 /**
- * Normalizes data sets by shifting all values in such way that data set has mean of 0 and std deviation of 1.
+ * Normalizes data sets by shifting all values in such way that data set has mean of 0 and standard deviation 1.
  */
 public class ZeroMeanNormalizer implements Normalizer, Serializable {
 
     private double[] maxInput;
     private double[] minInput;
     private double[] meanInput;
+    private double[] stdInput; // standard deviation
 
-    /**
-     * Flag to indicate that normalizer is initialized
-     */
-    private boolean intialized=false;
 
-    public void init(DataSet dataSet) {
+    public ZeroMeanNormalizer(DataSet dataSet) {
         maxInput = DataSetStats.inputsMax(dataSet);
         minInput = DataSetStats.inputsMin(dataSet);
         meanInput = DataSetStats.inputsMean(dataSet);
-        intialized = true;
+        stdInput =  DataSetStats.inputsStandardDeviation(dataSet, meanInput);
     }
 
     @Override
     public void normalize(DataSet dataSet) {
-        if (!intialized) init(dataSet);
 
         for (DataSetRow row : dataSet.getRows()) {
             double[] normalizedInput = row.getInput();

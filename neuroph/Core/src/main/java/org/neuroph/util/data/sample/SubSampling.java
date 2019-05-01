@@ -18,7 +18,6 @@ package org.neuroph.util.data.sample;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.neuroph.core.data.DataSet;
 
@@ -32,105 +31,81 @@ public class SubSampling implements Sampling {
     /**
      * Number of sub sets
      */
-    private int subSetCount;
+    private int numSubSets;
 
     /**
-     * Sizes of each subset
+     * Sizes of each subset as decimal numbers with sum equal to 1.
      */
-    private int[] subSetSizes;
-
-    /**
-     * True if samples are allowed to repeat in different subsets
-     */
-    private boolean allowRepetition = false;
+    private double[] subSetSizes;
 
 
     /**
-     * Sampling will produce a specified number of subsets of equal sizes
-     * Handy for K Fold subsampling
+     * Sampling will produce a specified number of subsets of equal sizes.
+     * Handy for sub-sampling in KFold crossvalidation
      *
-     * @param subSetCount number of subsets to produce
+     * @param numSubSets number of subsets to create
      */
-    public SubSampling(int subSetCount) { // without repetition
-        this.subSetCount = subSetCount;
-        this.subSetSizes = null;
+    public SubSampling(int numSubSets) {
+        this.numSubSets = numSubSets;
+        this.subSetSizes = null; // now known util specific data set is given
     }
 
 
     /**
-     * Sampling will produce subsets of specified sizes (in percents)
+     * Sampling will create subsets of specified sizes.
+     * Sum of specified sub set sizes must be 1.
      *
      * @param subSetSizes size of subsets in percents
      */
-    public SubSampling(int ... subSetSizes) { // without repetition, we should use doubles here
-        // sum of these must be 100%???
+    public SubSampling(double ... subSetSizes) { // we should use doubles here
+        double sum=0;
+        for(int i=0; i<subSetSizes.length; i++) {
+            sum+=subSetSizes[i];
+        }
+        if (sum>1) throw new IllegalArgumentException("Sum of sub set sizes cannot be greater then 1");
+
          this.subSetSizes = subSetSizes;
-         this.subSetCount = subSetSizes.length;
+         this.numSubSets = subSetSizes.length;
     }
 
-
     @Override
-    public List<DataSet> sample(DataSet dataSet) {
-        if (subSetSizes == null) { // if number of subSetSizes is null calculate it based on subSetSount
-            int  singleSubSetSize = dataSet.size() / subSetCount;
-            subSetSizes = new int[subSetCount];
-            for(int i=0; i< subSetCount; i++)
-               subSetSizes[i] = singleSubSetSize;
+    public DataSet[] sample(DataSet dataSet) {
+        // if object was initializes by specifying numParts calculate subSetSizes so all subsets are equally sized
+        if (subSetSizes == null) {
+            final double singleSubSetSize = 1.0d / numSubSets;
+            subSetSizes = new double[numSubSets];
+            for (int i = 0; i < numSubSets; i++) {
+                subSetSizes[i] = singleSubSetSize;
+            }
         }
 
+        // create list of data sets to return
         List<DataSet> subSets = new ArrayList<>();
 
         // shuffle dataset in order to randomize rows that will be used to fill subsets
         dataSet.shuffle();
 
-        int inputSize = dataSet.getInputSize();
-        int outputSize = dataSet.getOutputSize();
+        int idxCounter = 0; // index of main data set
+        for (int subSetIdx = 0; subSetIdx < numSubSets; subSetIdx++) {
+            // create new subset
+            DataSet newSubSet = new DataSet(dataSet.getInputSize(), dataSet.getOutputSize());
+            // cop column names if there are any
+            newSubSet.setColumnNames(dataSet.getColumnNames());
 
-        int idxCounter = 0;
-        for(int s=0; s < subSetSizes.length; s++) {
-            // create new sample subset
-            DataSet newSubSet = new DataSet(inputSize, outputSize);
             // fill subset with rows
-
-            if (!allowRepetition) {
-                int foldSize =  (int)Math.round(((double)subSetSizes[s] / 100) * dataSet.size());
-                for (int i = 0; i < foldSize; i++) {
-                    if(idxCounter >= dataSet.size()) break;
-                    newSubSet.addRow(dataSet.getRowAt(idxCounter));
-                    idxCounter++;
+            long subSetSize = Math.round(subSetSizes[subSetIdx] * dataSet.size()); // calculate size of the current subset
+            for (int i = 0; i < subSetSize; i++) {
+                if (idxCounter >= dataSet.size()) {
+                    break;
                 }
-            } else {
-                int randomIdx;
-                Random rand = new Random();
-                for (int i = 0; i < subSetSizes[s] /100 * dataSet.size(); i++) {
-                    randomIdx = rand.nextInt(dataSet.size());
-                    newSubSet.addRow(dataSet.getRowAt(randomIdx));
-                    idxCounter++;
-                }
+                newSubSet.add(dataSet.getRowAt(idxCounter));
+                idxCounter++;
             }
-            // add subset to th elist of subsets to return
+
+            // add current subset to list that will be returned
             subSets.add(newSubSet);
         }
 
-        return subSets;
+        return subSets.toArray(new DataSet[numSubSets]);
     }
-
-    /**
-     * Get flag which indicates if sample repetition is allowed in subsets
-     * @return
-     */
-    public boolean getAllowRepetition() {
-        return allowRepetition;
-    }
-
-    /**
-     * Set flag to allow repetition of samples in subsets
-     * @param allowRepetition
-     */
-    public void setAllowRepetition(boolean allowRepetition) {
-        this.allowRepetition = allowRepetition;
-    }
-
-
-
 }

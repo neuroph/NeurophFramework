@@ -39,31 +39,17 @@ public class DecimalScaleNormalizer implements Normalizer, Serializable {
     private  double[] scaleFactorIn, scaleFactorOut;
 
     /**
-     * Flag to indicate that normalizer is initialized
-     */
-    private boolean intialized=false;
-
-
-    public DecimalScaleNormalizer() {
-
-    }
-
-    /**
      * Initializes normalizer, finds right scale factor for each input and output column in vectors.
      * @param dataSet
      */
-    @Override
-    public void init(DataSet dataSet) {
+    public DecimalScaleNormalizer(DataSet dataSet) {
         findMaxVectors(dataSet);
         findScaleVectors();
-        intialized = true;
     }
 
 
     @Override
     public void normalize(DataSet dataSet) {
-        if (!intialized) init(dataSet);
-
         for (DataSetRow dataSetRow : dataSet.getRows()) {
             double[] normalizedInput = normalizeScale(dataSetRow.getInput(), scaleFactorIn);
             dataSetRow.setInput(normalizedInput);
@@ -114,7 +100,7 @@ public class DecimalScaleNormalizer implements Normalizer, Serializable {
         }
     }
 
-    public void findScaleVectors() {
+    private void findScaleVectors() {
         scaleFactorIn = new double[maxIn.length];
         for (int i = 0; i < scaleFactorIn.length; i++) {
             scaleFactorIn[i] = 1;

@@ -17,12 +17,12 @@ package org.neuroph.samples.crossvalidation;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import org.neuroph.eval.CrossFolds;
-import org.neuroph.eval.CrossValidation;
+import org.neuroph.eval.KFoldCrossValidation;
 import org.neuroph.eval.EvaluationResult;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.events.LearningEvent;
 import org.neuroph.core.events.LearningEventListener;
+import org.neuroph.eval.FoldResult;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.MomentumBackpropagation;
 import org.neuroph.util.data.norm.MaxNormalizer;
@@ -36,18 +36,18 @@ import org.neuroph.util.data.norm.Normalizer;
  INTRODUCTION TO THE PROBLEM AND DATA SET INFORMATION:
  1. Data set that will be used in this experiment: Wine Quality Dataset
     The Wine Quality Dataset involves predicting the quality of white wines on a scale given chemical measures of each wine.
-    It is a multi-class classification problem, but could also be framed as a regression problem. 
-    The original data set that will be used in this experiment can be found at link: 
+    It is a multi-class classification problem, but could also be framed as a regression problem.
+    The original data set that will be used in this experiment can be found at link:
     http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv
 2. Reference:  National Institute of Diabetes and Digestive and Kidney Diseases
-   Paulo Cortez, University of Minho, Guimarães, Portugal, http://www3.dsi.uminho.pt/pcortez 
+   Paulo Cortez, University of Minho, Guimarães, Portugal, http://www3.dsi.uminho.pt/pcortez
    A. CeA. Cerdeira, F. Almeida, T. Matos and J. Reis, Viticulture Commission of the Vinho Verde Region(CVRVV), Porto, Portugal , @ 2009
- 
+
 3. Number of instances: 4 898
 4. Number of Attributes: 11 pluss class attributes (inputs are continuous aand numerical values, and output is numerical)
-5. Attribute Information:    
+5. Attribute Information:
  Inputs:
- 11 attributes: 
+ 11 attributes:
  11 numerical or continuous features are computed for each wine:
  1) Fixed acidity.
  2) Volatile acidity.
@@ -62,7 +62,7 @@ import org.neuroph.util.data.norm.Normalizer;
  11) Alcohol.
  12) Output: Quality (score between 0 and 10).
 6. Missing Values: None.
- 
+
  */
 public class WineQuality implements LearningEventListener {
 
@@ -73,13 +73,13 @@ public class WineQuality implements LearningEventListener {
     public void run() throws InterruptedException, ExecutionException {
         System.out.println("Creating training set...");
         // get path to training set
-        String trainingSetFileName = "data_sets/wine.txt";
+        String dataSetFile = "data_sets/wine.txt";
         int inputsCount = 11;
         int outputsCount = 10;
 
         // create training set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, "\t", true);
-        Normalizer norm = new MaxNormalizer();
+        DataSet dataSet = DataSet.createFromFile(dataSetFile, inputsCount, outputsCount, "\t", true);
+        Normalizer norm = new MaxNormalizer(dataSet);
         norm.normalize(dataSet);
         dataSet.shuffle();
 
@@ -95,9 +95,9 @@ public class WineQuality implements LearningEventListener {
 
         String classLabels[] = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
         neuralNet.setOutputLabels(classLabels);
-        CrossValidation crossVal = new CrossValidation(neuralNet, dataSet, 10);
+        KFoldCrossValidation crossVal = new KFoldCrossValidation(neuralNet, dataSet, 10);
         EvaluationResult totalResult= crossVal.run();
-         List<CrossFolds> cflist= crossVal.getFoldResults();
+        List<FoldResult> cflist= crossVal.getResultsByFolds();
     }
 
     @Override

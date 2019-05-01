@@ -23,30 +23,31 @@ import org.neuroph.util.data.norm.MaxMinNormalizer;
 import org.neuroph.util.data.norm.Normalizer;
 
 /**
- * This sample shows how to do data normalization in Neuroph.
+ * This sample shows how to perform data normalization in Neuroph.
+ *
  * @author Zoran Sevarac <sevarac@gmail.com>
  */
 public class NormalizationSample {
 
     /**
      * Runs this sample
-     */    
+     */
     public static void main(String[] args) {
-        
+
         // create data set to normalize
         DataSet dataSet = new DataSet(2, 1);
-        dataSet.addRow(new DataSetRow(new double[]{10, 12}, new double[]{0}));
-        dataSet.addRow(new DataSetRow(new double[]{23, 19}, new double[]{0}));
-        dataSet.addRow(new DataSetRow(new double[]{47, 76}, new double[]{0}));
-        dataSet.addRow(new DataSetRow(new double[]{98, 123}, new double[]{1}));
+        dataSet.add(new DataSetRow(new double[]{10, 12}, new double[]{0}));
+        dataSet.add(new DataSetRow(new double[]{23, 19}, new double[]{0}));
+        dataSet.add(new DataSetRow(new double[]{47, 76}, new double[]{0}));
+        dataSet.add(new DataSetRow(new double[]{98, 123}, new double[]{1}));
 
-        Normalizer norm = new MaxMinNormalizer();
+        Normalizer norm = new MaxMinNormalizer(dataSet);
         norm.normalize(dataSet);
-        
+
         // print out normalized training set
         for (DataSetRow dataSetRow : dataSet.getRows()) {
             System.out.print("Input: " + Arrays.toString(dataSetRow.getInput()));
-            System.out.print("Output: " + Arrays.toString(dataSetRow.getDesiredOutput()));            
+            System.out.print("Output: " + Arrays.toString(dataSetRow.getDesiredOutput()));
         }
     }
 }

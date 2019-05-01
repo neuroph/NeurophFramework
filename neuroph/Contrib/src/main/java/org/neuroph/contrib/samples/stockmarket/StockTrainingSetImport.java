@@ -50,9 +50,9 @@ public class StockTrainingSetImport extends TrainingSetImport {
                     outputs.add(values[j]);
                 }
                 if (outputsCount > 0) {
-                    trainingSet.addRow(new DataSetRow(inputs, outputs));
+                    trainingSet.add(new DataSetRow(inputs, outputs));
                 } else {
-                    trainingSet.addRow(new DataSetRow(inputs));
+                    trainingSet.add(new DataSetRow(inputs));
                 }
             }
         }

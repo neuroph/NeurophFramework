@@ -27,10 +27,10 @@ import org.neuroph.nnet.learning.MomentumBackpropagation;
  * speed of data flow forward and backward through network
  * @author Zoran Sevarac <sevarac@gmail.com>
  */
-public class MyBenchmarkTask extends BenchmarkTask {    
+public class MyBenchmarkTask extends BenchmarkTask {
     private MultiLayerPerceptron network;
     private DataSet trainingSet;
-    
+
     public MyBenchmarkTask(String name) {
         super(name);
     }
@@ -45,9 +45,9 @@ public class MyBenchmarkTask extends BenchmarkTask {
         int trainingSetSize = 100;
         int inputSize = 10;
         int outputSize = 5;
-        
+
         this.trainingSet = new DataSet(inputSize, outputSize);
-        
+
         for (int i = 0; i < trainingSetSize; i++) {
             double[] input = new double[inputSize];
             for( int j=0; j<inputSize; j++)
@@ -55,16 +55,16 @@ public class MyBenchmarkTask extends BenchmarkTask {
 
             double[] output = new double[outputSize];
             for( int j=0; j<outputSize; j++)
-                output[j] = Math.random();            
-            
+                output[j] = Math.random();
+
             DataSetRow trainingSetRow = new DataSetRow(input, output);
-            trainingSet.addRow(trainingSetRow);
+            trainingSet.add(trainingSetRow);
         }
-        
-        
+
+
         network = new MultiLayerPerceptron(inputSize, 8, 7, outputSize);
         ((MomentumBackpropagation)network.getLearningRule()).setMaxIterations(2000);
-        
+
     }
 
     @Override

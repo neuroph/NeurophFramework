@@ -61,7 +61,7 @@ public class MNISTDataSet {
                     k += 4;
             }
             DataSetRow row = new DataSetRow(input, output);
-            dataSet.addRow(row);
+            dataSet.add(row);
         }
         dataSet.setColumnName(1024, "0");
         dataSet.setColumnName(1025, "1");
@@ -73,7 +73,7 @@ public class MNISTDataSet {
         dataSet.setColumnName(1031, "7");
         dataSet.setColumnName(1032, "8");
         dataSet.setColumnName(1033, "9");
-        
+
         return dataSet;
     }
 }

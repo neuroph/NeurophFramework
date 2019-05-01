@@ -5,7 +5,6 @@ import org.neuroph.core.data.DataSetRow;
 
 /**
  * Utility class with methods for calculating dataset statistics
- * TODO: add variance, and std
  * Calculate everything in one pass and expose as attributes - like summary() in R
  * Not only for inputs but also for outputs
  */
@@ -77,5 +76,23 @@ public class DataSetStats {
 		}
 		return minColumnElements;
 	}
+
+    public static double[] inputsStandardDeviation(DataSet dataSet, double[] mean) {
+        double[] sum = new double[mean.length];
+
+        for (DataSetRow dataSetRow : dataSet.getRows()) {
+            double[] input = dataSetRow.getInput();
+            for (int i = 0; i < input.length; i++) {
+                sum[i] = (input[i] - mean[i]) * (input[i] - mean[i]);
+            }
+        }
+
+        double[] std = new double[mean.length];
+        for (int i = 0; i < mean.length; i++) {
+            std[i] = Math.sqrt(sum[i] / (dataSet.size()-1));    // calculate as sample deviation not population
+        }
+
+        return std;
+    }
 
 }

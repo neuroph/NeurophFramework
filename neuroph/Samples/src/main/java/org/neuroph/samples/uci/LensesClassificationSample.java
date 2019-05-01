@@ -66,12 +66,12 @@ public class LensesClassificationSample implements LearningEventListener {
 
         System.out.println("Creating training set...");
         
-        String trainingSetFileName = "data_sets/lenses_data.txt";
+        String dataSetFile = "data_sets/lenses_data.txt";
         int inputsCount = 9;
         int outputsCount = 3;
 
         System.out.println("Creating training set...");
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, " ", false);
+        DataSet dataSet = DataSet.createFromFile(dataSetFile, inputsCount, outputsCount, " ", false);
 
 
         System.out.println("Creating neural network...");

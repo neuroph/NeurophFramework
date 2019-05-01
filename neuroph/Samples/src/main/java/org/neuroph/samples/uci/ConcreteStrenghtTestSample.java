@@ -62,12 +62,12 @@ public class ConcreteStrenghtTestSample implements LearningEventListener {
     public void run() {
 
         System.out.println("Creating training set...");
-        String trainingSetFileName = "data_sets/concrete_strenght_test_data.txt";
+        String dataSetFile = "data_sets/concrete_strenght_test_data.txt";
         int inputsCount = 8;
         int outputsCount = 1;
 
         // create training set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, ",", false);
+        DataSet dataSet = DataSet.createFromFile(dataSetFile, inputsCount, outputsCount, ",", false);
        
         
         System.out.println("Creating neural network...");

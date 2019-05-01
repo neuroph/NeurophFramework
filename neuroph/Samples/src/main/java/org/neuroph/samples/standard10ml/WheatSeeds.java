@@ -41,24 +41,24 @@ import org.neuroph.util.TransferFunctionType;
 
  1. Data set that will be used in this experiment: Wheat Seeds Dataset
     The Wheat Seeds Dataset involves the prediction of species given measurements of seeds from different varieties of wheat.
-    The original data set that will be used in this experiment can be found at link: 
+    The original data set that will be used in this experiment can be found at link:
     http://archive.ics.uci.edu/ml/machine-learning-databases/00236/seeds_dataset.txt
 
-2. Reference:  Magorzata Charytanowicz, Jerzy Niewczas ,Institute of Mathematics and Computer Science, ,The John Paul II Catholic University of Lublin, KonstantynÃ³w 1 H, ,PL 20-708 Lublin, Poland 
-   Owner of database: Volker Lohweg (University of Applied Sciences, Ostwestfalen-Lippe, volker.lohweg '@' hs-owl.de) 
+2. Reference:  Magorzata Charytanowicz, Jerzy Niewczas ,Institute of Mathematics and Computer Science, ,The John Paul II Catholic University of Lublin, KonstantynÃ³w 1 H, ,PL 20-708 Lublin, Poland
+   Owner of database: Volker Lohweg (University of Applied Sciences, Ostwestfalen-Lippe, volker.lohweg '@' hs-owl.de)
    M. Charytanowicz, J. Niewczas, P. Kulczycki, P.A. Kowalski, S. Lukasik, S. Zak, 'A Complete Gradient Clustering Algorithm for Features Analysis of X-ray Images', in: Information Technologies in Biomedicine, Ewa Pietka, Jacek Kawa (eds.), Springer-Verlag, Berlin-Heidelberg, 2010, pp. 15-24.
- 
- 
+
+
 3. Number of instances: 210
 
 4. Number of Attributes: 7 pluss class attributes
 
-5. Attribute Information:    
+5. Attribute Information:
  Inputs:
- 7 attributes: 
+ 7 attributes:
  7 continuous feature values are computed for each seed:
  1) Area.
- 2) Perimeter. 
+ 2) Perimeter.
  3) Compactness
  4) Length of kernel.
  5) Width of kernel.
@@ -71,7 +71,7 @@ import org.neuroph.util.TransferFunctionType;
 
 
 
- 
+
  */
 public class WheatSeeds implements LearningEventListener {
 
@@ -80,19 +80,18 @@ public class WheatSeeds implements LearningEventListener {
     }
 
     public void run() {
-        System.out.println("Creating training set...");
-        // get path to training set
-        String trainingSetFileName = "data_sets/ml10standard/seeds.txt";
+        System.out.println("Creating data set...");
+        String dataSetFile = "data_sets/ml10standard/seeds.txt";
         int inputsCount = 7;
         int outputsCount = 3;
 
         // create training set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, "\t");
-        dataSet.shuffle();
+        DataSet dataSet = DataSet.createFromFile(dataSetFile, inputsCount, outputsCount, "\t");
 
-        List<DataSet> subSets = dataSet.split(60, 40);
-        DataSet trainingSet = subSets.get(0);
-        DataSet testSet = subSets.get(1);
+        // split data into train and test set
+        DataSet[] trainTestSplit = dataSet.split(0.6, 0.4);
+        DataSet trainingSet = trainTestSplit[0];
+        DataSet testSet = trainTestSplit[1];
 
         System.out.println("Creating neural network...");
         MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 15, 2, outputsCount);
@@ -119,7 +118,7 @@ public class WheatSeeds implements LearningEventListener {
         neuralNet.save("nn1.nnet");
 
         System.out.println("Done.");
-        
+
         System.out.println();
         System.out.println("Network outputs for test set");
         testNeuralNetwork(neuralNet, testSet);
@@ -127,7 +126,7 @@ public class WheatSeeds implements LearningEventListener {
 
     // Displays inputs, desired output (from dataset) and actual output (calculated by neural network) for every row from data set.
     public void testNeuralNetwork(NeuralNetwork neuralNet, DataSet testSet) {
-        
+
         System.out.println("Showing inputs, desired output and neural network output for every row in test set.");
 
         for (DataSetRow testSetRow : testSet.getRows()) {
@@ -141,19 +140,19 @@ public class WheatSeeds implements LearningEventListener {
         }
     }
 
-    // Evaluates performance of neural network. 
+    // Evaluates performance of neural network.
     // Contains calculation of Confusion matrix for classification tasks or Mean Ssquared Error and Mean Absolute Error for regression tasks.
     // Difference in binary and multi class classification are made when adding Evaluator (MultiClass or Binary).
     public void evaluate(NeuralNetwork neuralNet, DataSet dataSet) {
-        
+
         System.out.println("Calculating performance indicators for neural network.");
-        
+
         Evaluation evaluation = new Evaluation();
         evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
 
         String[] classLabels = new String[]{"1", "2", "3"};
         evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(classLabels));
-        evaluation.evaluateDataSet(neuralNet, dataSet);
+        evaluation.evaluate(neuralNet, dataSet);
 
         ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
         ConfusionMatrix confusionMatrix = evaluator.getResult();

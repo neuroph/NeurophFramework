@@ -84,12 +84,12 @@ public class PredictingTheReligionSample implements LearningEventListener {
 
         System.out.println("Creating training set...");
         // get path to training set
-        String trainingSetFileName = "data_sets/religion_data.txt";
+        String dataSetFile = "data_sets/religion_data.txt";
         int inputsCount = 54;
         int outputsCount = 5;
 
         // create training set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, "\t", false);
+        DataSet dataSet = DataSet.createFromFile(dataSetFile, inputsCount, outputsCount, "\t", false);
        
         
         System.out.println("Creating neural network...");

@@ -28,12 +28,8 @@ import org.neuroph.eval.ErrorEvaluator;
 import org.neuroph.eval.Evaluation;
 import org.neuroph.eval.classification.ClassificationMetrics;
 import org.neuroph.eval.classification.ConfusionMatrix;
-import org.neuroph.nnet.Adaline;
 import org.neuroph.nnet.MultiLayerPerceptron;
-import org.neuroph.nnet.learning.BackPropagation;
-import org.neuroph.nnet.learning.LMS;
 import org.neuroph.nnet.learning.MomentumBackpropagation;
-import org.neuroph.util.TransferFunctionType;
 import org.neuroph.util.data.norm.MaxNormalizer;
 import org.neuroph.util.data.norm.Normalizer;
 
@@ -89,21 +85,22 @@ public class WineQualityClassification implements LearningEventListener {
     }
 
     public void run() {
-        System.out.println("Creating training set...");
-        // get path to training set
-        String trainingSetFileName = "data_sets/ml10standard/wine.txt";
+        System.out.println("Creating data set...");
+        String dataSetFile = "data_sets/ml10standard/wine.txt";
         int inputsCount = 11;
         int outputsCount = 10;
 
-        // create training set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, "\t", true);
-        Normalizer norm = new MaxNormalizer();
-        norm.normalize(dataSet);
-        dataSet.shuffle();
+        // create data set from file
+        DataSet dataSet = DataSet.createFromFile(dataSetFile, inputsCount, outputsCount, "\t", true);
 
-        List<DataSet> subSets = dataSet.split(60, 40);
-        DataSet trainingSet = subSets.get(0);
-        DataSet testSet = subSets.get(1);
+        // split data into train and test set
+        DataSet[] trainTestSplit = dataSet.split(0.6, 0.4);
+        DataSet trainingSet = trainTestSplit[0];
+        DataSet testSet = trainTestSplit[1];
+
+        Normalizer norm = new MaxNormalizer(trainingSet);
+        norm.normalize(trainingSet);
+        norm.normalize(testSet);
 
         System.out.println("Creating neural network...");
         MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 20, 15, outputsCount);
@@ -164,7 +161,7 @@ public class WineQualityClassification implements LearningEventListener {
 
         String classLabels[] = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
         evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(classLabels));
-        evaluation.evaluateDataSet(neuralNet, dataSet);
+        evaluation.evaluate(neuralNet, dataSet);
 
         ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
         ConfusionMatrix confusionMatrix = evaluator.getResult();

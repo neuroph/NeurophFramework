@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Random;
 
 import org.neuroph.core.exceptions.NeurophException;
 import org.neuroph.core.exceptions.VectorSizeMismatchException;
@@ -33,12 +34,12 @@ import org.neuroph.util.data.sample.SubSampling;
  * This class represents a collection of data rows (DataSetRow instances) used
  * for training and testing neural network.
  * TODO: add logging
- * 
+ *
  * @author Zoran Sevarac <sevarac@gmail.com>
  * @see DataSetRow
  * http://openforecast.sourceforge.net/docs/net/sourceforge/openforecast/DataSet.html
  */
-public class DataSet implements List<DataSetRow>, Serializable { // implements 
+public class DataSet implements javax.visrec.ml.data.DataSet<DataSetRow>, Serializable { // implements
 
     /**
      * The class fingerprint that is set to indicate serialization compatibility
@@ -79,7 +80,7 @@ public class DataSet implements List<DataSetRow>, Serializable { // implements
      * Full file path including file name
      */
     private transient String filePath;
-    
+
     /**
      * Column types for data set
      */
@@ -119,8 +120,10 @@ public class DataSet implements List<DataSetRow>, Serializable { // implements
      * Adds new row row to this data set
      *
      * @param row data set row to add
+     * @return
      */
-    public boolean addRow(DataSetRow row)
+    @Override
+    public DataSet add(DataSetRow row)
             throws VectorSizeMismatchException {
 
         if (row == null) {
@@ -139,7 +142,9 @@ public class DataSet implements List<DataSetRow>, Serializable { // implements
         }
 
         // if everything was ok add training row
-        return rows.add(row);
+        rows.add(row);
+
+        return this;
     }
 
     /**
@@ -157,7 +162,7 @@ public class DataSet implements List<DataSetRow>, Serializable { // implements
         if (isSupervised)
             throw new NeurophException("Cannot add unsupervised row to supervised data set!");
 
-        this.addRow(new DataSetRow(input));
+        this.add(new DataSetRow(input));
     }
 
     /**
@@ -166,8 +171,8 @@ public class DataSet implements List<DataSetRow>, Serializable { // implements
      * @param input
      * @param output
      */
-    public void addRow(double[] input, double[] output) {
-        this.addRow(new DataSetRow(input, output));
+    public void add(double[] input, double[] output) {
+        this.add(new DataSetRow(input, output));
     }
 
     /**
@@ -275,25 +280,25 @@ public class DataSet implements List<DataSetRow>, Serializable { // implements
     public void setColumnName(int idx, String columnName) {
         columnNames[idx] = columnName;
     }
-    
+
     public DataSetColumnType[] getColumnTypes() {
         return this.columnTypes;
     }
-    
+
     public DataSetColumnType getColumnType(int index) {
         return this.columnTypes[index];
     }
-    
+
     /**
      * Sets column type for the given index.
-     * 
+     *
      * @param index Index of the column in the row.
      * @param columnType Column type to set, nominal or numeric.
      */
     public void setColumnType(int index, DataSetColumnType columnType) {
         this.columnTypes[index] = columnType;
     }
-    
+
     /**
      * Sets full file path for this training set
      *
@@ -377,9 +382,9 @@ public class DataSet implements List<DataSetRow>, Serializable { // implements
      * Saves this training set to file specified in its filePath field
      */
     public void save() {
-        
+
         if (filePath == null) throw new NeurophException("filePath is null! It must be specified in order to save file!");
-        
+
         try (ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(filePath)))) {
             out.writeObject(this);
             out.flush();
@@ -437,26 +442,26 @@ public class DataSet implements List<DataSetRow>, Serializable { // implements
     /**
      * Loads training set from the specified file
      * TODO:  throw checked exceptionse here
-     * 
+     *
      * @param filePath training set file
      * @return loded training set
      */
     public static DataSet load(String filePath) {
 
         try (ObjectInputStream oistream = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filePath))) ) {
- 
+
             DataSet dataSet = (DataSet) oistream.readObject();
             dataSet.setFilePath(filePath);
 
             return dataSet;
 
         } catch(FileNotFoundException fnfe) {
-           throw new NeurophException("Could not find file: '" + filePath + "'!", fnfe); 
+           throw new NeurophException("Could not find file: '" + filePath + "'!", fnfe);
         } catch (IOException ioe) {
             throw new NeurophException("Error reading file: '" + filePath + "'!", ioe);
         } catch (ClassNotFoundException ex) {
             throw new NeurophException("Class not found while trying to read DataSet object from the stream!", ex);
-        } 
+        }
     }
 
     /**
@@ -468,11 +473,11 @@ public class DataSet implements List<DataSetRow>, Serializable { // implements
      * @param delimiter       delimiter of values
      * @param loadColumnNames true if csv file contains column names in first line, false otherwise
      * @return instance of dataset with values from specified file
-     * 
+     *
      * TODO: try with resources, provide information on exact line of error if format is not good in NumberFormatException
      */
     public static DataSet createFromFile(String filePath, int inputsCount, int outputsCount, String delimiter, boolean loadColumnNames) {
-       
+
         if (filePath == null) throw new IllegalArgumentException("File name cannot be null!");
         if (inputsCount <= 0) throw new IllegalArgumentException("Number of inputs cannot be <= 0 : "+inputsCount);
         if (outputsCount < 0) throw new IllegalArgumentException("Number of outputs cannot be < 0 : "+outputsCount);
@@ -481,7 +486,7 @@ public class DataSet implements List<DataSetRow>, Serializable { // implements
 
         try ( BufferedReader reader = new BufferedReader(new FileReader(filePath)) ) {
             DataSet dataSet = new DataSet(inputsCount, outputsCount);
-            dataSet.setFilePath(filePath);            
+            dataSet.setFilePath(filePath);
 
             String line = null;
 
@@ -512,14 +517,14 @@ public class DataSet implements List<DataSetRow>, Serializable { // implements
                 }
 
                 if (outputsCount > 0) {
-                    dataSet.addRow(new DataSetRow(inputs, outputs));
+                    dataSet.add(new DataSetRow(inputs, outputs));
                 } else {
-                    dataSet.addRow(new DataSetRow(inputs));
+                    dataSet.add(new DataSetRow(inputs));
                 }
             }
 
             reader.close();
-            
+
             return dataSet;
 
         } catch (FileNotFoundException ex) {
@@ -541,13 +546,13 @@ public class DataSet implements List<DataSetRow>, Serializable { // implements
      * @param outputsCount    number of outputs
      * @param delimiter       delimiter of values
      * @return instance of dataset with values from specified file
-     */    
-    public static DataSet createFromFile(String filePath, int inputsCount, int outputsCount, String delimiter) {    
+     */
+    public static DataSet createFromFile(String filePath, int inputsCount, int outputsCount, String delimiter) {
         return createFromFile(filePath, inputsCount, outputsCount, delimiter, false);
     }
-    
-    
-    
+
+
+
     // http://java.about.com/od/javautil/a/uniquerandomnum.htm
 
     /**
@@ -556,25 +561,45 @@ public class DataSet implements List<DataSetRow>, Serializable { // implements
      * @param testSetPercent
      * @return
      */
-    public DataSet[] createTrainingAndTestSubsets(int trainSetPercent, int testSetPercent) {
+    public DataSet[] createTrainingAndTestSubsets(double trainSetPercent, double testSetPercent) {
         SubSampling sampling = new SubSampling(trainSetPercent, testSetPercent);
-        DataSet[] trainAndTestSet =  new DataSet[2];
-        sampling.sample(this).toArray(trainAndTestSet);
+        DataSet[] trainAndTestSet = sampling.sample(this);
         return trainAndTestSet;
     }
 
 //    public DataSet[] split(double size) {
 //        SubSampling sampling = new SubSampling(sizePercents);
-//        return sampling.sample(this);    
-//    }    
-    
-    public List<DataSet> split(int ... sizePercents) {
-        SubSampling sampling = new SubSampling(sizePercents);
-        return sampling.sample(this);    
-    }
-    
+//        return sampling.sample(this);
+//    }
 
-    public List<DataSet> sample(Sampling sampling) {
+    /**
+     * Splits data set into specified number of parts and returns them as a list.
+     *
+     * @param numParts
+     * @return
+     */
+    @Override
+    public DataSet[] split(int numParts) {
+        SubSampling sampling = new SubSampling(numParts);
+        return sampling.sample(this);
+    }
+
+
+    /**
+     * Splits data sets into parts of specified sizes.
+     * Sum of parts must be equal one, or exception will be thrown.
+     *
+     * @param parts
+     * @return
+     */
+    @Override
+    public DataSet[] split(double ... parts) {
+        SubSampling sampling = new SubSampling(parts);
+        return sampling.sample(this);
+    }
+
+
+    public DataSet[] sample(Sampling sampling) {
         return sampling.sample(this);
     }
 
@@ -590,113 +615,44 @@ public class DataSet implements List<DataSetRow>, Serializable { // implements
      * Returns input vector size of training elements in this training set This
      * method is implementation of EngineIndexableSet interface, and it is added
      * to provide compatibility with Encog data sets and FlatNetwork
+     * @return
      */
     public int getInputSize() {
         return this.inputSize;
     }
 
+    @Override
     public void shuffle() {
         Collections.shuffle(rows);
     }
 
-    @Override
-    public boolean contains(Object o) {
-        return rows.contains(o);// TODO: implement equals for DataSetRow
-    }
 
-    @Override
-    public Object[] toArray() {
-       return rows.toArray();
-    }
-
-    @Override
-    public <T> T[] toArray(T[] a) {
-        return rows.toArray(a);
-    }
-
-    @Override
-    public boolean add(DataSetRow row) {
-        return rows.add(row); // better  call to addRow instead
-    }
-
-    @Override
     public boolean remove(Object row) {
         return rows.remove(row);
     }
 
-    @Override
-    public boolean containsAll(Collection<?> c) {
-       return rows.containsAll(c);
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends DataSetRow> c) {
-        return rows.addAll(c);
-    }
-
-    @Override
-    public boolean addAll(int index, Collection<? extends DataSetRow> c) {
-        return rows.addAll(index, c);
-    }
-
-    @Override
-    public boolean removeAll(Collection<?> c) {
-        return rows.removeAll(c);
-    }
-
-    @Override
-    public boolean retainAll(Collection<?> c) {
-        return rows.retainAll(c);
-    }
 
     @Override
     public DataSetRow get(int index) {
         return rows.get(index);
     }
 
-    @Override
-    public DataSetRow set(int index, DataSetRow row) {
-        return rows.set(index, row);
-    }
 
-    @Override
     public void add(int index, DataSetRow row) {
         rows.add(index, row);
     }
 
-    @Override
     public DataSetRow remove(int index) {
         return rows.remove(index);
     }
 
-    @Override
     public int indexOf(Object row) {
         return rows.indexOf(row);
     }
 
-    @Override
-    public int lastIndexOf(Object row) {
-        return rows.lastIndexOf(row);
-    }
-
-    @Override
-    public ListIterator<DataSetRow> listIterator() {
-        return rows.listIterator();
-    }
-
-    @Override
-    public ListIterator<DataSetRow> listIterator(int index) {
-        return rows.listIterator(index);
-    }
-
-    @Override
-    public List<DataSetRow> subList(int fromIndex, int toIndex) {
-        return rows.subList(fromIndex, toIndex);
-    }
-
     private void setDefaultColumnNames() {
         columnNames = new String[inputSize + outputSize];
-        
+
         for (int i = 0; i < inputSize; i++) {
             columnNames[i] = "Input" + (i+1);
         }
@@ -704,7 +660,7 @@ public class DataSet implements List<DataSetRow>, Serializable { // implements
             columnNames[inputSize + i] = "Output" + (i+1);
         }
     }
-    
+
     private void setDefaultColumnTypes() {
         columnTypes = new DataSetColumnType[inputSize + outputSize];
         for (int i = 0; i < inputSize; i++) {
@@ -714,5 +670,20 @@ public class DataSet implements List<DataSetRow>, Serializable { // implements
             columnTypes[inputSize + i] = DataSetColumnType.NUMERIC;
         }
     }
-    
+
+    @Override
+    public List<DataSetRow> getItems() {
+        return rows;
+    }
+
+    @Override
+    public javax.visrec.ml.data.DataSet<DataSetRow>[] split(int numParts, Random rnd) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public javax.visrec.ml.data.DataSet<DataSetRow>[] split(Random rnd, double... parts) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

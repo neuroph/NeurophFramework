@@ -33,10 +33,10 @@ public class TestMatrixMLP {
     public static void main(String[] args) {
         // create training set (logical XOR function)
         DataSet trainingSet = new DataSet(2, 1);
-        trainingSet.addRow(new DataSetRow(new double[]{0, 0}, new double[]{0}));
-        trainingSet.addRow(new DataSetRow(new double[]{0, 1}, new double[]{1}));
-        trainingSet.addRow(new DataSetRow(new double[]{1, 0}, new double[]{1}));
-        trainingSet.addRow(new DataSetRow(new double[]{1, 1}, new double[]{0}));
+        trainingSet.add(new DataSetRow(new double[]{0, 0}, new double[]{0}));
+        trainingSet.add(new DataSetRow(new double[]{0, 1}, new double[]{1}));
+        trainingSet.add(new DataSetRow(new double[]{1, 0}, new double[]{1}));
+        trainingSet.add(new DataSetRow(new double[]{1, 1}, new double[]{0}));
 
         MultiLayerPerceptron nnet = new MultiLayerPerceptron( TransferFunctionType.TANH ,2, 3, 1);
         MatrixMultiLayerPerceptron mnet = new MatrixMultiLayerPerceptron(nnet);

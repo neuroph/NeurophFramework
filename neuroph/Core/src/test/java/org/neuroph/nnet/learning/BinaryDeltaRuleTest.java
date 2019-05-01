@@ -26,10 +26,10 @@ public class BinaryDeltaRuleTest {
     public void setUp() {
         instance = new BinaryDeltaRule();
         dataSet = new DataSet(2, 1);
-        dataSet.addRow(new DataSetRow(new double[]{0, 0}, new double[]{0}));
-        dataSet.addRow(new DataSetRow(new double[]{0, 1}, new double[]{1}));
-        dataSet.addRow(new DataSetRow(new double[]{1, 0}, new double[]{1}));
-        dataSet.addRow(new DataSetRow(new double[]{1, 1}, new double[]{0}));
+        dataSet.add(new DataSetRow(new double[]{0, 0}, new double[]{0}));
+        dataSet.add(new DataSetRow(new double[]{0, 1}, new double[]{1}));
+        dataSet.add(new DataSetRow(new double[]{1, 0}, new double[]{1}));
+        dataSet.add(new DataSetRow(new double[]{1, 1}, new double[]{0}));
 
         maxError = 0.4;
         instance.setMaxError(maxError);

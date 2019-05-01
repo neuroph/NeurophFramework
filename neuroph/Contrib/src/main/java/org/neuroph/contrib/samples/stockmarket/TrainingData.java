@@ -75,7 +75,7 @@ public class TrainingData {
                 double d4 = (Double.parseDouble(s4[1]) - minlevel) / normalizer;
                 double d5 = (Double.parseDouble(s5[1]) - minlevel) / normalizer;
                 System.out.println(i + " " + d1 + " " + d2 + " " + d3 + " " + d4 + " ->" + d5);
-                trainingSet.addRow(new DataSetRow(new double[]{d1, d2, d3, d4}, new double[]{d5}));
+                trainingSet.add(new DataSetRow(new double[]{d1, d2, d3, d4}, new double[]{d5}));
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());

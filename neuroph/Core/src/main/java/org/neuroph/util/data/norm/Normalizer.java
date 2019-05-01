@@ -25,15 +25,6 @@ import org.neuroph.core.data.DataSet;
 public interface Normalizer {
 
     /**
-     * Initialize normalizer with specified data set to fin values that will be used for normalization.
-     * Typically this method should be called before normalization, but if it was not,
-     * implementation of normalize method should invoke it with data set given for normalization.
-     *
-     * @param dataSet data set to be used for initialization.
-     */
-    public void init(DataSet dataSet);
-
-    /**
      * Normalize specified data set
      * @param dataSet data set to normalize
      */

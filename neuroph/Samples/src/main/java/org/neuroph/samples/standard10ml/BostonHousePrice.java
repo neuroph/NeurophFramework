@@ -85,21 +85,23 @@ public class BostonHousePrice implements LearningEventListener {
     }
 
     public void run() {
-        System.out.println("Creating training set...");
-        // get path to training set
-        String trainingSetFileName = "data_sets/ml10standard/bostonhouse.txt";
+        System.out.println("Creating data set...");
+        String dataSetFile = "data_sets/ml10standard/bostonhouse.txt";
         int inputsCount = 13;
         int outputsCount = 1;
 
-        // create training set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, ",");
-        Normalizer norm = new MaxNormalizer();
-        norm.normalize(dataSet);
-        dataSet.shuffle();
+        // create data set from file
+        DataSet dataSet = DataSet.createFromFile(dataSetFile, inputsCount, outputsCount, ",");
 
-        List<DataSet> subSets = dataSet.split(60, 40);
-        DataSet trainingSet = subSets.get(0);
-        DataSet testSet = subSets.get(1);
+        // split data into training and test set
+        DataSet[] trainTestSplit = dataSet.split(0.6, 0.4);
+        DataSet trainingSet = trainTestSplit[0];
+        DataSet testSet = trainTestSplit[1];
+
+        // normalize data
+        Normalizer norm = new MaxNormalizer(trainingSet);
+        norm.normalize(trainingSet);
+        norm.normalize(testSet);
 
         System.out.println("Creating neural network...");
         MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(TransferFunctionType.TANH, inputsCount, 2, 2, outputsCount);

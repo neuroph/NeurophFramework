@@ -29,6 +29,6 @@ import java.util.List;
  */
 public interface Sampling {
 
-    public List<DataSet> sample(DataSet dataSet);
+    public DataSet[] sample(DataSet dataSet);
 
 }

@@ -38,7 +38,7 @@ import org.neuroph.util.data.norm.Normalizer;
  INTRODUCTION TO THE PROBLEM AND DATA SET INFORMATION:
 
  *Data set that will be used in this experiment: Pima Indians Diabetes
- The original data set that will be used in this experiment can be found at link: 
+ The original data set that will be used in this experiment can be found at link:
 http://archive.ics.uci.edu/ml/machine-learning-databases/pima-indians-diabetes/pima-indians-diabetes.data
 
  1. Title: Pima Indians Diabetes Database
@@ -64,12 +64,12 @@ http://archive.ics.uci.edu/ml/machine-learning-databases/pima-indians-diabetes/p
 
        The diagnostic, binary-valued variable investigated is whether the
        patient shows signs of diabetes according to World Health Organization
-       criteria (i.e., if the 2 hour post-load plasma glucose was at least 
+       criteria (i.e., if the 2 hour post-load plasma glucose was at least
        200 mg/dl at any survey  examination or if found during routine medical
        care).   The population lives near Phoenix, Arizona, USA.
 
        Results: Their ADAP algorithm makes a real-valued prediction between
-       0 and 1.  This was transformed into a binary decision using a cutoff of 
+       0 and 1.  This was transformed into a binary decision using a cutoff of
        0.448.  Using 576 training instances, the sensitivity and specificity
        of their algorithm was 76% on the remaining 192 instances.
 
@@ -82,7 +82,7 @@ http://archive.ics.uci.edu/ml/machine-learning-databases/pima-indians-diabetes/p
 
 5. Number of Instances: 768
 
-6. Number of Attributes: 8 plus class 
+6. Number of Attributes: 8 plus class
 
 7. For Each Attribute: (all numeric-valued)
    1. Number of times pregnant
@@ -125,31 +125,29 @@ public class DiabetesSample implements LearningEventListener {
 
     // for evaluating classification result
     int total, correct, incorrect;
-    
+
     // if output is greater then this value it is considered as malign
     float classificationThreshold = 0.5f;
 
 
 
     public void run() {
-
-        System.out.println("Creating training and test set from file...");
-        String trainingSetFileName = "data_sets/diabetes.txt";
+        String dataSetFile = "data_sets/diabetes.txt";
         int inputsCount = 8;
         int outputsCount = 1;
 
-        //Create data set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, ",");
-        dataSet.shuffle();
-        
-        //Normalizing data set
-        Normalizer normalizer = new MaxNormalizer();
-        normalizer.normalize(dataSet);
+        // Create data set from file
+        DataSet dataSet = DataSet.createFromFile(dataSetFile, inputsCount, outputsCount, ",");
 
-        //Creatinig training set (70%) and test set (30%)
-        List<DataSet> trainingAndTestSet = dataSet.split(70, 30);
-        DataSet trainingSet = trainingAndTestSet.get(0);
-        DataSet testSet = trainingAndTestSet.get(1);
+        // Creatinig training set (70%) and test set (30%)
+        DataSet[] trainTestSplit = dataSet.split(0.7, 0.3);
+        DataSet trainingSet = trainTestSplit[0];
+        DataSet testSet = trainTestSplit[1];
+
+        // Normalizing training and test set
+        Normalizer normalizer = new MaxNormalizer(trainingSet);
+        normalizer.normalize(trainingSet);
+        normalizer.normalize(testSet);
 
         System.out.println("Creating neural network...");
         //Create MultiLayerPerceptron neural network
@@ -217,7 +215,7 @@ public class DiabetesSample implements LearningEventListener {
         }
     }
 
-    public void countPredictions(int prediction, int target) {        
+    public void countPredictions(int prediction, int target) {
         if (prediction == target) {
             correct++;
         } else {
@@ -230,11 +228,11 @@ public class DiabetesSample implements LearningEventListener {
     public String formatDecimalNumber(double number) {
         return new BigDecimal(number).setScale(4, RoundingMode.HALF_UP).toString();
     }
-    
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         (new DiabetesSample()).run();
-    }    
+    }
 }

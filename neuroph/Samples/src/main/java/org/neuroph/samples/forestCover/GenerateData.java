@@ -50,7 +50,7 @@ public class GenerateData {
         DataSet testSet = trainingAndTestSet[1];
         System.out.println("Normalizing test set...");
 
-        Normalizer nor = new MaxNormalizer();
+        Normalizer nor = new MaxNormalizer(trainingSet);
         nor.normalize(testSet);
 
         System.out.println("Saving normalized test set to file...");
@@ -81,7 +81,7 @@ public class GenerateData {
         return new BigDecimal(number).setScale(3, RoundingMode.HALF_UP).toString();
     }
 
-    //Creating balanced training set with defined maximum sample of each type od tree 
+    //Creating balanced training set with defined maximum sample of each type od tree
     public void createBalancedTrainingSet(int count) {
         //Creating empety data set
         DataSet balanced = new DataSet(54, 7);
@@ -102,7 +102,7 @@ public class GenerateData {
             //Taking desired output vector from loaded file
             double[] DesiredOutput = row.getDesiredOutput();
             int index = -1;
-            //Find index of number one in output vector. 
+            //Find index of number one in output vector.
             for (int i = 0; i < DesiredOutput.length; i++) {
                 if (DesiredOutput[i] == 1.0) {
                     index = i;
@@ -113,43 +113,43 @@ public class GenerateData {
             switch (index + 1) {
                 case 1:
                     if (firstType < count) {
-                        balanced.addRow(row);
+                        balanced.add(row);
                         firstType++;
                     }
                     break;
                 case 2:
                     if (secondType < count) {
-                        balanced.addRow(row);
+                        balanced.add(row);
                         secondType++;
                     }
                     break;
                 case 3:
                     if (thirdType < count) {
-                        balanced.addRow(row);
+                        balanced.add(row);
                         thirdType++;
                     }
                     break;
                 case 4:
                     if (fourthType < count) {
-                        balanced.addRow(row);
+                        balanced.add(row);
                         fourthType++;
                     }
                     break;
                 case 5:
                     if (fifthType < count) {
-                        balanced.addRow(row);
+                        balanced.add(row);
                         fifthType++;
                     }
                     break;
                 case 6:
                     if (sixthType < count) {
-                        balanced.addRow(row);
+                        balanced.add(row);
                         sixthType++;
                     }
                     break;
                 case 7:
                     if (seventhType < count) {
-                        balanced.addRow(row);
+                        balanced.add(row);
                         seventhType++;
                     }
                     break;
@@ -173,11 +173,10 @@ public class GenerateData {
     public void normalizeBalancedTrainingSet() {
         //Normalizing balanced training set with MaxNormalizer
         DataSet dataSet = DataSet.load(config.getBalancedFileName());
-        Normalizer normalizer = new MaxNormalizer();
+        Normalizer normalizer = new MaxNormalizer(dataSet);
         normalizer.normalize(dataSet);
 
         System.out.println("Saving normalized training data set to file... ");
-        dataSet.shuffle();
         dataSet.shuffle();
         dataSet.save(config.getNormalizedBalancedFileName());
         System.out.println("Normalized training data set successfully saved!");

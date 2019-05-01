@@ -44,21 +44,21 @@ import org.neuroph.util.data.norm.Normalizer;
 
  1. Data set that will be used in this experiment: Banknote Dataset
     The Banknote Dataset involves predicting whether a given banknote is authentic given a number of measures taken from a photograph.
-    The original data set that will be used in this experiment can be found at link: 
+    The original data set that will be used in this experiment can be found at link:
     http://archive.ics.uci.edu/ml/machine-learning-databases/00267/data_banknote_authentication.txt
 
 2. Reference:  University of Applied Sciences, Ostwestfalen-Lippe
-   Owner of database: Volker Lohweg (University of Applied Sciences, Ostwestfalen-Lippe, volker.lohweg '@' hs-owl.de) 
-   Donor of database: Helene DÃ¶rksen (University of Applied Sciences, Ostwestfalen-Lippe, helene.doerksen '@' hs-owl.de) 
- 
- 
+   Owner of database: Volker Lohweg (University of Applied Sciences, Ostwestfalen-Lippe, volker.lohweg '@' hs-owl.de)
+   Donor of database: Helene DÃ¶rksen (University of Applied Sciences, Ostwestfalen-Lippe, helene.doerksen '@' hs-owl.de)
+
+
 3. Number of instances: 1 372
 
 4. Number of Attributes: 4 pluss class attributes
 
-5. Attribute Information:    
+5. Attribute Information:
  Inputs:
- 5 attributes: 
+ 5 attributes:
  4 continuous feature values are computed for each banknote:
  1) Variance of Wavelet Transformed image (continuous).
  2) Skewness of Wavelet Transformed image (continuous).
@@ -71,7 +71,7 @@ import org.neuroph.util.data.norm.Normalizer;
 
 
 
- 
+
  */
 public class Banknote implements LearningEventListener {
 
@@ -88,13 +88,13 @@ public class Banknote implements LearningEventListener {
 
         // create training set from file
         DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, ",", false);
-        Normalizer norm = new MaxNormalizer();
-        norm.normalize(dataSet);
-        dataSet.shuffle();
+        DataSet[] trainTestSplit = dataSet.split(0.6, 0.4);
+        DataSet trainingSet = trainTestSplit[0];
+        DataSet testSet = trainTestSplit[1];
 
-        List<DataSet> subSets = dataSet.split(60, 40);
-        DataSet trainingSet = subSets.get(0);
-        DataSet testSet = subSets.get(1);
+        Normalizer norm = new MaxNormalizer(trainingSet);
+        norm.normalize(trainingSet);
+        norm.normalize(testSet);
 
         System.out.println("Creating neural network...");
         MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(TransferFunctionType.TANH, inputsCount, 1, outputsCount);
@@ -142,7 +142,7 @@ public class Banknote implements LearningEventListener {
         }
     }
 
-    // Evaluates performance of neural network. 
+    // Evaluates performance of neural network.
     // Contains calculation of Confusion matrix for classification tasks or Mean Ssquared Error and Mean Absolute Error for regression tasks.
     // Difference in binary and multi class classification are made when adding Evaluator (MultiClass or Binary).
     public void evaluate(NeuralNetwork neuralNet, DataSet dataSet) {
@@ -153,7 +153,7 @@ public class Banknote implements LearningEventListener {
         evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
 
         evaluation.addEvaluator(new ClassifierEvaluator.Binary(0.5));
-        evaluation.evaluateDataSet(neuralNet, dataSet);
+        evaluation.evaluate(neuralNet, dataSet);
 
         ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.Binary.class);
         ConfusionMatrix confusionMatrix = evaluator.getResult();

@@ -59,12 +59,12 @@ public class ConceptLearningAndClassificationSample implements LearningEventList
     public void run() {
 
         System.out.println("Creating training set...");
-        String trainingSetFileName = "data_sets/concept_learning_and_classification_data_1.txt";
+        String dataSetFile = "data_sets/concept_learning_and_classification_data_1.txt";
         int inputsCount = 15;
         int outputsCount = 3;
 
         // create training set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, ",", false);
+        DataSet dataSet = DataSet.createFromFile(dataSetFile, inputsCount, outputsCount, ",", false);
        //dataSet.normalize();
 
         

@@ -79,12 +79,12 @@ public class ForestFiresSample implements LearningEventListener {
 
         System.out.println("Creating training set...");
 
-        String trainingSetFileName = "data_sets/forest_fires_data.txt";
+        String dataSetFile = "data_sets/forest_fires_data.txt";
         int inputsCount = 29;
         int outputsCount = 1;
 
         // create training set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, ",", false);
+        DataSet dataSet = DataSet.createFromFile(dataSetFile, inputsCount, outputsCount, ",", false);
        
         
         System.out.println("Creating neural network...");

@@ -330,7 +330,7 @@ public class StatisticsTest {
 	private DataSet createDataSetFromRows(DataSetRow... rows) {
 		DataSet dataSet = new DataSet(rows[0].getInput().length);
 		for (DataSetRow row : rows) {
-			dataSet.addRow(row);
+			dataSet.add(row);
 		}
 		return dataSet;
 	}

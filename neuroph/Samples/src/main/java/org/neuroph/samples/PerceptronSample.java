@@ -32,13 +32,13 @@ public class PerceptronSample {
      * Runs this sample
      */
     public static void main(String args[]) {
- 
+
             // create training set (logical AND function)
             DataSet trainingSet = new DataSet(2, 1);
-            trainingSet.addRow(new DataSetRow(new double[]{0, 0}, new double[]{0}));
-            trainingSet.addRow(new DataSetRow(new double[]{0, 1}, new double[]{0}));
-            trainingSet.addRow(new DataSetRow(new double[]{1, 0}, new double[]{0}));
-            trainingSet.addRow(new DataSetRow(new double[]{1, 1}, new double[]{1}));
+            trainingSet.add(new DataSetRow(new double[]{0, 0}, new double[]{0}));
+            trainingSet.add(new DataSetRow(new double[]{0, 1}, new double[]{0}));
+            trainingSet.add(new DataSetRow(new double[]{1, 0}, new double[]{0}));
+            trainingSet.add(new DataSetRow(new double[]{1, 1}, new double[]{1}));
 
             // create perceptron neural network
             NeuralNetwork myPerceptron = new Perceptron(2, 1);

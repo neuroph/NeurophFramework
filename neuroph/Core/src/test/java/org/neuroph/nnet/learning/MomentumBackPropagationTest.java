@@ -30,10 +30,10 @@ public class MomentumBackPropagationTest {
         instance = new MomentumBackpropagation();
         instance.setMomentum(0.5);
         xorDataSet = new DataSet(2, 1);
-        xorDataSet.addRow(new DataSetRow(new double[]{0, 0}, new double[]{0}));
-        xorDataSet.addRow(new DataSetRow(new double[]{0, 1}, new double[]{1}));
-        xorDataSet.addRow(new DataSetRow(new double[]{1, 0}, new double[]{1}));
-        xorDataSet.addRow(new DataSetRow(new double[]{1, 1}, new double[]{0}));
+        xorDataSet.add(new DataSetRow(new double[]{0, 0}, new double[]{0}));
+        xorDataSet.add(new DataSetRow(new double[]{0, 1}, new double[]{1}));
+        xorDataSet.add(new DataSetRow(new double[]{1, 0}, new double[]{1}));
+        xorDataSet.add(new DataSetRow(new double[]{1, 1}, new double[]{0}));
         maxError = 0.01;
         instance.setLearningRate(0.5);
         instance.setMaxError(maxError);

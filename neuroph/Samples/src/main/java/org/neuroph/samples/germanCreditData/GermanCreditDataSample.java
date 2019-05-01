@@ -37,29 +37,29 @@ import org.neuroph.util.data.norm.Normalizer;
  INTRODUCTION TO THE PROBLEM AND DATA SET INFORMATION:
 
  *Data set that will be used in this experiment: Statlog (German Credit Data)
- The original data set that will be used in this experiment can be found at link: 
+ The original data set that will be used in this experiment can be found at link:
 https://archive.ics.uci.edu/ml/machine-learning-databases/statlog/german/german.data-numeric
 
  1. Title: German Credit data
 
 2. Source Information
 
-Professor Dr. Hans Hofmann  
-Institut f"ur Statistik und "Okonometrie  
-Universit"at Hamburg  
-FB Wirtschaftswissenschaften  
-Von-Melle-Park 5    
-2000 Hamburg 13 
+Professor Dr. Hans Hofmann
+Institut f"ur Statistik und "Okonometrie
+Universit"at Hamburg
+FB Wirtschaftswissenschaften
+Von-Melle-Park 5
+2000 Hamburg 13
 
 3. Number of Instances:  1000
 
 Two datasets are provided.  the original dataset, in the form provided
 by Prof. Hofmann, contains categorical/symbolic attributes and
-is in the file "german.data".   
- 
-For algorithms that need numerical attributes, Strathclyde University 
-produced the file "german.data-numeric".  This file has been edited 
-and several indicator variables added to make it suitable for 
+is in the file "german.data".
+
+For algorithms that need numerical attributes, Strathclyde University
+produced the file "german.data-numeric".  This file has been edited
+and several indicator variables added to make it suitable for
 algorithms which cannot cope with categorical variables.   Several
 attributes that are ordered categorical (such as attribute 17) have
 been coded as integer.    This was the form used by StatLog.
@@ -69,12 +69,12 @@ been coded as integer.    This was the form used by StatLog.
    Number of Attributes german.numer: 24 (24 numerical)
     **In this sample we used german.numer data set
     25. and 26. class variables: 0 (absence) or 1 (presence)
-    1,0 => "good". 
+    1,0 => "good".
     0,1 => "bad"
 
 
 7.  Attribute description for german
-    
+
 Attribute 1:  (qualitative)
 	       Status of existing checking account
                A11 :      ... <    0 DM
@@ -125,7 +125,7 @@ Attribute 7:  (qualitative)
 	      Present employment since
 	      A71 : unemployed
 	      A72 :       ... < 1 year
-	      A73 : 1  <= ... < 4 years  
+	      A73 : 1  <= ... < 4 years
 	      A74 : 4  <= ... < 7 years
 	      A75 :       .. >= 7 years
 
@@ -161,7 +161,7 @@ Attribute 13: (numerical)
 	      Age in years
 
 Attribute 14: (qualitative)
-	      Other installment plans 
+	      Other installment plans
 	      A141 : bank
 	      A142 : stores
 	      A143 : none
@@ -218,16 +218,16 @@ public class GermanCreditDataSample implements LearningEventListener {
     public void run() {
 
         System.out.println("Creating training and test set from file...");
-        String trainingSetFileName = "data_sets/german credit data.txt";
+        String dataSetFile = "data_sets/german credit data.txt";
         int inputsCount = 24;
         int outputsCount = 2;
 
         //Create data set from file
-        DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, " ");
+        DataSet dataSet = DataSet.createFromFile(dataSetFile, inputsCount, outputsCount, " ");
         dataSet.shuffle();
 
         //Normalizing data set
-        Normalizer normalizer = new MaxNormalizer();
+        Normalizer normalizer = new MaxNormalizer(dataSet);
         normalizer.normalize(dataSet);
 
         //Creatinig training set (70%) and test set (30%)
@@ -309,7 +309,7 @@ public class GermanCreditDataSample implements LearningEventListener {
         }
     }
 
-    //Metod determines the maximum output. Maximum output is network prediction for one row. 
+    //Metod determines the maximum output. Maximum output is network prediction for one row.
     public static int maxOutput(double[] array) {
         double max = array[0];
         int index = 0;
@@ -320,18 +320,18 @@ public class GermanCreditDataSample implements LearningEventListener {
                 max = array[i];
             }
         }
-        //If maximum is less than 0.5, that prediction will not count. 
+        //If maximum is less than 0.5, that prediction will not count.
         if (max < 0.5) {
             return -1;
         }
         return index;
     }
 
-    //Colecting data to evaluate network. 
+    //Colecting data to evaluate network.
     public void keepScore(int prediction, int ideal) {
         count[ideal]++;
         count[2]++;
-        
+
         if (prediction == ideal) {
             correct[ideal]++;
             correct[2]++;

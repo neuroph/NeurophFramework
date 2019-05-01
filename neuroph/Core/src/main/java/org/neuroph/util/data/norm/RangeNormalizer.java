@@ -14,11 +14,6 @@ public class RangeNormalizer implements Normalizer, Serializable {
     private double[] maxIn, maxOut; // contains max values for in and out columns
     private double[] minIn, minOut; // contains min values for in and out columns
 
-    /**
-     * Flag to indicate that normalizer is initialized
-     */
-    private boolean intialized=false;
-
 
     public RangeNormalizer(double lowLimit, double highLimit) {
         this.lowLimit= lowLimit;
@@ -26,14 +21,9 @@ public class RangeNormalizer implements Normalizer, Serializable {
     }
 
     @Override
-    public void init(DataSet dataSet) {
-        findMaxAndMinVectors(dataSet);
-        intialized = true;
-    }
-
-    @Override
     public void normalize(DataSet dataSet) {
-        if (!intialized) init(dataSet);
+
+        findMaxAndMinVectors(dataSet);
 
         for (DataSetRow row : dataSet.getRows()) {
             double[] normalizedInput = normalizeToRange(row.getInput(), minIn, maxIn);
@@ -43,9 +33,7 @@ public class RangeNormalizer implements Normalizer, Serializable {
                 double[] normalizedOutput = normalizeToRange(row.getDesiredOutput(), minOut, maxOut);
                 row.setDesiredOutput(normalizedOutput);
             }
-
         }
-
     }
 
     private double[] normalizeToRange(double[] vector, double[] min, double[] max) {
@@ -60,6 +48,11 @@ public class RangeNormalizer implements Normalizer, Serializable {
 
 
 
+    /**
+     * Find min and max values for each position in vectors.
+     *
+     * @param dataSet
+     */
     private void findMaxAndMinVectors(DataSet dataSet) {
         int inputSize = dataSet.getInputSize();
         int outputSize = dataSet.getOutputSize();

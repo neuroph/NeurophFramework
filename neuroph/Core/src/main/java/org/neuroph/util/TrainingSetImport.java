@@ -38,7 +38,7 @@ import org.neuroph.core.data.DataSet;
 // rename to DataSetImport
 public class TrainingSetImport
 {
-  
+
   public static DataSet importFromFile(String filePath, int inputsCount, int outputsCount, String separator)
     throws IOException, FileNotFoundException, NumberFormatException
   {
@@ -66,14 +66,14 @@ public class TrainingSetImport
           outputs[i] = Double.parseDouble(values[inputsCount + i]);
 
         if (outputsCount>0) {
-              trainingSet.addRow(new DataSetRow(inputs, outputs));
+              trainingSet.add(new DataSetRow(inputs, outputs));
         } else {
-              trainingSet.addRow(new DataSetRow(inputs));
+              trainingSet.add(new DataSetRow(inputs));
         }
       }
 
       return trainingSet;
-      
+
     } catch (FileNotFoundException ex) {
        ex.printStackTrace();
        throw ex;

@@ -45,22 +45,22 @@ import org.neuroph.util.data.norm.Normalizer;
 
  1. Data set that will be used in this experiment: Pima Indians Diabetes Dataset
     The Pima Indians Diabetes Dataset involves predicting the onset of diabetes within 5 years in Pima Indians given medical details.
-    The original data set that will be used in this experiment can be found at link: 
+    The original data set that will be used in this experiment can be found at link:
     https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv
 
 2. Reference:  National Institute of Diabetes and Digestive and Kidney Diseases
    Smith, J.W., Everhart, J.E., Dickson, W.C., Knowler, W.C., & Johannes, R.S. (1988). Using the ADAP learning algorithm to forecast the onset of diabetes mellitus. In Proceedings of the Symposium on Computer Applications and Medical Care (pp. 261--265). IEEE Computer Society Press.
- 
+
 3. Number of instances: 768
 
 4. Number of Attributes: 8 pluss class attributes
 
-5. Attribute Information:    
+5. Attribute Information:
  Inputs:
- 8 attributes: 
+ 8 attributes:
  8 numerical features are computed for each person:
  1) Number of times pregnant.
- 2) Plasma glucose concentration a 2 hours in an oral glucose tolerance test. 
+ 2) Plasma glucose concentration a 2 hours in an oral glucose tolerance test.
  3) Diastolic blood pressure (mm Hg).
  4) Triceps skinfold thickness (mm).
  5) 2-Hour serum insulin (mu U/ml).
@@ -74,7 +74,7 @@ import org.neuroph.util.data.norm.Normalizer;
 
 
 
- 
+
  */
 public class PimaIndiansDiabetes implements LearningEventListener {
 
@@ -91,13 +91,16 @@ public class PimaIndiansDiabetes implements LearningEventListener {
 
         // create training set from file
         DataSet dataSet = DataSet.createFromFile(trainingSetFileName, inputsCount, outputsCount, "\t", false);
-        Normalizer norm = new MaxNormalizer();
-        norm.normalize(dataSet);
-        dataSet.shuffle();
 
-        List<DataSet> subSets = dataSet.split(60, 40);
-        DataSet trainingSet = subSets.get(0);
-        DataSet testSet = subSets.get(1);
+        // split data into training and test set
+        DataSet[] trainTestSplit = dataSet.split(0.6, 0.4);
+        DataSet trainingSet = trainTestSplit[0];
+        DataSet testSet = trainTestSplit[1];
+
+        // normalize training and test set
+        Normalizer norm = new MaxNormalizer(trainingSet);
+        norm.normalize(trainingSet);
+        norm.normalize(testSet);
 
         System.out.println("Creating neural network...");
         MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(TransferFunctionType.TANH, inputsCount, 15, 5, outputsCount);
@@ -145,7 +148,7 @@ public class PimaIndiansDiabetes implements LearningEventListener {
         }
     }
 
-    // Evaluates performance of neural network. 
+    // Evaluates performance of neural network.
     // Contains calculation of Confusion matrix for classification tasks or Mean Ssquared Error and Mean Absolute Error for regression tasks.
     // Difference in binary and multi class classification are made when adding Evaluator (MultiClass or Binary).
     public void evaluate(NeuralNetwork neuralNet, DataSet dataSet) {
@@ -156,7 +159,7 @@ public class PimaIndiansDiabetes implements LearningEventListener {
         evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
 
         evaluation.addEvaluator(new ClassifierEvaluator.Binary(0.5));
-        evaluation.evaluateDataSet(neuralNet, dataSet);
+        evaluation.evaluate(neuralNet, dataSet);
 
         ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.Binary.class);
         ConfusionMatrix confusionMatrix = evaluator.getResult();
