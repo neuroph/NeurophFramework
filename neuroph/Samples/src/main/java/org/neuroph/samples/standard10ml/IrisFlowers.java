@@ -16,7 +16,6 @@
 package org.neuroph.samples.standard10ml;
 
 import java.util.Arrays;
-import java.util.List;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
@@ -33,8 +32,10 @@ import org.neuroph.nnet.learning.MomentumBackpropagation;
 import org.neuroph.util.TransferFunctionType;
 
 /**
+ * Example of simple multi class classification problem using iris flower data set.
  *
  * @author Nevena Milenkovic
+ * @author Zoran Sevarac
  */
 /*
  INTRODUCTION TO THE PROBLEM AND DATA SET INFORMATION:
