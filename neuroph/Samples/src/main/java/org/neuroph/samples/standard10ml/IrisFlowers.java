@@ -36,8 +36,7 @@ import org.neuroph.util.TransferFunctionType;
  *
  * @author Nevena Milenkovic
  * @author Zoran Sevarac
- */
-/*
+
  INTRODUCTION TO THE PROBLEM AND DATA SET INFORMATION:
 
  1. Data set that will be used in this experiment: Iris Flower Dataset
@@ -64,11 +63,8 @@ import org.neuroph.util.TransferFunctionType;
  5)Output: Class (Iris Setosa, Iris Versicolour, Iris Virginica). They are represented as (1,0,0), (0,1,0) and (0,0,1) respectively.
 
 6. Missing Values: None.
-
-
-
-
  */
+
 public class IrisFlowers implements LearningEventListener {
 
     public static void main(String[] args) {
@@ -119,7 +115,12 @@ public class IrisFlowers implements LearningEventListener {
         testNeuralNetwork(neuralNet, testSet);
     }
 
-    // Displays inputs, desired output (from dataset) and actual output (calculated by neural network) for every row from data set.
+    /**
+     * Displays inputs, desired output (from dataset) and actual output (calculated by neural network) for every row from data set.
+     * 
+     * @param neuralNet
+     * @param testSet
+     */
     public void testNeuralNetwork(NeuralNetwork neuralNet, DataSet testSet) {
 
         System.out.println("Showing inputs, desired output and neural network output for every row in test set.");
@@ -135,9 +136,13 @@ public class IrisFlowers implements LearningEventListener {
         }
     }
 
-    // Evaluates performance of neural network.
-    // Contains calculation of Confusion matrix for classification tasks or Mean Ssquared Error and Mean Absolute Error for regression tasks.
-    // Difference in binary and multi class classification are made when adding Evaluator (MultiClass or Binary).
+    /**
+     * Evaluates classification performance of a neural network.
+     * Contains calculation of Confusion matrix for classification tasks or Mean Ssquared Error and Mean Absolute Error for regression tasks.
+     *
+     * @param neuralNet
+     * @param dataSet
+     */
     public void evaluate(NeuralNetwork neuralNet, DataSet dataSet) {
 
         System.out.println("Calculating performance indicators for neural network.");
@@ -162,6 +167,11 @@ public class IrisFlowers implements LearningEventListener {
         System.out.println(average.toString());
     }
 
+    /**
+     * Prints training information.
+     *
+     * @param event
+     */
     @Override
     public void handleLearningEvent(LearningEvent event) {
         MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
