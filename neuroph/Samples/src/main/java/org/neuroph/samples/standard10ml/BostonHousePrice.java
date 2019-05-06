@@ -16,7 +16,6 @@
 package org.neuroph.samples.standard10ml;
 
 import java.util.Arrays;
-import java.util.List;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
@@ -24,9 +23,7 @@ import org.neuroph.core.events.LearningEvent;
 import org.neuroph.core.events.LearningEventListener;
 import org.neuroph.core.learning.error.MeanAbsoluteError;
 import org.neuroph.core.learning.error.MeanSquaredError;
-import org.neuroph.nnet.Adaline;
 import org.neuroph.nnet.MultiLayerPerceptron;
-import org.neuroph.nnet.learning.LMS;
 import org.neuroph.nnet.learning.MomentumBackpropagation;
 import org.neuroph.util.TransferFunctionType;
 import org.neuroph.util.data.norm.MaxNormalizer;
@@ -159,7 +156,6 @@ public class BostonHousePrice implements LearningEventListener {
         MeanAbsoluteError mae = new MeanAbsoluteError();
 
         for (DataSetRow testSetRow : dataSet.getRows()) {
-
             neuralNet.setInput(testSetRow.getInput());
             neuralNet.calculate();
             double[] networkOutput = neuralNet.getOutput();

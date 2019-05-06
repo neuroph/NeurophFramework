@@ -16,7 +16,6 @@
 package org.neuroph.samples.standard10ml;
 
 import java.util.Arrays;
-import java.util.List;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;

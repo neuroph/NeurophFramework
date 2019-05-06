@@ -35,18 +35,18 @@ import org.neuroph.util.TransferFunctionType;
  * but that dont works for some problems.
  * @author Zoran Sevarac <sevarac@gmail.com>
  */
-public class Adaline extends NeuralNetwork {
-	
+public class Adaline extends NeuralNetwork<LMS> {
+
 	/**
 	 * The class fingerprint that is set to indicate serialization
 	 * compatibility with a previous version of the class.
-	 */	
+	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Creates new Adaline network with specified number of neurons in input
 	 * layer
-	 * 
+	 *
 	 * @param inputNeuronsCount
 	 *            number of neurons in input layer
 	 */
@@ -56,14 +56,14 @@ public class Adaline extends NeuralNetwork {
 
 	/**
 	 * Creates adaline network architecture with specified number of input neurons
-	 * 
+	 *
 	 * @param inputNeuronsCount
          *              number of neurons in input layer
 	 */
 	private void createNetwork(int inputNeuronsCount) {
 		// set network type code
 		this.setNetworkType(NeuralNetworkType.ADALINE);
-                
+
                 // create input layer neuron settings for this network
 		NeuronProperties inNeuronProperties = new NeuronProperties();
 		inNeuronProperties.setProperty("transferFunction", TransferFunctionType.LINEAR);
@@ -73,7 +73,7 @@ public class Adaline extends NeuralNetwork {
                 Layer inputLayer = new InputLayer(inputNeuronsCount);
                 inputLayer.addNeuron(new BiasNeuron()); // add bias neuron (always 1, and it will act as bias input for output neuron)
 		this.addLayer(inputLayer);
-                
+
                // create output layer neuron settings for this network
 		NeuronProperties outNeuronProperties = new NeuronProperties();
 		outNeuronProperties.setProperty("transferFunction", TransferFunctionType.LINEAR); // was RAMP
