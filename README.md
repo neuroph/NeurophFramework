@@ -23,7 +23,7 @@ Copy/Paste following code into your pom.xml file
         <dependency>
             <groupId>org.neuroph</groupId>
             <artifactId>neuroph-core</artifactId>
-            <version>2.94</version>
+            <version>2.96</version>
         </dependency>
 </dependencies>
 ```
