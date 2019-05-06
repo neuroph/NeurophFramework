@@ -36,11 +36,15 @@ For Repository URL enter https://github.com/neuroph/NeurophFramework.git
 
 Click Finish
 
+Right click cloned project, and click Build
+
 Getting and Building from Sources using command line
 ======
 
 git clone  https://github.com/neuroph/NeurophFramework.git
+
 cd neuroph
+
 mvn
 
 
