@@ -23,7 +23,7 @@ Copy/Paste following code into your pom.xml file
         <dependency>
             <groupId>org.neuroph</groupId>
             <artifactId>neuroph-core</artifactId>
-            <version>2.94</version>
+            <version>2.96</version>
         </dependency>
 </dependencies>
 ```
@@ -36,11 +36,15 @@ For Repository URL enter https://github.com/neuroph/NeurophFramework.git
 
 Click Finish
 
+Right click cloned project, and click Build
+
 Getting and Building from Sources using command line
 ======
 
 git clone  https://github.com/neuroph/NeurophFramework.git
+
 cd neuroph
+
 mvn
 
 
