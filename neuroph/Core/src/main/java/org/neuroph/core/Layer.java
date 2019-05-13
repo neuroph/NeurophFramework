@@ -249,20 +249,13 @@ public class Layer implements Iterable<Neuron>, Serializable {
         return neurons.size();
     }
 
- //static final ForkJoinPool mainPool = ForkJoinPool.commonPool();
-
     /**
      * Performs calculaton for all neurons in this layer
      */
     public void calculate() {
-
-        for (Neuron neuron : neurons) {
+        neurons.forEach((neuron) -> {
             neuron.calculate();
-        }
-     //   neurons.forEach(Neuron::calculate);
-
-     //   neurons.parallelStream().forEach( n -> n.calculate());
-//        mainPool.invokeAll(Arrays.asList(neurons.asArray()));
+        });
     }
 
     /**

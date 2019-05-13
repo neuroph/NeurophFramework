@@ -505,7 +505,15 @@ public class Neuron implements Serializable, Cloneable /*, Callable<Void>*/ {
     @Override
     public Object clone() throws CloneNotSupportedException {
         throw new UnsupportedOperationException("Not yer implemented");
-        // return super.clone(); //To change body of generated methods, choose Tools | Templates.
+        // use clone support from apache
+        // return super.clone();
     }
+
+    @Override
+    public String toString() {
+        return "Neuron{" + "totalInput=" + totalInput + ", output=" + output + ", delta=" + delta + ", inputFunction=" + inputFunction + ", transferFunction=" + transferFunction + ", label=" + label + '}';
+    }
+
+
 
 }

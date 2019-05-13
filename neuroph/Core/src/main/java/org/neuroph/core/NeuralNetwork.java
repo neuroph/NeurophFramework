@@ -52,7 +52,7 @@ public class NeuralNetwork<L extends LearningRule> implements Serializable {
      * with a previous version of the class.
      */
     private static final long serialVersionUID = 7L;
-    
+
     /**
      * Network type id (see neuroph.util.NeuralNetworkType).
      */
@@ -66,8 +66,8 @@ public class NeuralNetwork<L extends LearningRule> implements Serializable {
     /**
      * Learning rule for this network
      */
-    private L learningRule;     
-    
+    private L learningRule;
+
     /**
      * Neural network output buffer
      */
@@ -84,12 +84,12 @@ public class NeuralNetwork<L extends LearningRule> implements Serializable {
      * These neurons are used to read network's output.
      */
     private List<Neuron> outputNeurons;
-    
+
     /**
      * Plugins collection
      */
     private Map<Class, PluginBase> plugins;
-    
+
     /**
      * Network label
      */
@@ -99,11 +99,11 @@ public class NeuralNetwork<L extends LearningRule> implements Serializable {
      * List of neural network listeners
      */
     private transient List<NeuralNetworkEventListener> listeners = new ArrayList();
-    
+
     /**
      * Neural network logger
-     */    
-    private final Logger LOGGER = LoggerFactory.getLogger(NeuralNetwork.class);        
+     */
+    private final Logger LOGGER = LoggerFactory.getLogger(NeuralNetwork.class);
 
     /**
      * Creates an instance of empty neural network.
@@ -120,7 +120,7 @@ public class NeuralNetwork<L extends LearningRule> implements Serializable {
      *
      * @param layer layer to add
      */
-    public void addLayer(Layer layer) {              
+    public void addLayer(Layer layer) {
 
         // In case of null throw exception to prevent adding null layers
         if (layer == null) {
@@ -128,8 +128,8 @@ public class NeuralNetwork<L extends LearningRule> implements Serializable {
         }
 
         // set parent network for added layer
-        layer.setParentNetwork(this);        
-        
+        layer.setParentNetwork(this);
+
         // add layer to layers collection
         layers.add(layer);
 
@@ -156,9 +156,9 @@ public class NeuralNetwork<L extends LearningRule> implements Serializable {
         }
 
         // set parent network for added layer
-        layer.setParentNetwork(this);        
-        
-        // add layer to layers collection at specified position        
+        layer.setParentNetwork(this);
+
+        // add layer to layers collection at specified position
         layers.add(index, layer);
 
         // notify listeners that layer has been added
@@ -203,7 +203,7 @@ public class NeuralNetwork<L extends LearningRule> implements Serializable {
     public List<Layer> getLayers() {
         return Collections.unmodifiableList(this.layers);
     }
-    
+
     /**
      * Returns layer at specified index
      *
@@ -274,7 +274,7 @@ public class NeuralNetwork<L extends LearningRule> implements Serializable {
 //        // default calculator
 //        public void calculate();
 //    }
-//    
+//
 //    // default calculator is sequential using foreach loop
 //    transient Calculator calculator = new Calculator() {
 //        @Override
@@ -292,18 +292,19 @@ public class NeuralNetwork<L extends LearningRule> implements Serializable {
 //    public void setCalculator(Calculator calculator) {
 //        this.calculator = calculator;
 //    }
-    
-    
-    
+
+
+
     /**
-     * Performs calculation on whole network
+     * Performs calculation on whole network (calculates all layer).
+     * Fires corresponding event after calculation is performed.
      */
     public void calculate() {
-//        for (Layer layer : this.layers) {
-//            layer.calculate();
-//        }
-        layers.forEach(Layer::calculate);
-        
+
+        layers.forEach((layer) -> {
+            layer.calculate();
+        });
+
         fireNetworkEvent(new NeuralNetworkEvent(this, NeuralNetworkEvent.Type.CALCULATED));
     }
 
@@ -311,9 +312,9 @@ public class NeuralNetwork<L extends LearningRule> implements Serializable {
      * Resets the activation levels for whole network
      */
     public void reset() {
-        for (Layer layer : this.layers) {
+        layers.forEach((layer) -> {
             layer.reset();
-        }
+        });
     }
 
     /**
@@ -482,7 +483,7 @@ public class NeuralNetwork<L extends LearningRule> implements Serializable {
             outputNeurons.get(i).setLabel(labels[i]);
         }
     }
-    
+
     public String[] getOutputLabels() {
         String[] labels = new String[outputNeurons.size()];
         for (int i = 0; i < outputNeurons.size(); i++) {
