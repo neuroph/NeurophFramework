@@ -29,8 +29,10 @@ import org.neuroph.eval.classification.ClassificationMetrics;
 import org.neuroph.eval.classification.ConfusionMatrix;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.MomentumBackpropagation;
+import org.neuroph.util.TransferFunctionType;
 import org.neuroph.util.data.norm.MaxNormalizer;
 import org.neuroph.util.data.norm.Normalizer;
+import org.neuroph.util.data.norm.RangeNormalizer;
 
 /**
  * Example of binary classification (mine or rock) using Multi Layer Perceptron on sonar signal data set.
@@ -64,7 +66,7 @@ import org.neuroph.util.data.norm.Normalizer;
 8. Missing Values: None.
 
  */
-public class Sonar implements LearningEventListener {
+public class Sonar {
 
     public static void main(String[] args) {
         (new Sonar()).run();
@@ -76,7 +78,6 @@ public class Sonar implements LearningEventListener {
         int numOutputs = 1;
 
         // create data set from csv file
-        System.out.println("Creating data set...");
         DataSet dataSet = DataSet.createFromFile(dataSetFile, numInputs, numOutputs, ",");
 
         // split data into train and test set
@@ -84,39 +85,33 @@ public class Sonar implements LearningEventListener {
         DataSet trainingSet = trainTestSplit[0];
         DataSet testSet = trainTestSplit[1];
 
-        // normalize data using max normalization
-        Normalizer norm = new MaxNormalizer(trainingSet);
-        norm.normalize(trainingSet);
-        norm.normalize(testSet);
+        // create neural network
+        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(TransferFunctionType.TANH, numInputs, 35, 15, numOutputs);
 
-        System.out.println("Creating neural network...");
-        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(numInputs, 15, 10, numOutputs);
-
+        // set learning rule and add listener
         neuralNet.setLearningRule(new MomentumBackpropagation());
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
-        learningRule.addListener(this);
+        learningRule.addListener((event) -> {
+            MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
+            System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
+        });
 
         // set learning rate and max error
-        learningRule.setLearningRate(0.1);
+        learningRule.setLearningRate(0.01);
         learningRule.setMaxError(0.01);
-        System.out.println("Training network...");
+
         // train the network with training set
         neuralNet.learn(trainingSet);
-        System.out.println("Training completed.");
-        System.out.println("Testing network...");
 
-        System.out.println("Network performance on the test set");
+        // evaluate network performance on test set
         evaluate(neuralNet, testSet);
 
-        System.out.println("Saving network");
         // save neural network to file
         neuralNet.save("nn1.nnet");
 
         System.out.println("Done.");
 
-        System.out.println();
-        System.out.println("Network outputs for test set");
-        testNeuralNetwork(neuralNet, testSet);
+        //testNeuralNetwork(neuralNet, testSet);
     }
 
     // Displays inputs, desired output (from dataset) and actual output (calculated by neural network) for every row from data set.
@@ -161,9 +156,4 @@ public class Sonar implements LearningEventListener {
         System.out.println(average.toString());
     }
 
-    @Override
-    public void handleLearningEvent(LearningEvent event) {
-        MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
-        System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
-    }
 }

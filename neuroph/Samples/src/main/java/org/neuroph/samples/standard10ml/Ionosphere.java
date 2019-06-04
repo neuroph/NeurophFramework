@@ -16,7 +16,6 @@
 package org.neuroph.samples.standard10ml;
 
 import java.util.Arrays;
-import java.util.List;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
@@ -30,15 +29,14 @@ import org.neuroph.eval.classification.ClassificationMetrics;
 import org.neuroph.eval.classification.ConfusionMatrix;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.MomentumBackpropagation;
-import org.neuroph.util.TransferFunctionType;
 import org.neuroph.util.data.norm.MaxNormalizer;
 import org.neuroph.util.data.norm.Normalizer;
 
 /**
- *
- * @author Nevena Milenkovic
- */
-/*
+  Binary classification of radar signals.
+
+  @author Nevena Milenkovic
+
  INTRODUCTION TO THE PROBLEM AND DATA SET INFORMATION:
 
  1. Data set that will be used in this experiment: Ionosphere Dataset
@@ -51,7 +49,7 @@ import org.neuroph.util.data.norm.Normalizer;
 
 3. Number of instances: 351
 
-4. Number of Attributes: 34 pluss class attributes
+4. Number of Attributes: 34 plus class attributes
 
 5. Attribute Information:
    Inputs:
@@ -60,9 +58,6 @@ import org.neuroph.util.data.norm.Normalizer;
    Output: Class variable (0 or 1). Value 1 indicates good radar return.
 
 6. Missing Values: None.
-
-
-
 
  */
 public class Ionosphere implements LearningEventListener {
