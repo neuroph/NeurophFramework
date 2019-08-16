@@ -13,28 +13,20 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.neuroph.contrib.rnn.lstm;
+package org.neuroph.contrib.rnn;
 
-import java.io.Serializable;
 import java.util.Map;
 
 import org.jblas.DoubleMatrix;
 import org.neuroph.contrib.rnn.util.Activation;
 import org.neuroph.contrib.rnn.util.MatrixInitializer;
 import org.neuroph.contrib.rnn.util.MatrixInitializer.Type;
-import org.neuroph.core.NeuralNetwork;
-import org.neuroph.nnet.learning.BackPropagation;
 
 /**
- * 
+ *
  * @author Milan Šuša <milan_susa@hotmail.com>
  */
-public class LSTM extends NeuralNetwork<BackPropagation> implements Serializable {
-
-    private static final long serialVersionUID = -7059290852389115565L;
-
-    private int inputSize;
-    private int outputSize;
+public final class LSTM extends RNN {
 
     private DoubleMatrix inputGateInputWeight;
     private DoubleMatrix inputGateOutputWeight;
@@ -67,22 +59,6 @@ public class LSTM extends NeuralNetwork<BackPropagation> implements Serializable
         } else if (matrixInitializer.getType() == Type.Gaussian) {
             setGaussianWeights(matrixInitializer);
         }
-    }
-
-    public int getInputSize() {
-        return inputSize;
-    }
-
-    public void setInputSize(int inputSize) {
-        this.inputSize = inputSize;
-    }
-
-    public int getOutputSize() {
-        return outputSize;
-    }
-
-    public void setOutputSize(int outputSize) {
-        this.outputSize = outputSize;
     }
 
     public DoubleMatrix getInputGateInputWeight() {
@@ -221,6 +197,7 @@ public class LSTM extends NeuralNetwork<BackPropagation> implements Serializable
         this.outputBias = outputBias;
     }
 
+    @Override
     public void activate(int timestep, Map<String, DoubleMatrix> valuesInTimesteps) {
         DoubleMatrix input = valuesInTimesteps.get("input" + timestep);
         DoubleMatrix previousOutputActivation = null;
@@ -263,11 +240,13 @@ public class LSTM extends NeuralNetwork<BackPropagation> implements Serializable
         valuesInTimesteps.put("output" + timestep, output);
     }
 
+    @Override
     public DoubleMatrix decode(DoubleMatrix matrix) {
         return Activation.softmax(matrix.mmul(outputWeight).add(outputBias));
     }
 
-    private void setUniformWeights(MatrixInitializer matrixInitializer) {
+    @Override
+    protected void setUniformWeights(MatrixInitializer matrixInitializer) {
         this.inputGateInputWeight = matrixInitializer.uniform(inputSize, outputSize);
         this.inputGateOutputWeight = matrixInitializer.uniform(outputSize, outputSize);
         this.inputGateMemoryCellWeight = matrixInitializer.uniform(outputSize, outputSize);
@@ -291,7 +270,8 @@ public class LSTM extends NeuralNetwork<BackPropagation> implements Serializable
         this.outputBias = new DoubleMatrix(1, inputSize);
     }
 
-    private void setGaussianWeights(MatrixInitializer matrixInitializer) {
+    @Override
+    protected void setGaussianWeights(MatrixInitializer matrixInitializer) {
         this.inputGateInputWeight = matrixInitializer.gaussian(inputSize, outputSize);
         this.inputGateOutputWeight = matrixInitializer.gaussian(outputSize, outputSize);
         this.inputGateMemoryCellWeight = matrixInitializer.gaussian(outputSize, outputSize);

@@ -13,20 +13,24 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.neuroph.contrib.rnn;
+package org.neuroph.contrib.rnn.example;
 
 import org.neuroph.contrib.rnn.bptt.BackPropagationThroughTime;
 import org.neuroph.contrib.rnn.util.SequenceModeller;
-import org.neuroph.contrib.rnn.lstm.LSTM;
+import org.neuroph.contrib.rnn.LSTM;
+import org.neuroph.contrib.rnn.RNN;
+import org.neuroph.contrib.rnn.bptt.LSTMBackPropagationThroughTime;
 import org.neuroph.contrib.rnn.util.MatrixInitializer;
 import org.neuroph.core.data.DataSet;
-import org.neuroph.util.data.norm.MaxNormalizer;
+import org.neuroph.core.learning.error.MeanSquaredError;
+import org.neuroph.eval.ErrorEvaluator;
+import org.neuroph.eval.Evaluation;
 
 /**
  *
  * @author Milan Šuša <milan_susa@hotmail.com>
  */
-public class StockPricePredictionExample {
+public class LSTMStockPricePredictionExample {
 
     public static void main(String[] args) {
 
@@ -44,8 +48,8 @@ public class StockPricePredictionExample {
         double learningRate = 0.8;
 
         System.out.println("Creating neural network...");
-        LSTM lstm = new LSTM(inputsCount, hiddenCount, new MatrixInitializer(MatrixInitializer.Type.Uniform, 0.1, 0, 0));
-        BackPropagationThroughTime bptt = new BackPropagationThroughTime();
+        RNN lstm = new LSTM(inputsCount, hiddenCount, new MatrixInitializer(MatrixInitializer.Type.Uniform, 0.1, 0, 0));
+        BackPropagationThroughTime bptt = new LSTMBackPropagationThroughTime();
         bptt.setLearningRate(learningRate);
         lstm.setLearningRule(bptt);
 
@@ -56,7 +60,7 @@ public class StockPricePredictionExample {
 //        evaluate(lstm, testSet);
     }
 
-    private static void evaluate(LSTM lstm, DataSet testSet) {
+    private static void evaluate(RNN lstm, DataSet testSet) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
