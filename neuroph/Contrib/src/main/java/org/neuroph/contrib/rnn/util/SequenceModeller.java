@@ -45,14 +45,9 @@ public class SequenceModeller {
         dataSetRows.forEach(row -> {
             StringBuilder stringBuilder = new StringBuilder();
 
-            for (double input : row.getInput()) {
-                stringBuilder.append(input);
-                stringBuilder.append(" ");
-            }
-
             for (double desiredOutput : row.getDesiredOutput()) {
                 stringBuilder.append(desiredOutput);
-                stringBuilder.append(" ");
+                stringBuilder.append("");
             }
 
             String rowString = stringBuilder.toString();

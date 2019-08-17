@@ -15,16 +15,18 @@
  */
 package org.neuroph.contrib.rnn.example;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.jblas.DoubleMatrix;
 import org.neuroph.contrib.rnn.bptt.BackPropagationThroughTime;
 import org.neuroph.contrib.rnn.util.SequenceModeller;
 import org.neuroph.contrib.rnn.LSTM;
 import org.neuroph.contrib.rnn.RNN;
 import org.neuroph.contrib.rnn.bptt.LSTMBackPropagationThroughTime;
+import org.neuroph.contrib.rnn.util.LossFunction;
 import org.neuroph.contrib.rnn.util.MatrixInitializer;
 import org.neuroph.core.data.DataSet;
-import org.neuroph.core.learning.error.MeanSquaredError;
-import org.neuroph.eval.ErrorEvaluator;
-import org.neuroph.eval.Evaluation;
 
 /**
  *
@@ -33,11 +35,12 @@ import org.neuroph.eval.Evaluation;
 public class LSTMStockPricePredictionExample {
 
     public static void main(String[] args) {
+        trainNetwork();
+    }
 
-        DataSet dataSet = DataSet.createFromFile("Google_Stock_Price.csv", 3, 1, ",");
-        DataSet[] trainTestSplit = dataSet.split(0.8, 0.2);
-        DataSet trainingSet = trainTestSplit[0];
-        DataSet testSet = trainTestSplit[1];
+    private static void trainNetwork() {
+        DataSet trainingSet = DataSet.createFromFile("google-stock-price-train.csv", 3, 1, ",");
+        DataSet testSet = DataSet.createFromFile("google-stock-price-test.csv", 3, 1, ",");
 
         SequenceModeller sequenceModeller = new SequenceModeller(trainingSet);
 
@@ -57,11 +60,52 @@ public class LSTMStockPricePredictionExample {
         bptt.learn(trainingSet, maxIterations);
         System.out.println("Training completed.");
 
-//        evaluate(lstm, testSet);
+        testNetwork(lstm, testSet);
     }
 
-    private static void evaluate(RNN lstm, DataSet testSet) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private static void testNetwork(RNN lstm, DataSet testSet) {
+        SequenceModeller sequenceModeller = new SequenceModeller(testSet);
+        Map<Integer, String> indexChar = sequenceModeller.getIndexChar();
+        Map<String, DoubleMatrix> charVector = sequenceModeller.getCharVector();
+        List<String> sequence = sequenceModeller.getSequence();
+
+        System.out.println("Test set:");
+        testSet.forEach(System.out::println);
+
+        System.out.println("Prediction:");
+        double error = 0;
+        double num = 0;
+        double start = System.currentTimeMillis();
+
+        for (int j = 0; j < sequence.size(); j++) {
+            String seq = sequence.get(j);
+
+            Map<String, DoubleMatrix> valuesInTimesteps = new HashMap<>();
+
+            System.out.print(String.valueOf(seq.charAt(0)));
+            for (int timestep = 0; timestep < seq.length() - 1; timestep++) {
+                DoubleMatrix input = charVector.get(String.valueOf(seq.charAt(timestep)));
+                valuesInTimesteps.put("input" + timestep, input);
+
+                lstm.activate(timestep, valuesInTimesteps);
+
+                DoubleMatrix predictedResult = lstm.decode(valuesInTimesteps.get("output" + timestep));
+                valuesInTimesteps.put("predictedResult" + timestep, predictedResult);
+                DoubleMatrix result = charVector.get(String.valueOf(seq.charAt(timestep + 1)));
+                valuesInTimesteps.put("result" + timestep, result);
+
+                System.out.print(indexChar.get(predictedResult.argmax()));
+                error += LossFunction.getMeanCategoricalCrossEntropy(predictedResult, result);
+            }
+            System.out.println();
+
+            BackPropagationThroughTime bptt = (BackPropagationThroughTime) lstm.getLearningRule();
+            bptt.propagate(valuesInTimesteps, seq.length() - 2, bptt.getLearningRate());
+
+            num += seq.length();
+        }
+
+        System.out.println("Error = " + error / num + ", time = " + (System.currentTimeMillis() - start) / 1000 + "s");
     }
 
 }
