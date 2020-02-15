@@ -1,24 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.neuroph.imgrec.filter.impl;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.Serializable;
 import org.neuroph.imgrec.filter.ImageFilter;
-
-
-
 
 /**
  * 
  * @author Sanja
  */
-public class EdgeDetection implements ImageFilter,Serializable {
+public class EdgeDetection implements ImageFilter<BufferedImage>,Serializable {
 
     int width;
     int height;
@@ -26,7 +17,7 @@ public class EdgeDetection implements ImageFilter,Serializable {
     transient BufferedImage filteredImage;
 
     @Override
-    public BufferedImage processImage(BufferedImage image) {
+    public BufferedImage apply(BufferedImage image) {
         originalImage = image;
         setAttributes(image);
         int width = originalImage.getWidth();
@@ -88,7 +79,6 @@ public class EdgeDetection implements ImageFilter,Serializable {
     }
 
     private void setAttributes(BufferedImage image) {
-        //this.originalImage = image;
         this.height = originalImage.getHeight();
         this.width = originalImage.getWidth();
     }

@@ -1,17 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.neuroph.imgrec.filter.impl;
-
-
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import javax.imageio.ImageIO;
 import org.neuroph.imgrec.ImageUtilities;
@@ -21,7 +13,7 @@ import org.neuroph.imgrec.filter.ImageFilter;
  *
  * @author Mihailo Stupar
  */
-public class OCRSeparationFilter implements ImageFilter {
+public class OCRSeparationFilter implements ImageFilter<BufferedImage> {
 
     private BufferedImage originalImage;
     private int width;
@@ -39,7 +31,6 @@ public class OCRSeparationFilter implements ImageFilter {
     private int[] counts;
 
     private int[] linePositions = null;
-//    private ArrayList<String> letterLabels;
 
     private String text;
     private int seqNum = 0;
@@ -49,13 +40,12 @@ public class OCRSeparationFilter implements ImageFilter {
     public OCRSeparationFilter() {
         letterWidth = 0;
         letterHeight = 0;
-//        letterLabels = new ArrayList<>(); 
         cropHeight = 0;
         cropWidth = 0;
     }
 
     @Override
-    public BufferedImage processImage(BufferedImage image) {
+    public BufferedImage apply(BufferedImage image) {
 
         originalImage = image;
         width = originalImage.getWidth();
@@ -73,7 +63,6 @@ public class OCRSeparationFilter implements ImageFilter {
                 int i = linePositions[line]+k;
                 if (i == -1 || i == height)
                     continue;;
-//        for (int i = 0; i < height; i++) {
 
                 for (int j = 0; j < width; j++) {
 
@@ -100,8 +89,8 @@ public class OCRSeparationFilter implements ImageFilter {
 
         BufferedImage letter = new BufferedImage(letterWidth, letterHeight, originalImage.getType());
         int alpha = new Color(originalImage.getRGB(startJ, startI)).getAlpha();
-        int white = ImageUtilities.colorToRGB(alpha, 255, 255, 255);
-        int black = ImageUtilities.colorToRGB(alpha, 0, 0, 0);
+        int white = ImageUtilities.argbToColor(alpha, 255, 255, 255);
+        int black = ImageUtilities.argbToColor(alpha, 0, 0, 0);
 
         // fill all letter image with white pixels
         for (int i = 0; i < letterHeight; i++) {
@@ -163,7 +152,7 @@ public class OCRSeparationFilter implements ImageFilter {
         if (cropHeight != 0 || cropWidth != 0) {
             OCRCropImage ci = new OCRCropImage();
             ci.setDimension(cropWidth, cropHeight);
-            crop = ci.processImage(img);
+            crop = ci.apply(img);
         }
         
         

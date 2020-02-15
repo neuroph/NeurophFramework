@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.neuroph.imgrec.filter.impl;
 
 import java.awt.Color;
@@ -21,13 +15,13 @@ import org.neuroph.imgrec.filter.ImageFilter;
  * 
  * @author Mihailo Stupar
  */
-public class HistogramEqualizationFilter implements ImageFilter,Serializable {
+public class HistogramEqualizationFilter implements ImageFilter<BufferedImage>,Serializable {
 
     private transient BufferedImage originalImage;
     private transient BufferedImage filteredImage;
 	
     @Override
-    public BufferedImage processImage(BufferedImage image) {
+    public BufferedImage apply(BufferedImage image) {
 		
 	originalImage = image;
 		
@@ -60,7 +54,7 @@ public class HistogramEqualizationFilter implements ImageFilter,Serializable {
 		newColor = (G-1)*histogramCumulative[gray]/(width*height); //zaokruziti izbeci celobrojno deljenje
 
 				
-		newColor = ImageUtilities.colorToRGB(alpha, newColor, newColor, newColor);
+		newColor = ImageUtilities.argbToColor(alpha, newColor, newColor, newColor);
 		filteredImage.setRGB(i, j, newColor);
             }
 	}
@@ -68,10 +62,10 @@ public class HistogramEqualizationFilter implements ImageFilter,Serializable {
 	return filteredImage;
     }
 	
-	
-    public int[] imageHistogram(BufferedImage image) {
+    // ubaci u neku util klasu jer je isto kao i kod OtsuBinarizera
+    private int[] imageHistogram(BufferedImage image) {
 
-	int[] histogram = new int[256];
+	int[] histogram = new int[256]; // histogram je 256 jer tretira samo nijanse sive
 
 	for (int i = 0; i < histogram.length; i++)
             histogram[i] = 0;

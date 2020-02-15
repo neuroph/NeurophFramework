@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.neuroph.imgrec.filter.impl;
 
 import java.awt.Color;
@@ -22,13 +17,13 @@ import org.neuroph.imgrec.filter.ImageFilter;
  *
  * @author Mihailo Stupar
  */
-public class EraseBlackBorderFilter implements ImageFilter,Serializable {
+public class EraseBlackBorderFilter implements ImageFilter<BufferedImage>,Serializable {
 
     private transient BufferedImage originalImage;
     private transient BufferedImage filteredImage;
 
     @Override
-    public BufferedImage processImage(BufferedImage image) {
+    public BufferedImage apply(BufferedImage image) {
 
         originalImage = image;
 
@@ -69,11 +64,11 @@ public class EraseBlackBorderFilter implements ImageFilter,Serializable {
                 int alpha = new Color(originalImage.getRGB(i, j)).getAlpha();
                 if (!visited[i][j]) {
                     int white = 255;
-                    color = ImageUtilities.colorToRGB(alpha, white, white, white);
+                    color = ImageUtilities.argbToColor(alpha, white, white, white);
                     filteredImage.setRGB(i, j, color);
                 } else {
                     int black = 0;
-                    color = ImageUtilities.colorToRGB(alpha, black, black, black);
+                    color = ImageUtilities.argbToColor(alpha, black, black, black);
                     filteredImage.setRGB(i, j, color);
                 }
             }

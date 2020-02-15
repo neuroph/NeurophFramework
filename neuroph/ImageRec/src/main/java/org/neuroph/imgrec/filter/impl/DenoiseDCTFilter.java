@@ -23,7 +23,7 @@ import org.neuroph.imgrec.filter.ImageFilter;
 
 //http://www.lokminglui.com/dct.pdf
 //http://www.ipol.im/pub/art/2011/ys-dct/
-public class DenoiseDCTFilter implements ImageFilter,Serializable{
+public class DenoiseDCTFilter implements ImageFilter<BufferedImage>,Serializable{
     
     
     private transient BufferedImage originalImage;
@@ -44,7 +44,7 @@ public class DenoiseDCTFilter implements ImageFilter,Serializable{
     
     
      @Override
-    public BufferedImage processImage(BufferedImage image) {
+    public BufferedImage apply(BufferedImage image) {
 		
         int width = image.getWidth();
 	int height = image.getHeight();
@@ -255,7 +255,7 @@ public class DenoiseDCTFilter implements ImageFilter,Serializable{
             for (int y = j*N; y < j*N+N; y++) {
                 int alpha = new Color(originalImage.getRGB(x, y)).getAlpha();
                 int color = Nmatrix[xx][yy];
-                int rgb = ImageUtilities.colorToRGB(alpha, color, color, color);  
+                int rgb = ImageUtilities.argbToColor(alpha, color, color, color);  
                 yy++;
                 filteredImage.setRGB(x, y, rgb);                        
             }

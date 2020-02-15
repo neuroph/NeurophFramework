@@ -24,7 +24,7 @@ import org.neuroph.imgrec.filter.ImageFilter;
 //http://dspace.thapar.edu:8080/dspace/bitstream/10266/2753/1/Tara+Dissertation.pdf
 
 
-public class DCTgrayscale implements ImageFilter,Serializable{
+public class DCTgrayscale implements ImageFilter<BufferedImage>, Serializable{
     
     private transient BufferedImage originalImage;
     private transient BufferedImage filteredImage;
@@ -37,11 +37,8 @@ public class DCTgrayscale implements ImageFilter,Serializable{
         qualityLevel = 50;
     }
 
-    
-    
-    
-     @Override
-    public BufferedImage processImage(BufferedImage image) {
+    @Override
+    public BufferedImage apply(BufferedImage image) {
 		
         int width = image.getWidth();
 	int height = image.getHeight();
@@ -248,7 +245,7 @@ public class DCTgrayscale implements ImageFilter,Serializable{
             for (int y = j*N; y < j*N+N; y++) {
                 int alpha = new Color(originalImage.getRGB(x, y)).getAlpha();
                 int color = Nmatrix[xx][yy];
-                int rgb = ImageUtilities.colorToRGB(alpha, color, color, color);  
+                int rgb = ImageUtilities.argbToColor(alpha, color, color, color);  
                 yy++;
                 filteredImage.setRGB(x, y, rgb);                        
             }

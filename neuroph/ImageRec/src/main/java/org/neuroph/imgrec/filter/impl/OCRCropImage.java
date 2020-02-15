@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.neuroph.imgrec.filter.impl;
 
 import java.awt.Color;
@@ -16,7 +11,7 @@ import org.neuroph.imgrec.filter.ImageFilter;
  *
  * @author Mihailo Stupar
  */
-public class OCRCropImage implements ImageFilter {
+public class OCRCropImage implements ImageFilter<BufferedImage> {
 
     private BufferedImage originalImage;
     private BufferedImage filteredImage;
@@ -38,7 +33,7 @@ public class OCRCropImage implements ImageFilter {
     }
 
     @Override
-    public BufferedImage processImage(BufferedImage image) {
+    public BufferedImage apply(BufferedImage image) {
 
         width = image.getWidth();
         height = image.getHeight();
@@ -126,12 +121,9 @@ public class OCRCropImage implements ImageFilter {
     }
 
     private void fillImage(int startH, int startW, int endH, int endW) {
-
-       
-        
         // fill the image with white color
         int alpha = new Color(originalImage.getRGB(width / 2, height / 2)).getRed();
-        int whiteRGB = ImageUtilities.colorToRGB(alpha, 255, 255, 255);
+        int whiteRGB = ImageUtilities.argbToColor(alpha, 255, 255, 255);
         for (int i = 0; i < newHeight; i++) {
             for (int j = 0; j < newWidth; j++) {
                 filteredImage.setRGB(j, i, whiteRGB);

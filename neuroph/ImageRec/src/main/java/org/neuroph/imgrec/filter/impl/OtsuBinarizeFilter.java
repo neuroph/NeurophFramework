@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.neuroph.imgrec.filter.impl;
 
 import java.awt.Color;
@@ -17,7 +12,7 @@ import org.neuroph.imgrec.filter.ImageFilter;
  * In determining threshold a image histogram is created in way that the value of 
  * each pixel of image affects on the histogram appearance. Then, depending upon 
  * the look of the histogram threshold counts and based on that, the real image 
- * which is binarized is made.The image before this filter must be grayscale and 
+ * which is binarized is made.The image before this filter MUST be GRAYSCALE and 
  * at the end image will contain only two colors - black and white. 
  *
  * reference to: http://zerocool.is-a-geek.net/?p=376
@@ -25,13 +20,16 @@ import org.neuroph.imgrec.filter.ImageFilter;
  * 
  * @author Mihailo Stupar
  */
-public class OtsuBinarizeFilter implements ImageFilter,Serializable {
+public class OtsuBinarizeFilter implements ImageFilter<BufferedImage>, Serializable {
 
     private transient BufferedImage originalImage;
     private transient BufferedImage filteredImage;
-    @Override
-	
-    public BufferedImage processImage(BufferedImage image) {
+        
+    private static final int BLACK_PIXEL = 0;
+    private static final int WHITE_PIXEL = 255;    
+    
+    @Override	
+    public BufferedImage apply(BufferedImage image) {
 		
         originalImage = image;
 		
@@ -44,26 +42,22 @@ public class OtsuBinarizeFilter implements ImageFilter,Serializable {
 		
 	int totalNumberOfpixels = height*width;
 		
-	int treshold = treshold(histogram, totalNumberOfpixels);
-		
-	int black = 0;
-	int white = 255;
-		
-	int alpha;
-	int gray;
-	int newColor;
+	int treshold = calculateThreshold(histogram, totalNumberOfpixels);
+			
+	int alpha, gray, newColor;
 		
 	for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-		gray = new Color(originalImage.getRGB(i, j)).getRed();
-		alpha = new Color(originalImage.getRGB(i, j)).getAlpha();
+                 final Color col = new Color(originalImage.getRGB(i, j));
+		gray = col.getRed();
+		alpha = col.getAlpha();
 				
 		if (gray > treshold)
-                    newColor = white;
+                    newColor = WHITE_PIXEL;
 		else
-                    newColor = black;
+                    newColor = BLACK_PIXEL;
 				
-		newColor = ImageUtilities.colorToRGB(alpha, newColor, newColor, newColor);
+		newColor = ImageUtilities.argbToColor(alpha, newColor, newColor, newColor);
 		filteredImage.setRGB(i, j, newColor);
             }
 	}
@@ -71,55 +65,67 @@ public class OtsuBinarizeFilter implements ImageFilter,Serializable {
 	return filteredImage;
     }
 	
-    public int[] imageHistogram(BufferedImage image) {
+    /**
+     * Creates image histogram for the given image.
+     * 
+     * @param image
+     * @return 
+     */
+    private int[] imageHistogram(BufferedImage image) {
 
-	int[] histogram = new int[256];
+        int[] histogram = new int[256];
 
-	for (int i = 0; i < histogram.length; i++)
+        // ovo je mozda nepotrebno vec su svi nule
+        for (int i = 0; i < histogram.length; i++) {
             histogram[i] = 0;
+        }
 
-            for (int i = 0; i < image.getWidth(); i++) {
-		for (int j = 0; j < image.getHeight(); j++) {
-                    int gray = new Color(image.getRGB(i, j)).getRed();
-                    histogram[gray]++;
-		}
+        for (int x = 0; x < image.getWidth(); x++) {
+            for (int y = 0; y < image.getHeight(); y++) {
+                // ovde bi bilo bolje da ne instanciram ovoliko objekata... nego nek atransformacija
+                int gray = new Color(image.getRGB(x, y)).getRed(); //samo crveni kanal jer se pretpostavlja da je prethodno prosla kroz grayscale filter pa su sva tri kaala ista
+                histogram[gray]++; // za svaku nijansu sive povecaj odgovarajucu poziciju za 1
             }
+        }
         return histogram;
     }
 	
-    private int treshold(int [] histogram, int total) {
-	float sum = 0;
-	for (int i = 0; i < 256; i++)
+    private int calculateThreshold(int[] histogram, int total) {
+        float sum = 0;
+        for (int i = 0; i < 256; i++) {
             sum += i * histogram[i];
+        }
 
-            float sumB = 0;
-            int wB = 0;
-            int wF = 0;
+        float sumB = 0;
+        int wB = 0;
+        int wF = 0;
 
-            float varMax = 0;
-            int threshold = 0;
+        float varMax = 0;
+        int threshold = 0;
 
-            for (int i = 0; i < 256; i++) {
-		wB += histogram[i];
-		if (wB == 0)
-                    continue;
-		wF = total - wB;
-
-		if (wF == 0)
-                    break;
-
-		sumB += (float) (i * histogram[i]);
-                float mB = sumB / wB;
-                float mF = (sum - sumB) / wF;
-
-                float varBetween = (float) wB * (float) wF * (mB - mF) * (mB - mF);
-
-                if (varBetween > varMax) {
-                    varMax = varBetween;
-                    threshold = i;
-                }
+        for (int i = 0; i < 256; i++) {
+            wB += histogram[i];
+            if (wB == 0) {
+                continue;
             }
-	return threshold;
+            wF = total - wB;
+
+            if (wF == 0) {
+                break;
+            }
+
+            sumB += (float) (i * histogram[i]);
+            float mB = sumB / wB;
+            float mF = (sum - sumB) / wF;
+
+            float varBetween = (float) wB * (float) wF * (mB - mF) * (mB - mF);
+
+            if (varBetween > varMax) {
+                varMax = varBetween;
+                threshold = i;
+            }
+        }
+        return threshold;
     }
     
     @Override

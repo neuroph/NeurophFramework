@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.neuroph.imgrec.filter.impl;
 
 import java.awt.Color;
@@ -16,26 +10,18 @@ import org.neuroph.imgrec.filter.ImageFilter;
  *
  * @author Mihailo Stupar
  */
-public class UnsharpMaskingFilter implements ImageFilter,Serializable{
+public class UnsharpMaskingFilter implements ImageFilter<BufferedImage>,Serializable{
 
     private transient BufferedImage originalImage;
     private transient BufferedImage filteredImage;
     
     
     @Override
-    public BufferedImage processImage(BufferedImage image) {
-        
+    public BufferedImage apply(BufferedImage image) {  
         originalImage = image;
-        
-        
-        
-        
         BufferedImage bluredImage = getBluredImage();
-        
-        BufferedImage unsharpMask = getUnsharpMask(originalImage, bluredImage);
-        
+        BufferedImage unsharpMask = getUnsharpMask(originalImage, bluredImage);     
         filteredImage = getSharpImage(originalImage, unsharpMask);
-  
         return filteredImage;
     }
     
@@ -53,7 +39,7 @@ public class UnsharpMaskingFilter implements ImageFilter,Serializable{
             for (int j = 0; j < height; j++) {
                 newColor = getAverageBluring(i, j);
                 alpha = new Color(originalImage.getRGB(i, j)).getAlpha();
-                int rgb = ImageUtilities.colorToRGB(alpha, newColor, newColor, newColor);
+                int rgb = ImageUtilities.argbToColor(alpha, newColor, newColor, newColor);
                 bluredImage.setRGB(i, j, rgb);
             }
         }
@@ -94,7 +80,7 @@ public class UnsharpMaskingFilter implements ImageFilter,Serializable{
                 int blurColor = new Color(bluredImage.getRGB(i, j)).getRed();
                 int alpha = new Color(originalImage.getRGB(i, j)).getAlpha(); 
                 int newColor = originalColor - blurColor;
-                int rgb = ImageUtilities.colorToRGB(alpha, newColor, newColor, newColor);
+                int rgb = ImageUtilities.argbToColor(alpha, newColor, newColor, newColor);
                 unsharpMask.setRGB(i, j, rgb);
             }
         } 
@@ -115,7 +101,7 @@ public class UnsharpMaskingFilter implements ImageFilter,Serializable{
                 int unsharpColor = new Color(unsharpMask.getRGB(i, j)).getRed();
                 int alpha = new Color(originalImage.getRGB(i, j)).getAlpha(); 
                 int newColor = originalColor + unsharpColor;
-                int rgb = ImageUtilities.colorToRGB(alpha, newColor, newColor, newColor);
+                int rgb = ImageUtilities.argbToColor(alpha, newColor, newColor, newColor);
                 sharpImage.setRGB(i, j, rgb);
             }
         } 

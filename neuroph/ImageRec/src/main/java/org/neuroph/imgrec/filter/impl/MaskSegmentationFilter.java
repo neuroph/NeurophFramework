@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.neuroph.imgrec.filter.impl;
 
 import java.awt.Color;
@@ -26,13 +20,13 @@ import org.neuroph.imgrec.filter.ImageFilter;
  *  
  * @author Mihailo Stupar
  */
-public class MaskSegmentationFilter implements ImageFilter,Serializable{
+public class MaskSegmentationFilter implements ImageFilter<BufferedImage>,Serializable{
 
     private transient BufferedImage originalImage;
     private transient BufferedImage filteredImage;
 	
     @Override
-    public BufferedImage processImage(BufferedImage image) {
+    public BufferedImage apply(BufferedImage image) {
 		
         originalImage =  image;
 		
@@ -42,7 +36,7 @@ public class MaskSegmentationFilter implements ImageFilter,Serializable{
 	filteredImage = new BufferedImage(width, height, originalImage.getType());
 		
 	OtsuBinarizeFilter obf = new OtsuBinarizeFilter();
-	BufferedImage tempImage = obf.processImage(originalImage);
+	BufferedImage tempImage = obf.apply(originalImage);
 		
 	int gray;
 	int alpha;
@@ -63,7 +57,7 @@ public class MaskSegmentationFilter implements ImageFilter,Serializable{
 		else {
                     newColor = white;
 		}
-		newColor = ImageUtilities.colorToRGB(alpha, newColor, newColor, newColor);
+		newColor = ImageUtilities.argbToColor(alpha, newColor, newColor, newColor);
 		filteredImage.setRGB(i, j, newColor);
 	
             }

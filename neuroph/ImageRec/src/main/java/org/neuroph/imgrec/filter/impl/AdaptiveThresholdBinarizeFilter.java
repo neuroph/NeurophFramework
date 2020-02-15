@@ -23,7 +23,7 @@ import org.neuroph.imgrec.filter.ImageFilter;
  * 
  * @author Mihailo Stupar
  */
-public class AdaptiveThresholdBinarizeFilter implements ImageFilter, Serializable {
+public class AdaptiveThresholdBinarizeFilter implements ImageFilter<BufferedImage>, Serializable {
 
     private transient BufferedImage originalImage;
     private transient BufferedImage filteredImage;
@@ -36,13 +36,12 @@ public class AdaptiveThresholdBinarizeFilter implements ImageFilter, Serializabl
     /**
      * Constant k, values between 0 and 1, default value is 0.02
      */
-    private double k = 0.02;
+    private double k = 0.02; // sta je ov akonstanta???
 
     @Override
-    public BufferedImage processImage(BufferedImage image) {
+    public BufferedImage apply(BufferedImage image) {
 
-        originalImage = image;
-
+        this.originalImage = image;
         int width = originalImage.getWidth();
         int height = originalImage.getHeight();
 
@@ -73,10 +72,7 @@ public class AdaptiveThresholdBinarizeFilter implements ImageFilter, Serializabl
 
         int d = windowSize / 2;
 
-        int A = 0;
-        int B = 0;
-        int C = 0;
-        int D = 0;
+        int A = 0, B = 0, C = 0, D = 0;
 
         double s;
         double m;
@@ -128,7 +124,7 @@ public class AdaptiveThresholdBinarizeFilter implements ImageFilter, Serializabl
                 }
 
                 alpha = new Color(originalImage.getRGB(i, j)).getAlpha();
-                newColor = ImageUtilities.colorToRGB(alpha, newColor, newColor, newColor);
+                newColor = ImageUtilities.argbToColor(alpha, newColor, newColor, newColor);
 
                 filteredImage.setRGB(i, j, newColor);
             }

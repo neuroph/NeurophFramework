@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.neuroph.imgrec.filter.impl;
 
 import java.awt.Color;
@@ -18,7 +12,7 @@ import org.neuroph.imgrec.filter.ImageFilter;
  */
 
 //http://www.swageroo.com/wordpress/how-to-program-a-gaussian-blur-without-using-3rd-party-libraries/
-public class GaussianBluring implements ImageFilter,Serializable{
+public class GaussianBluring implements ImageFilter<BufferedImage>,Serializable{
     
     private transient BufferedImage originalImage;
     private transient BufferedImage filteredImage;
@@ -32,12 +26,9 @@ public class GaussianBluring implements ImageFilter,Serializable{
         radius = 7;
         sigma = 10;
     }
-    
-    
-    
-    
+      
     @Override
-    public BufferedImage processImage(BufferedImage image) {
+    public BufferedImage apply(BufferedImage image) {
 
         originalImage = image;
         
@@ -46,21 +37,16 @@ public class GaussianBluring implements ImageFilter,Serializable{
         
         int width = image.getWidth() - 2*radius;
         int height = image.getHeight() - 2*radius;
-        
-        
-        
-        
-        
+
         filteredImage = new BufferedImage(width, height, originalImage.getType());
         
-        createKernel();
-        
+        createKernel();        
 
         for (int i = radius; i < oldWidth - radius; i++) {
             for (int j = radius; j < oldHeight - radius; j++) {
                 int alpha = new Color(originalImage.getRGB(i, j)).getAlpha();
                 int newColor = getNewColor(i, j);
-                int rgb = ImageUtilities.colorToRGB(alpha, newColor, newColor, newColor);
+                int rgb = ImageUtilities.argbToColor(alpha, newColor, newColor, newColor);
                 
                 int x = i-radius;
                 int y = j-radius;
@@ -82,11 +68,11 @@ public class GaussianBluring implements ImageFilter,Serializable{
         int center = radius;
         kernel = new double [size][size];
         
-        for (int i = 0; i < kernel.length; i++) {
-            for (int j = 0; j < kernel[0].length; j++) {
-                int distanceX = Math.abs(center - i);
-                int distanceY = Math.abs(center - j);
-                kernel [i][j] = gaussianFormula(distanceX, distanceY);
+        for (int x = 0; x < kernel.length; x++) {
+            for (int y = 0; y < kernel[0].length; y++) {
+                int distanceX = Math.abs(center - x);
+                int distanceY = Math.abs(center - y);
+                kernel [x][y] = gaussianFormula(distanceX, distanceY);
             }
         }
         
@@ -100,7 +86,7 @@ public class GaussianBluring implements ImageFilter,Serializable{
     
     }
     
-    public double gaussianFormula (double x, double y) {
+    private double gaussianFormula (double x, double y) {
         double one = 1.0;
         double value = one/(2*Math.PI*sigma*sigma);
         double exp = -(x*x+y*y)/(2*sigma*sigma);
@@ -109,7 +95,7 @@ public class GaussianBluring implements ImageFilter,Serializable{
         return value;
     }
     
-    public double getNormalizationValue (double[][] kernel) {
+    private double getNormalizationValue (double[][] kernel) {
         double sum = 0;
         for (int i = 0; i < kernel.length; i++) {
             for (int j = 0; j < kernel[0].length; j++) {
@@ -120,7 +106,7 @@ public class GaussianBluring implements ImageFilter,Serializable{
         return one/sum;
     }
  
-    public int getNewColor (int x, int y) {
+    private int getNewColor (int x, int y) {
         if (!checkConditios(x, y)) {
             return new Color(originalImage.getRGB(x, y)).getRed();
         }
@@ -131,9 +117,7 @@ public class GaussianBluring implements ImageFilter,Serializable{
         int newI = 0;
         int newJ = 0;
         for (int i = x-radius; i <= x+radius; i++) {
-            for (int j = y-radius; j <= y+radius; j++) {
-                
-                //System.out.println("size:" +size+", radius:"+radius+", x:"+x+",y:"+y+", i:"+i+",j:"+j+ ", newI:"+newI+"newJ:"+newJ);
+            for (int j = y-radius; j <= y+radius; j++) {                
                 int oldColor = new Color(originalImage.getRGB(i, j)).getRed();
                 matrix[newI][newJ] = oldColor * kernel[newI][newJ];
                 newJ++;
@@ -151,10 +135,6 @@ public class GaussianBluring implements ImageFilter,Serializable{
         }
         
         return (int) Math.round(sum);
-        
-        
-        
-        
     }
    
     public boolean checkConditios (int x, int y) {

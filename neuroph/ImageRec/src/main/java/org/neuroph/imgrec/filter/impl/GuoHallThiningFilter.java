@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.neuroph.imgrec.filter.impl;
 
 import java.awt.Color;
@@ -14,7 +9,7 @@ import org.neuroph.imgrec.filter.ImageFilter;
  *
  * @author Mihailo Stupar
  */
-public class GuoHallThiningFilter implements ImageFilter {
+public class GuoHallThiningFilter implements ImageFilter<BufferedImage> {
 
     private BufferedImage originalImage;
     private BufferedImage filteredImage;
@@ -31,7 +26,7 @@ public class GuoHallThiningFilter implements ImageFilter {
      * @return
      */
     @Override
-    public BufferedImage processImage(BufferedImage image) {
+    public BufferedImage apply(BufferedImage image) {
 
         originalImage = image;
         width = originalImage.getWidth();
@@ -95,7 +90,7 @@ public class GuoHallThiningFilter implements ImageFilter {
                 } else {
                     col = imageM[i][j] * 255;
                 }
-                int rgb = ImageUtilities.colorToRGB(alpha, col, col, col);
+                int rgb = ImageUtilities.argbToColor(alpha, col, col, col);
 
                 filteredImage.setRGB(i, j, rgb);
             }

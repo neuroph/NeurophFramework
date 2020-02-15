@@ -15,7 +15,7 @@ import org.neuroph.imgrec.filter.ImageFilter;
  * @author Mihailo Stupar
  */
 // http://opencv-code.com/quick-tips/implementation-of-thinning-algorithm-in-opencv/
-public class ZhangSuenThinFilter implements ImageFilter {
+public class ZhangSuenThinFilter implements ImageFilter<BufferedImage> {
 
     private BufferedImage originalImage;
     private BufferedImage filteredImage;
@@ -32,7 +32,7 @@ public class ZhangSuenThinFilter implements ImageFilter {
      * @return
      */
     @Override
-    public BufferedImage processImage(BufferedImage image) {
+    public BufferedImage apply(BufferedImage image) {
 
         originalImage = image;
         width = originalImage.getWidth();
@@ -96,7 +96,7 @@ public class ZhangSuenThinFilter implements ImageFilter {
                 } else {
                     col = imageM[i][j] * 255;
                 }
-                int rgb = ImageUtilities.colorToRGB(alpha, col, col, col);
+                int rgb = ImageUtilities.argbToColor(alpha, col, col, col);
 
                 filteredImage.setRGB(i, j, rgb);
             }

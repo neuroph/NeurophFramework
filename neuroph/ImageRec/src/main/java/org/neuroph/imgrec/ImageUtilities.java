@@ -320,7 +320,7 @@ public class ImageUtilities {
         return rgbDataMap;
     }
 
-    public static int colorToRGB(int alpha, int red, int green, int blue) {
+    public final static int argbToColor(int alpha, int red, int green, int blue) {
 
         int newPixel = 0;
         newPixel += alpha;

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.neuroph.imgrec.filter.impl;
 
 import java.awt.Color;
@@ -16,7 +11,7 @@ import org.neuroph.imgrec.filter.ImageFilter;
  * 
  * @author Mihailo Stupar
  */
-public class LetterSeparationFilter implements ImageFilter {
+public class LetterSeparationFilter implements ImageFilter<BufferedImage> {
 
     private BufferedImage originalImage;
     private BufferedImage filteredImage;
@@ -26,7 +21,7 @@ public class LetterSeparationFilter implements ImageFilter {
  * @return 
  */
     @Override
-    public BufferedImage processImage(BufferedImage image) {
+    public BufferedImage apply(BufferedImage image) {
 
         originalImage = image;
 
@@ -76,7 +71,7 @@ public class LetterSeparationFilter implements ImageFilter {
                     newColor = black;
                 }
 
-                newColor = ImageUtilities.colorToRGB(alpha, newColor, newColor, newColor);
+                newColor = ImageUtilities.argbToColor(alpha, newColor, newColor, newColor);
                 filteredImage.setRGB(i, j, newColor);
             }
         }
@@ -166,13 +161,11 @@ public class LetterSeparationFilter implements ImageFilter {
 
     public int numberOfBlackPixels(boolean[][] matrix) {
         int count = 0;
-        for (int i = 0; i < originalImage.getWidth(); i++) {
-            for (int j = 0; j < originalImage.getHeight(); j++) {
-
-                if (matrix[i][j] == false) {
+        for (int x = 0; x < originalImage.getWidth(); x++) {
+            for (int y = 0; y < originalImage.getHeight(); y++) {
+                if (matrix[x][y] == false) {
                     count++;
                 }
-
             }
         }
         return count;

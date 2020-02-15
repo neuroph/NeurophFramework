@@ -10,7 +10,7 @@ import org.neuroph.imgrec.filter.ImageFilter;
  *
  * @author Mihailo Stupar
  */
-public class SobelEdgeDetection implements ImageFilter,Serializable{
+public class SobelEdgeDetection implements ImageFilter<BufferedImage>,Serializable{
     
     private transient BufferedImage originalImage;
     private transient BufferedImage filteredImage;
@@ -18,58 +18,48 @@ public class SobelEdgeDetection implements ImageFilter,Serializable{
     private double [][] sobelX;
     private double [][] sobelY;
     
-    private double treshold;
+    private double threshold;
     
     
     @Override
-    public BufferedImage processImage(BufferedImage image) {
+    public BufferedImage apply(BufferedImage image) {
         
-        originalImage = image;
-        
+        originalImage = image;        
         int width = image.getWidth();
-        int height = image.getHeight();
-        
+        int height = image.getHeight();        
         filteredImage = new BufferedImage(width, height, image.getType());
         
-        treshold = 0.1;
+        threshold = 0.1;
         generateSobelOperators();
         
-        double [][] Gx = new double[width][height];
-        double [][] Gy = new double[width][height];
-        double [][] G = new double[width][height];
+        double [][] gradX = new double[width][height];
+        double [][] gradY = new double[width][height];
+        double [][] grad = new double[width][height];
         
         double max = 0;
         
-        for (int i = 1; i < width-1; i++) {
-            for (int j = 1; j < height-1; j++) {
-                
-                Gx[i][j] = calculateGradient(i, j, sobelX);
-                Gy[i][j] = calculateGradient(i, j, sobelY);
-                
-                G[i][j] = Math.abs(Gx[i][j]) + Math.abs(Gy[i][j]);
-                
-                if (G[i][j] > max)
-                    max = G[i][j];
-                
-                
-            }
-            
+        for (int x = 1; x < width-1; x++) {
+            for (int y = 1; y < height-1; y++) {                
+                gradX[x][y] = calculateGradient(x, y, sobelX);
+                gradY[x][y] = calculateGradient(x, y, sobelY);                
+                grad[x][y] = Math.abs(gradX[x][y]) + Math.abs(gradY[x][y]);                
+                if (grad[x][y] > max)  max = grad[x][y];
+            }            
         }
-        
-        
-        treshold = treshold*max;
+                
+        threshold = threshold*max;
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 
                 int newColor;
                 int alpha = new Color(originalImage.getRGB(i, j)).getAlpha();
                 
-                if (G[i][j] > treshold)
+                if (grad[i][j] > threshold)
                     newColor = 0;
                 else
                     newColor = 255;
                
-                int rgb = ImageUtilities.colorToRGB(alpha, newColor, newColor, newColor);
+                int rgb = ImageUtilities.argbToColor(alpha, newColor, newColor, newColor);
                 filteredImage.setRGB(i, j, rgb);
                 
             }
@@ -110,13 +100,10 @@ public class SobelEdgeDetection implements ImageFilter,Serializable{
     	double sum = 0;
         
         int posX = 0;
-        for (int x = i-1; x <= i+1; x++) {
-            
+        for (int x = i-1; x <= i+1; x++) {            
             int posY = 0;
-            for (int y = j-1; y <= j+1; y++) {
-                
-                double gray = new Color(originalImage.getRGB(x, y)).getRed();
-                
+            for (int y = j-1; y <= j+1; y++) {                
+                double gray = new Color(originalImage.getRGB(x, y)).getRed();                
                 sum = sum + gray*sobelOperator[posX][posY];
                 posY++;
             }
@@ -127,7 +114,7 @@ public class SobelEdgeDetection implements ImageFilter,Serializable{
     } 
 
     public void setTreshold(double treshold) {
-        this.treshold = treshold;
+        this.threshold = treshold;
     }
 
     @Override

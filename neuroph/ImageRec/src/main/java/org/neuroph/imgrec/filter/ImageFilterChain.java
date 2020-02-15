@@ -9,7 +9,7 @@ import java.util.List;
  * Process images by applying all filters in chain 
  * @author Sanja
  */
-public class ImageFilterChain implements ImageFilter, Serializable {
+public class ImageFilterChain implements ImageFilter<BufferedImage>, Serializable {
 
     private List<ImageFilter> filters = new ArrayList<>();
     private String chainName;
@@ -35,11 +35,11 @@ public class ImageFilterChain implements ImageFilter, Serializable {
      * @return processed image
      */
     @Override
-    public BufferedImage processImage(BufferedImage image) {
+    public BufferedImage apply(BufferedImage image) {
         
         BufferedImage tempImage = image;
         for (ImageFilter filter : filters) {
-            BufferedImage filteredImage = filter.processImage(tempImage);
+            BufferedImage filteredImage = filter.apply(tempImage);
             tempImage = filteredImage;
         }
 
@@ -56,7 +56,7 @@ public class ImageFilterChain implements ImageFilter, Serializable {
         List<FilteredImage> list = new ArrayList<FilteredImage>();
         BufferedImage tempImage = image;
         for (ImageFilter filter : filters) {
-            BufferedImage processedImage = filter.processImage(tempImage);
+            BufferedImage processedImage = filter.apply(tempImage);
             String filterName = filter.toString();
             FilteredImage filteredImage = new FilteredImage(processedImage,filterName);
             list.add(filteredImage);

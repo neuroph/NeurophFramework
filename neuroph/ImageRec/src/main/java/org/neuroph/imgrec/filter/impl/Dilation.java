@@ -18,7 +18,7 @@ import org.neuroph.imgrec.filter.ImageFilter;
  * and every black pixel replaces with 9 pixels. 
  * @author Mihailo Stupar
  */
-public class Dilation implements ImageFilter,Serializable{
+public class Dilation implements ImageFilter<BufferedImage>,Serializable{
   
     
     private transient BufferedImage originalImage;
@@ -29,7 +29,7 @@ public class Dilation implements ImageFilter,Serializable{
     
     private int [][] kernel;
     @Override
-    public BufferedImage processImage(BufferedImage image) {
+    public BufferedImage apply(BufferedImage image) {
         
         originalImage = image;
         
@@ -51,7 +51,7 @@ public class Dilation implements ImageFilter,Serializable{
                 }
                 else {
                     int alpha = new Color(originalImage.getRGB(i, j)).getAlpha();
-                    int rgb = ImageUtilities.colorToRGB(alpha, white, white, white);
+                    int rgb = ImageUtilities.argbToColor(alpha, white, white, white);
                     filteredImage.setRGB(i, j, rgb);
                 }         
             }
@@ -75,7 +75,7 @@ public class Dilation implements ImageFilter,Serializable{
                 if (x>=0 && y>=0 && x<width && y<height) {
                     int black = 0;
                     int alpha = new Color(originalImage.getRGB(x, y)).getAlpha();
-                    int rgb = ImageUtilities.colorToRGB(alpha, black, black, black);
+                    int rgb = ImageUtilities.argbToColor(alpha, black, black, black);
                     filteredImage.setRGB(x, y, rgb);
                 }
             }

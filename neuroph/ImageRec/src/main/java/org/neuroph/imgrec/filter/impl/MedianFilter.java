@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.neuroph.imgrec.filter.impl;
 
 import java.awt.Color;
@@ -24,41 +19,50 @@ import org.neuroph.imgrec.filter.ImageFilter;
  * 
  * @author Mihailo Stupar
  */
-public class MedianFilter implements ImageFilter, Serializable{
+public class MedianFilter implements ImageFilter<BufferedImage>, Serializable{
 
     private transient BufferedImage originalImage;
     private transient BufferedImage filteredImage;
 	
+    /**
+     * Radius around pixel to calculate neighborhood  mean, typically should be 1 or 2 (to get 3 or 5 neighbourhood conv filter).
+     * Central pixel can be greater.
+     */    
     private int radius;
+    private transient int imageWidth;
+    private transient int imageHeight;    
 	
     public MedianFilter () {
 	radius = 1;
     }
 	
+    public MedianFilter(int radius) {
+        this.radius = radius;
+    }        
 	
     @Override
-    public BufferedImage processImage(BufferedImage image) {
+    public BufferedImage apply(BufferedImage image) {
 		
         originalImage = image;
 		
-	int width = originalImage.getWidth();
-	int height = originalImage.getHeight();
+	imageWidth = originalImage.getWidth();
+	imageHeight = originalImage.getHeight();
 		
-	filteredImage = new BufferedImage(width, height, originalImage.getType());
+	filteredImage = new BufferedImage(imageWidth, imageHeight, originalImage.getType());
 		
 	int [] arrayOfPixels;
 	int median;
 	int alpha;
 	int newColor;
 		
-	for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
+	for (int i = 0; i < imageWidth; i++) {
+            for (int j = 0; j < imageHeight; j++) {
 				
 		arrayOfPixels = getArrayOfPixels(i, j);
-		median = findMedian(arrayOfPixels);
+		median = findMedianPixelColor(arrayOfPixels);
 		alpha = new Color(originalImage.getRGB(i, j)).getAlpha();
 				
-		newColor = ImageUtilities.colorToRGB(alpha, median, median, median);
+		newColor = ImageUtilities.argbToColor(alpha, median, median, median);
 		filteredImage.setRGB(i, j, newColor);
             }
         }
@@ -66,12 +70,12 @@ public class MedianFilter implements ImageFilter, Serializable{
 	return filteredImage;
     }
 	
-    public int[] getArrayOfPixels (int i, int j) {
+    public int[] getArrayOfPixels (int x, int y) {
 		
-        int startX = i - radius;
-	int goalX = i + radius;
-	int startY = j - radius;
-	int goalY = j + radius;
+        int startX = x - radius;
+	int goalX = x + radius;
+	int startY = y - radius;
+	int goalY = y + radius;
 		
 	if (startX < 0)
             startX = 0;
@@ -98,7 +102,7 @@ public class MedianFilter implements ImageFilter, Serializable{
 	return pixels;
     }
 	
-    public int findMedian (int [] arrayOfPixels) {
+    private int findMedianPixelColor (int [] arrayOfPixels) {
 	Arrays.sort(arrayOfPixels);
 	int middle = arrayOfPixels.length/2;
 	return arrayOfPixels[middle];

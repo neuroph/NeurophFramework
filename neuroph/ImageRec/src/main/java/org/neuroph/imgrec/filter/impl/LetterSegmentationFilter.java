@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.neuroph.imgrec.filter.impl;
 
 import java.awt.Color;
@@ -20,7 +14,7 @@ import org.neuroph.imgrec.filter.ImageFilter;
  *
  * @author Mihailo Stupar
  */
-public class LetterSegmentationFilter implements ImageFilter{
+public class LetterSegmentationFilter implements ImageFilter<BufferedImage>{
     
     private BufferedImage originalImage;
 
@@ -30,7 +24,7 @@ public class LetterSegmentationFilter implements ImageFilter{
     private boolean[][] visited;
 
     @Override
-    public BufferedImage processImage(BufferedImage image) {
+    public BufferedImage apply(BufferedImage image) {
 
         originalImage = image;
         width = originalImage.getWidth();
@@ -70,8 +64,8 @@ public class LetterSegmentationFilter implements ImageFilter{
         int gapY = 30;
         BufferedImage letter = new BufferedImage(letterWidth, letterHeight, BufferedImage.TYPE_BYTE_BINARY);
         int alpha = new Color(originalImage.getRGB(startI, startJ)).getAlpha();
-        int white = ImageUtilities.colorToRGB(alpha, 255, 255, 255);
-        int black = ImageUtilities.colorToRGB(alpha, 0, 0, 0);
+        int white = ImageUtilities.argbToColor(alpha, 255, 255, 255);
+        int black = ImageUtilities.argbToColor(alpha, 0, 0, 0);
         for (int i = 0; i < letterWidth; i++) {
             for (int j = 0; j < letterHeight; j++) {
                 letter.setRGB(i, j, white);
@@ -138,7 +132,7 @@ public class LetterSegmentationFilter implements ImageFilter{
     }
 
     public void saveToFile(BufferedImage img, String name) throws FileNotFoundException, IOException {
-
+        // Ovo nce raditi nikako!!!
         File outputfile = new File("C:/Users/Mihailo/Documents/NetBeansProjects/ImagePreprocessing/Segmented_letters/" + name + ".jpg");
         ImageIO.write(img, "jpg", outputfile);
     }

@@ -8,7 +8,7 @@ import org.neuroph.nnet.MultiLayerPerceptron;
 public class NeurophImageClassifier extends AbstractImageClassifier<BufferedImage, MultiLayerPerceptron> {
 
     public NeurophImageClassifier(MultiLayerPerceptron model) {
-        super(model);
+        super(BufferedImage.class, model);
     }
 
     @Override
