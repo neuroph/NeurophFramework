@@ -27,67 +27,67 @@ import org.neuroph.core.transfer.TransferFunction;
  *
  * @author Zoran Sevarac <sevarac@gmail.com>
  */
-public class NeuronProperties extends Properties {
+public class NeuronProperties extends NeurophProperties {
 
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
     
-   // public static final DEFAULT = new NeuronProperties();
-    
+    public final static String INPUT_FUNCTION = "inputFunction";
+    public final static String TRANSFER_FUNCTION = "transferFunction";
+    public final static String NEURON_TYPE = "neuronType";
+    public final static String USE_BIAS = "useBias";
 
     public NeuronProperties() {
         initKeys();
-        this.setProperty("inputFunction", WeightedSum.class);
-        this.setProperty("transferFunction", Linear.class);
-        this.setProperty("neuronType", Neuron.class);
+        this.setProperty(INPUT_FUNCTION, WeightedSum.class);
+        this.setProperty(TRANSFER_FUNCTION, Linear.class);
+        this.setProperty(NEURON_TYPE, Neuron.class);
     }
 
     public NeuronProperties(Class<? extends Neuron> neuronClass) {
         initKeys();
-        this.setProperty("inputFunction", WeightedSum.class);
-        this.setProperty("transferFunction", Linear.class);
-        this.setProperty("neuronType", neuronClass);
+        this.setProperty(INPUT_FUNCTION, WeightedSum.class);
+        this.setProperty(TRANSFER_FUNCTION, Linear.class);
+        this.setProperty(NEURON_TYPE, neuronClass);
     }
 
     public NeuronProperties(Class<? extends Neuron> neuronClass, Class<? extends TransferFunction> transferFunctionClass) {
         initKeys();
-        this.setProperty("inputFunction", WeightedSum.class);
-        this.setProperty("transferFunction", transferFunctionClass);
-        this.setProperty("neuronType", neuronClass);
+        this.setProperty(INPUT_FUNCTION, WeightedSum.class);
+        this.setProperty(TRANSFER_FUNCTION, transferFunctionClass);
+        this.setProperty(NEURON_TYPE, neuronClass);
     }
 
     public NeuronProperties(Class<? extends Neuron> neuronClass,
             Class<? extends InputFunction> inputFunctionClass,
             Class<? extends TransferFunction> transferFunctionClass) {
         initKeys();
-        this.setProperty("inputFunction", inputFunctionClass);
-        this.setProperty("transferFunction", transferFunctionClass);
-        this.setProperty("neuronType", neuronClass);
+        this.setProperty(INPUT_FUNCTION, inputFunctionClass);
+        this.setProperty(TRANSFER_FUNCTION, transferFunctionClass);
+        this.setProperty(NEURON_TYPE, neuronClass);
     }
 
     public NeuronProperties(Class<? extends Neuron> neuronClass, TransferFunctionType transferFunctionType) {
         initKeys();
-        this.setProperty("inputFunction", WeightedSum.class);
-        this.setProperty("transferFunction", transferFunctionType.getTypeClass());
-        this.setProperty("neuronType", neuronClass);
+        this.setProperty(INPUT_FUNCTION, WeightedSum.class);
+        this.setProperty(TRANSFER_FUNCTION, transferFunctionType.getTypeClass());
+        this.setProperty(NEURON_TYPE, neuronClass);
     }
 
     public NeuronProperties(TransferFunctionType transferFunctionType, boolean useBias) {
         initKeys();
-//		this.setProperty("weightsFunction", WeightedInput.class);
-//		this.setProperty("summingFunction", Sum.class);
-        this.setProperty("inputFunction", WeightedSum.class);
-        this.setProperty("transferFunction", transferFunctionType.getTypeClass());
-        this.setProperty("useBias", useBias);
-        this.setProperty("neuronType", Neuron.class);
+        this.setProperty(INPUT_FUNCTION, WeightedSum.class);
+        this.setProperty(TRANSFER_FUNCTION, transferFunctionType.getTypeClass());
+        this.setProperty(USE_BIAS, useBias); // ovo bi trebalo da je defaultno podesavanje uvek na tru, ako nece moze da se stavi na 0
+        this.setProperty(NEURON_TYPE, Neuron.class);
     }
 
     // uraditi override za setProperty tako da za enum type uzima odgovarajuce klase
     private void initKeys() {
-        createKeys("inputFunction", "transferFunction", "neuronType", "useBias"); // use bias prebaciti u NeuralNetworkProperties
+        createKeys(INPUT_FUNCTION, TRANSFER_FUNCTION, NEURON_TYPE, USE_BIAS); // use bias prebaciti u NeuralNetworkProperties
     }
 
     public Class getInputFunction() {
-        Object val = this.get("inputFunction");
+        Object val = this.get(INPUT_FUNCTION);
         if (!val.equals("")) {
             return (Class) val;
         }
@@ -95,20 +95,20 @@ public class NeuronProperties extends Properties {
     }
 
     public Class getTransferFunction() {
-        return (Class) this.get("transferFunction");
+        return (Class) this.get(TRANSFER_FUNCTION);
     }
 
     public Class getNeuronType() {
-        return (Class) this.get("neuronType");
+        return (Class) this.get(NEURON_TYPE);
     }
 
-    public Properties getTransferFunctionProperties() {
-        Properties tfProperties = new Properties();
+    public NeurophProperties getTransferFunctionProperties() {
+        NeurophProperties tfProperties = new NeurophProperties();
         //Enumeration<?> en = this.keys(); 
         Iterator iterator =  this.keySet().iterator();
         while (iterator.hasNext()) {
             String name = iterator.next().toString();
-            if (name.contains("transferFunction")) {
+            if (name.contains(TRANSFER_FUNCTION)) {
                 tfProperties.setProperty(name, this.get(name));
             }
         }
@@ -117,9 +117,6 @@ public class NeuronProperties extends Properties {
 
     @Override
     public final void setProperty(String key, Object value) {
-//                if (!this.containsKey(key))
-//                    throw new RuntimeException("Unknown property key: "+key);
-
         if (value instanceof TransferFunctionType) {
             value = ((TransferFunctionType) value).getTypeClass();
         }

@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.neuroph.util.Properties;
+import org.neuroph.util.NeurophProperties;
 import static org.junit.Assert.*;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -64,7 +64,7 @@ public class RampTest {
 
 	@Test
 	public void testgetOutputwthProperties() {
-		Properties properties = new Properties();
+		NeurophProperties properties = new NeurophProperties();
 		properties.setProperty("transferFunction.slope", 1d);
 		properties.setProperty("transferFunction.yHigh", .9d);
 		properties.setProperty("transferFunction.yLow", .3d);
@@ -77,7 +77,7 @@ public class RampTest {
 
 	@Test
 	public void testgetDerivativewthProperties() {
-		Properties properties = new Properties();
+		NeurophProperties properties = new NeurophProperties();
 		properties.setProperty("transferFunction.slope", 1d);
 		properties.setProperty("transferFunction.yHigh", .9d);
 		properties.setProperty("transferFunction.yLow", .3d);

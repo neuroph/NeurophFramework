@@ -23,7 +23,6 @@ import org.neuroph.core.learning.LearningRule;
  * 
  * @author Zoran Sevarac
  */
-
 public class LearningEvent extends java.util.EventObject {
     
     LearningEvent.Type eventType;

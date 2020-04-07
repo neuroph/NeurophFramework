@@ -18,7 +18,7 @@ package org.neuroph.core.transfer;
 
 import java.io.Serializable;
 
-import org.neuroph.util.Properties;
+import org.neuroph.util.NeurophProperties;
 
 /**
  * <pre>
@@ -76,7 +76,7 @@ public class Tanh extends TransferFunction implements Serializable {
      *
      * @param properties properties of the Tanh function
      */
-    public Tanh(Properties properties) {
+    public Tanh(NeurophProperties properties) {
         try {
             this.slope = (Double) properties.getProperty("transferFunction.slope");
             //this.amplitude = (Double) properties.getProperty("transferFunction.amplitude");

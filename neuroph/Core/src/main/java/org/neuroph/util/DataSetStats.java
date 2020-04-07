@@ -9,7 +9,9 @@ import org.neuroph.core.data.DataSetRow;
  * Not only for inputs but also for outputs
  */
 public class DataSetStats {
-
+    // samo jednu od DataSetStatistics  i DataSetStats - koristi se u normalizeru, mozda da prebacim sve u ovu jednu klasu
+    // optimizovati da sve ovo vrati u jednom prolazu...
+    // mislim da DataSetStatistics zavrsava posao
     /**
      *
      * @param dataSet Neuroph dataset

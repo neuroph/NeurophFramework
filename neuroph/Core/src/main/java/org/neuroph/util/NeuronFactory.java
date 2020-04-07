@@ -124,7 +124,7 @@ public class NeuronFactory {
 	 *            transfer function properties
 	 * @return returns transfer function
 	 */
-	private static TransferFunction createTransferFunction(Properties tfProperties) {
+	private static TransferFunction createTransferFunction(NeurophProperties tfProperties) {
 		TransferFunction transferFunction = null;
 
 		Class  tfClass = (Class)tfProperties.getProperty("transferFunction");
@@ -137,9 +137,9 @@ public class NeuronFactory {
                              paramTypes = cons[i].getParameterTypes();
 
                             // use constructor with one parameter of Properties type
-                            if ((paramTypes.length == 1) && (paramTypes[0] == Properties.class)) {
+                            if ((paramTypes.length == 1) && (paramTypes[0] == NeurophProperties.class)) {
                                 Class[] argTypes = new Class[1];
-                                argTypes[0] = Properties.class;
+                                argTypes[0] = NeurophProperties.class;
                                 Constructor ct = tfClass.getConstructor(argTypes);
 
                                 Object[] argList = new Object[1];

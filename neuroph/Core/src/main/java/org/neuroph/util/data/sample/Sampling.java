@@ -18,12 +18,8 @@ package org.neuroph.util.data.sample;
 
 import org.neuroph.core.data.DataSet;
 
-import java.util.List;
-
 /**
- * Interface for data set sampling  methods.
- *
- * TODO: enable in-place sampling or returning different datasets for all sampling methods.
+ * Base interface for all data set sampling  techniques.
  *
  * @author Zoran Sevarac <sevarac@gmail.com>
  */

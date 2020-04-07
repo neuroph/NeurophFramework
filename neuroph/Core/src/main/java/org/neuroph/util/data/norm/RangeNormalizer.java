@@ -6,7 +6,7 @@ import org.neuroph.core.data.DataSetRow;
 
 /**
  * Performs normalization of a data set inputs and outputs to specified range.
- *
+ * 
  * @author Zoran Sevarac <sevarac@gmail.com>
  */
 public class RangeNormalizer implements Normalizer, Serializable {
@@ -14,7 +14,8 @@ public class RangeNormalizer implements Normalizer, Serializable {
     private double[] maxIn, maxOut; // contains max values for in and out columns
     private double[] minIn, minOut; // contains min values for in and out columns
 
-
+    // Da li ovde fali Abs? low moze biti i negativan!
+    
     public RangeNormalizer(double lowLimit, double highLimit) {
         this.lowLimit= lowLimit;
         this.highLimit = highLimit;

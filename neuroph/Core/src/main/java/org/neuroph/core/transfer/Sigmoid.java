@@ -17,7 +17,7 @@
 package org.neuroph.core.transfer;
 
 import java.io.Serializable;
-import org.neuroph.util.Properties;
+import org.neuroph.util.NeurophProperties;
 
 /**
  * <pre>
@@ -62,7 +62,7 @@ public class Sigmoid extends TransferFunction implements Serializable {
 	 * specified properties.
 	 * @param properties properties of the sigmoid function
 	 */	
-	public Sigmoid(Properties properties) {
+	public Sigmoid(NeurophProperties properties) {
 		try {
 			this.slope = (Double)properties.getProperty("transferFunction.slope");
 		} catch (NullPointerException e) {

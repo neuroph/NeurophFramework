@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.neuroph.util.Properties;
+import org.neuroph.util.NeurophProperties;
 import static org.junit.Assert.*;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -78,7 +78,7 @@ public class LinearTest {
 
 	@Test
 	public void testgetOutputwithproperties() {
-		Properties properties = new Properties();
+		NeurophProperties properties = new NeurophProperties();
 		properties.setProperty("transferFunction.slope", 1.0);
 		instance = new Linear(properties);// again
 		double result = instance.getOutput(input);
@@ -87,7 +87,7 @@ public class LinearTest {
 
 	@Test
 	public void testgetDerivativewthproperties() {
-		Properties properties = new Properties();
+		NeurophProperties properties = new NeurophProperties();
 		properties.setProperty("transferFunction.slope", 1.0);
 		instance = new Linear(properties);// and again
 		double result = instance.getDerivative(input);

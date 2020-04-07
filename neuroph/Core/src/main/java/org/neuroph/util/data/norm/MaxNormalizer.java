@@ -35,29 +35,21 @@ public class MaxNormalizer implements Normalizer, Serializable {
     private double[] maxIn, maxOut;
 
     /**
-     * Flag to indicate that normalizer is initialized
-     */
-    private boolean intialized=false;
-
-    /**
      * Creates new instance of MaxNormalizer initialized with max values from specified data set.
      * @param dataSet
      */
     public MaxNormalizer(DataSet dataSet) {
-        findMaxVectors(dataSet);
-        intialized = true;
+        init(dataSet);
     }
 
-    @Override
+   @Override
    public void normalize(DataSet dataSet) {
 
         for (DataSetRow row : dataSet.getRows()) {
-            double[] normalizedInput = normalizeMax(row.getInput(), maxIn);
-            row.setInput(normalizedInput);
+            normalizeVector(row.getInput(), maxIn);
 
             if (dataSet.isSupervised()) {
-                double[] normalizedOutput = normalizeMax(row.getDesiredOutput(), maxOut);
-                row.setDesiredOutput(normalizedOutput);
+                normalizeVector(row.getDesiredOutput(), maxOut);
             }
         }
     }
@@ -67,7 +59,7 @@ public class MaxNormalizer implements Normalizer, Serializable {
     * Finds max values for columns in input and output vector for given data set
     * @param dataSet
     */
-    private void findMaxVectors(DataSet dataSet) {
+    private void init(DataSet dataSet) {
         int inputSize = dataSet.getInputSize();
         int outputSize = dataSet.getOutputSize();
 
@@ -97,14 +89,16 @@ public class MaxNormalizer implements Normalizer, Serializable {
         }
     }
 
-    private double[] normalizeMax(double[] vector, double[] max) {
-        double[] normalizedVector = new double[vector.length];
-
-        for(int i = 0; i < vector.length; i++) {
-                normalizedVector[i] = vector[i] / max[i];
+    /**
+     * Performs normalization of the given input vector.
+     * 
+     * @param vector vector to normalize
+     * @param max vector of max values
+     */
+    private void normalizeVector(double[] vector, double[] max) {
+        for (int i = 0; i < vector.length; i++) {
+            vector[i] = vector[i] / max[i];
         }
-
-        return normalizedVector;
     }
 
 }

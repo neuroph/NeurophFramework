@@ -189,19 +189,24 @@ public class Connection implements Serializable {
         if (obj == null) {
             return false;
         }
+        
         if (getClass() != obj.getClass()) {
             return false;
         }
+        
         final Connection other = (Connection) obj;
         if (!Objects.equals(this.fromNeuron, other.fromNeuron)) {
             return false;
         }
+        
         if (!Objects.equals(this.toNeuron, other.toNeuron)) {
             return false;
         }
+        
         if (!Objects.equals(this.weight, other.weight)) {
             return false;
         }
+        
         return true;
     }
     

@@ -313,13 +313,13 @@ public class NeuralNetworkTest {
         instance.learn(ds);
     }
 
-    @Test
-    public void testLearnWithLr() {
-        DataSet ds = Mockito.mock(DataSet.class);
-        LearningRule l = Mockito.mock(LearningRule.class);
-        instance.learn(ds, l);
-        Mockito.verify(l).learn(ds);
-    }
+//    @Test
+//    public void testLearnWithLr() {
+//        DataSet ds = Mockito.mock(DataSet.class);
+//        LearningRule l = Mockito.mock(LearningRule.class);
+//        instance.learn(ds, l);
+//        Mockito.verify(l).learn(ds);
+//    }
 
     @SuppressWarnings("unchecked")
     @Test

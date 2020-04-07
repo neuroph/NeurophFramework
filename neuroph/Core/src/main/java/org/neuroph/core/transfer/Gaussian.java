@@ -17,7 +17,7 @@
 package org.neuroph.core.transfer;
 
 import java.io.Serializable;
-import org.neuroph.util.Properties;
+import org.neuroph.util.NeurophProperties;
 
 /**
  * <pre>
@@ -52,11 +52,11 @@ public class Gaussian extends TransferFunction implements Serializable {
 	 * specified properties.
 	 * @param properties properties of the Gaussian function
 	 */	
-	public Gaussian(Properties properties) {
+	public Gaussian(NeurophProperties properties) {
 		try {
 			this.sigma = (Double)properties.getProperty("transferFunction.sigma");
 		} catch (NullPointerException e) {
-			// if properties are not set just leave default values
+			// if properties are not set just leave default values! properties must be set if this constructor is callled!
 		} catch (NumberFormatException e) {
 			System.err.println("Invalid transfer function properties! Using default values.");
 		}

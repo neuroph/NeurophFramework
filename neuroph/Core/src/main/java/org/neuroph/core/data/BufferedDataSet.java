@@ -27,7 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class can be used for large training sets, which are partially read from
+ * This class can be used for big training sets, which are loaded from
  * file during the training. It loads bufferSize rows from file into DataSet,
  * and when it iterates all of them, it takes next bufferSize rows. It can be
  * used everywhere where DataSet class is used since it extends it. The rows

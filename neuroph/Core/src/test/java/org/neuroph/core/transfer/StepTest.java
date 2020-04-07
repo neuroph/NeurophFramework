@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
 
-import org.neuroph.util.Properties;
+import org.neuroph.util.NeurophProperties;
 
 /**
  *
@@ -91,10 +91,10 @@ public class StepTest {
 	 */
 	@Test
 	public void testGetProperties() {
-		Properties expResult = new Properties();
+		NeurophProperties expResult = new NeurophProperties();
 		expResult.setProperty("transferFunction.yHigh", String.valueOf(yhigh));
 		expResult.setProperty("transferFunction.yLow", String.valueOf(ylow));
-		Properties result = instance.getProperties();
+		NeurophProperties result = instance.getProperties();
 		assertEquals(expResult, result);
 	}
 

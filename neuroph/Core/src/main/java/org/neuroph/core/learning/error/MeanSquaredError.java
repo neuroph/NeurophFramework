@@ -27,12 +27,12 @@ public final class MeanSquaredError implements ErrorFunction, Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    private transient double totalError;
+    private transient double totalError = 0;
     
     /**
      * Number of patterns - n 
      */
-    private transient float patternCount;
+    private transient float patternCount = 0;
 
     public MeanSquaredError() {
         reset();
@@ -64,4 +64,6 @@ public final class MeanSquaredError implements ErrorFunction, Serializable {
         return totalError / (2*patternCount );
     }
 
+    // TODO: when deserialized init transient fields to zero
+    
 }

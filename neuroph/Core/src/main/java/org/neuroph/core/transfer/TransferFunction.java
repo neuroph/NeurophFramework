@@ -34,6 +34,8 @@ abstract public class TransferFunction implements Serializable {
         
         /**
          * Output result
+         * Used to cache calculated output in order to be  able to reuse it and avoid multiple calculations (especially in getDerivative method).
+         * Every time when method getOutput is called output should be stored here.
          */
         protected transient double output; // cached output value to avoid double calculation for derivative
 
@@ -42,6 +44,7 @@ abstract public class TransferFunction implements Serializable {
 	 * 
 	 * @param totalInput
 	 *            total input 
+         * @return returns calculated value of the function
 	 */
 	abstract public double getOutput(double totalInput);
 

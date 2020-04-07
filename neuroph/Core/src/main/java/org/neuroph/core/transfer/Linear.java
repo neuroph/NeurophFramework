@@ -17,7 +17,7 @@
 package org.neuroph.core.transfer;
 
 import java.io.Serializable;
-import org.neuroph.util.Properties;
+import org.neuroph.util.NeurophProperties;
 
 /**
  * Linear neuron transfer function.
@@ -54,7 +54,7 @@ public class Linear extends TransferFunction implements Serializable {
 	/**
 	 * Creates an instance of Linear transfer function with specified properties
 	 */		
-	public Linear(Properties properties) {
+	public Linear(NeurophProperties properties) {
 		try {
 			this.slope = (Double)properties.getProperty("transferFunction.slope");
 		} catch (NullPointerException e) {

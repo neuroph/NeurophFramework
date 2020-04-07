@@ -37,7 +37,6 @@ import org.neuroph.util.NeuronProperties;
  * @author Zoran Sevarac <sevarac@gmail.com>
  */
 public class Layer implements Iterable<Neuron>, Serializable {
-// TODO: make this Layer<N extends Neuron>
 
     /**
      * The class fingerprint that is set to indicate serialization compatibility

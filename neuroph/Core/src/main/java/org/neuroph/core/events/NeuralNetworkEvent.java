@@ -59,6 +59,8 @@ public class NeuralNetworkEvent extends java.util.EventObject {
         CONNECTION_ADDED,
         CONNECTION_REMOVED;
     }    
+    
+    public static Type CALCULATED = Type.CALCULATED;
 
         
 }

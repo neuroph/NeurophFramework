@@ -17,7 +17,7 @@
 package org.neuroph.core.transfer;
 
 import java.io.Serializable;
-import org.neuroph.util.Properties;
+import org.neuroph.util.NeurophProperties;
 
 /**
  * Ramp neuron transfer function.
@@ -78,7 +78,7 @@ public class Ramp extends TransferFunction implements Serializable {
 	/**
 	 * Creates an instance of Ramp transfer function with specified properties.
 	 */		
-	public Ramp(Properties properties) {
+	public Ramp(NeurophProperties properties) {
 		try {
 			this.slope = (Double)properties.getProperty("transferFunction.slope");
 			this.yHigh = (Double)properties.getProperty("transferFunction.yHigh");

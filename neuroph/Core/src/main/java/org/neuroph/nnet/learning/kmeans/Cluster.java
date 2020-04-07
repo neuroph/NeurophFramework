@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * This class represents a single cluster, with corresponding centroid and assigned vectors
+ * This class represents a single cluster, with corresponding centroid and assigned vectors.
+ * 
  * @author Zoran Sevarac
  */
 public class Cluster {    

@@ -22,7 +22,7 @@ import java.util.HashMap;
  * Represents a general set of properties for neuroph objects
  * @author Zoran Sevarac <sevarac@gmail.com>
  */
-public class Properties extends HashMap {
+public class NeurophProperties extends HashMap {
 	private static final long serialVersionUID = 1L;
 
 
@@ -32,16 +32,10 @@ public class Properties extends HashMap {
 	}
 
 	public void setProperty(String key, Object value) {
-//                if (!this.containsKey(key))
-//                    throw new RuntimeException("Unknown property key: "+key);
-
 		this.put(key, value);
 	}
 
         public Object getProperty(String key) {
-//                if (!this.containsKey(key))
-//                        throw new RuntimeException("Unknown property key: "+key);
-
                 return this.get(key);
         }
 

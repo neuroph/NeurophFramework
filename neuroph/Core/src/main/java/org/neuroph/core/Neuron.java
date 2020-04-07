@@ -19,8 +19,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
-import org.apache.commons.lang3.NotImplementedException;
 
 import org.neuroph.core.input.InputFunction;
 import org.neuroph.core.input.WeightedSum;
@@ -41,13 +39,8 @@ import org.neuroph.core.transfer.TransferFunction;
  * @see InputFunction
  * @see TransferFunction
  */
-public class Neuron implements Serializable, Cloneable /*, Callable<Void>*/ {
+public class Neuron implements Serializable, Cloneable {
 
-//    @Override
-//    public Void call() throws Exception {
-//        calculate();
-//        return null;
-//    }
     /**
      * The class fingerprint that is set to indicate serialization compatibility
      * with a previous version of the class

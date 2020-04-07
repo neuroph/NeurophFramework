@@ -25,7 +25,7 @@ import org.neuroph.core.transfer.TransferFunction;
  * Provides methods to create instance of a Layer with various setting (number of neurons and neuron's properties, etc.
  * @author Zoran Sevarac <sevarac@gmail.com>
  */
-public class LayerFactory {
+public final class LayerFactory {
     
         /**
          * Private constructor prevents creating an instances of this class.

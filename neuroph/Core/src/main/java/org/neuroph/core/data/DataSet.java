@@ -17,12 +17,9 @@ package org.neuroph.core.data;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Random;
 
 import org.neuroph.core.exceptions.NeurophException;
 import org.neuroph.core.exceptions.VectorSizeMismatchException;
@@ -677,13 +674,14 @@ public class DataSet implements javax.visrec.ml.data.DataSet<DataSetRow>, Serial
     }
 
     @Override
-    public javax.visrec.ml.data.DataSet<DataSetRow>[] split(int numParts, Random rnd) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    public String[] getTargetNames() {
+        if (!isSupervised()) return new String[0];
 
-    @Override
-    public javax.visrec.ml.data.DataSet<DataSetRow>[] split(Random rnd, double... parts) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String[] targetNames=new String[outputSize];
+        for(int i=0; i<outputSize; i++)
+            targetNames[i]=columnNames[inputSize+i];
+        
+        return targetNames;
     }
 
 }

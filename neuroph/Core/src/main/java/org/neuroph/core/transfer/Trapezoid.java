@@ -17,7 +17,7 @@
 package org.neuroph.core.transfer;
 
 import java.io.Serializable;
-import org.neuroph.util.Properties;
+import org.neuroph.util.NeurophProperties;
 
 /**
  * Fuzzy trapezoid neuron tranfer function.
@@ -61,7 +61,7 @@ public class Trapezoid extends TransferFunction implements Serializable {
 	 * Creates an instance of Trapezoid transfer function with the specified
 	 * properties.
 	 */		
-	public Trapezoid(Properties properties) {
+	public Trapezoid(NeurophProperties properties) {
 		try {
 			this.leftLow = (Double)properties.getProperty("transferFunction.leftLow");
 			this.leftHigh = (Double)properties.getProperty("transferFunction.leftHigh");

@@ -24,7 +24,7 @@ public class RBFLearning extends LMS {
      * how many nearest neighbours to use when determining width (sigma) for
      * gaussian functions
      */
-    int k=2;
+    int k=3;
     
     @Override
     protected void onStart() {
@@ -60,9 +60,8 @@ public class RBFLearning extends LMS {
         }        
 
         // use KNN to calculate sigma param - gausssian function width for each neuron
-        KNearestNeighbour knn = new KNearestNeighbour();
-        knn.setDataSet(centroids);
-        
+        KNearestNeighbour knn = new KNearestNeighbour(centroids);
+       
         int n = 0;
         for(KVector centroid : centroids) {
         // calculate and set sigma for each neuron in rbf layer
@@ -72,13 +71,11 @@ public class RBFLearning extends LMS {
             ((Gaussian)neuron.getTransferFunction()).setSigma(sigma);
             i++;
             
-        }
-        
-                
+        }                        
     }
     
     /**
-     * Calculates and returns  width of a gaussian function
+     * Calculates and returns  width of a gaussian function used in RBF layer.
      * @param centroid
      * @param nearestNeighbours
      * @return 
@@ -94,9 +91,5 @@ public class RBFLearning extends LMS {
        
        return sigma;
     }
-
-
-    
-   
-    
+  
 }

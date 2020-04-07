@@ -29,79 +29,90 @@ import org.neuroph.core.data.DataSetRow;
  *
  * @author Zoran Sevarac <sevarac@gmail.com>
  */
-public class MaxMinNormalizer implements Normalizer, Serializable {
+public final class MaxMinNormalizer implements Normalizer, Serializable {
 
     private double[] maxIn, maxOut; // contains max values for in and out columns
     private double[] minIn, minOut; // contains min values for in and out columns
-
+    
+    /**
+     * Creates a new MaxMinNormalizer which is initialized with min and max vales from the dataset specified as input arument.
+     * Normalizes all input and output values.
+     * @param dataSet data set to initialize min and max values 
+     */
     public MaxMinNormalizer(DataSet dataSet) {
-        findMaxAndMinVectors(dataSet);
+        init(dataSet);
     }
 
     @Override
     public void normalize(DataSet dataSet) {
         for (DataSetRow row : dataSet.getRows()) {
-            double[] normalizedInput = normalizeMaxMin(row.getInput(), minIn, maxIn);
-            row.setInput(normalizedInput);
+            normalizeVector(row.getInput(), minIn, maxIn);
 
             if (dataSet.isSupervised()) {
-                double[] normalizedOutput = normalizeMaxMin(row.getDesiredOutput(), minOut, maxOut);
-                row.setDesiredOutput(normalizedOutput);
+               normalizeVector(row.getDesiredOutput(), minOut, maxOut);
             }
         }
     }
 
-    private void findMaxAndMinVectors(DataSet dataSet) {
-        int inputSize = dataSet.getInputSize();
-        int outputSize = dataSet.getOutputSize();
+   /**
+    * Initialize normalizer: finds min and max values for all the columns in the data set.
+    * 
+    * @param dataSet 
+    */
+    private void init(DataSet dataSet) {
+        int numInputs = dataSet.getInputSize();
+        int numOutputs = dataSet.getOutputSize();
 
-        maxIn = new double[inputSize];
-        minIn = new double[inputSize];
+        maxIn = new double[numInputs];
+        minIn = new double[numInputs];
 
-        for (int i = 0; i < inputSize; i++) {
+        for (int i = 0; i < numInputs; i++) {
             maxIn[i] = Double.MIN_VALUE;
             minIn[i] = Double.MAX_VALUE;
         }
 
-        maxOut = new double[outputSize];
-        minOut = new double[outputSize];
+        maxOut = new double[numOutputs];
+        minOut = new double[numOutputs];
 
-        for (int i = 0; i < outputSize; i++) {
+        for (int i = 0; i < numOutputs; i++) {
             maxOut[i] = Double.MIN_VALUE;
             minOut[i] = Double.MAX_VALUE;
         }
 
         for (DataSetRow dataSetRow : dataSet.getRows()) {
             double[] input = dataSetRow.getInput();
-            for (int i = 0; i < inputSize; i++) {
-                if (input[i] > maxIn[i]) {
-                    maxIn[i] = input[i];
+            for (int i = 0; i < numInputs; i++) {
+                if (Math.abs(input[i]) > maxIn[i]) {
+                    maxIn[i] = Math.abs(input[i]);
                 }
-                if (input[i] < minIn[i]) {
-                    minIn[i] = input[i];
+                if (Math.abs(input[i]) < minIn[i]) {
+                    minIn[i] = Math.abs(input[i]);
                 }
             }
 
             double[] output = dataSetRow.getDesiredOutput();
-            for (int i = 0; i < outputSize; i++) {
-                if (output[i] > maxOut[i]) {
-                    maxOut[i] = output[i];
+            for (int i = 0; i < numOutputs; i++) {
+                if (Math.abs(output[i]) > maxOut[i]) {
+                    maxOut[i] = Math.abs(output[i]);
                 }
-                if (output[i] < minOut[i]) {
-                    minOut[i] = output[i];
+                if (Math.abs(output[i]) < minOut[i]) {
+                    minOut[i] = Math.abs(output[i]);
                 }
             }
         }
     }
 
-    private double[] normalizeMaxMin(double[] vector, double[] min, double[] max) {
-        double[] normalizedVector = new double[vector.length];
-
+    /**
+     * Performs normalization of the given input vector.
+     * 
+     * @param vector vector to normalize
+     * @param min vector of min values
+     * @param max vector of max values
+     */
+    private void normalizeVector(double[] vector, double[] min, double[] max) {
         for (int i = 0; i < vector.length; i++) {
-            normalizedVector[i] = (vector[i] - min[i]) / (max[i] - min[i]);
+            vector[i] = (vector[i] - min[i]) / (max[i] - min[i]);
         }
-
-        return normalizedVector;
     }
 
     public double[] getMaxIn() {

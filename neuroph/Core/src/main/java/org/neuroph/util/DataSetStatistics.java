@@ -1,65 +1,47 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.neuroph.util;
 
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
 
 /**
- * This class calculates statistics for data set.
+ * This class calculates various statistics for a data set.
  *
  * @author Arsenovic Aleksandar <salle18@gmail.com>
  */
 public class DataSetStatistics {
 
-    private final int rowSize;
-
-    private final int rowCount;
+    private final DataSet dataSet;    
+    
+    private final int rowLength;
+    private final int rowsCount;
 
     private final double[] mean;
-
     private final double[] max;
-
     private final double[] min;
-
     private final double[] sum;
-
-    private final double[] var;
-
-    private final double[] stdDev;
-
+    private final double[] variance;
+    private final double[] stdDeviation;
     private final double[] frequency;
 
-    private final DataSet dataSet;
-    
-    public static final String MIN = "min";
-    
-    public static final String MAX = "max";
-    
+    public static final String MIN = "min";    
+    public static final String MAX = "max";    
     public static final String MEAN = "mean";
-    
     public static final String SUM = "sum";
-    
-    public static final String STD_DEV = "std dev";
-    
-    public static final String VAR = "var";
-    
+    public static final String STD_DEV = "std dev";    
+    public static final String VAR = "var";    
     public static final String FREQ = "freq";
 
     public DataSetStatistics(DataSet dataSet) {
         this.dataSet = dataSet;
-        this.rowSize = dataSet.getInputSize() + dataSet.getOutputSize();
-        this.rowCount = dataSet.getRows().size();
-        this.mean = new double[this.rowSize];
-        this.max = new double[this.rowSize];
-        this.min = new double[this.rowSize];
-        this.sum = new double[this.rowSize];
-        this.var = new double[this.rowSize];
-        this.stdDev = new double[this.rowSize];
-        this.frequency = new double[this.rowSize];
+        this.rowLength = dataSet.getInputSize() + dataSet.getOutputSize();
+        this.rowsCount = dataSet.getRows().size();
+        this.mean = new double[this.rowLength];
+        this.max = new double[this.rowLength];
+        this.min = new double[this.rowLength];
+        this.sum = new double[this.rowLength];
+        this.variance = new double[this.rowLength];
+        this.stdDeviation = new double[this.rowLength];
+        this.frequency = new double[this.rowLength];
         this.setDefaultValues();
     }
 
@@ -67,7 +49,7 @@ public class DataSetStatistics {
      * Sets default values for statistics.
      */
     private void setDefaultValues() {
-        for (int i = 0; i < this.rowSize; i++) {
+        for (int i = 0; i < this.rowLength; i++) {
             this.max[i] = -Double.MAX_VALUE;
             this.min[i] = Double.MAX_VALUE;
         }
@@ -77,9 +59,9 @@ public class DataSetStatistics {
      * Resets statistics values to default.
      */
     private void resetValues() {
-        for (int i = 0; i < this.rowSize; i++) {
+        for (int i = 0; i < this.rowLength; i++) {
             this.sum[i] = 0;
-            this.var[i] = 0;
+            this.variance[i] = 0;
             this.frequency[i] = -0.0;
         }
     }
@@ -88,39 +70,46 @@ public class DataSetStatistics {
      * Calculates basic statistics by columns of the dataset.
      */
     public void calculateStatistics() {
+
         this.resetValues();
         DataSetColumnType[] columnTypes = this.dataSet.getColumnTypes();
         for (DataSetRow dataSetRow : this.dataSet.getRows()) {
-            double[] row = dataSetRow.toArray();
-            for (int i = 0; i < this.rowSize; i++) {
+            double[] row = dataSetRow.toArray(); // ovaj uzima i ulaze i izlaze
+            for (int i = 0; i < this.rowLength; i++) {
                 this.max[i] = Math.max(this.max[i], row[i]);
                 this.min[i] = Math.min(this.min[i], row[i]);
                 this.sum[i] += row[i];
+               
                 if (columnTypes[i] == DataSetColumnType.NOMINAL) {
                     this.frequency[i] += row[i];
                 }
             }
         }
 
-        for (int i = 0; i < this.rowSize; i++) {
-            this.mean[i] = this.sum[i] / (double) this.rowCount;
-            if (columnTypes[i] == DataSetColumnType.NOMINAL) {
-                this.frequency[i] /= (double) this.rowCount;
-            }
+        // calculate mean for all columns
+        for (int i = 0; i < this.rowLength; i++) {
+            this.mean[i] = this.sum[i] / (double) this.rowsCount; // makes no sense for binary columns
+//            if (columnTypes[i] == DataSetColumnType.NOMINAL) {
+//                this.frequency[i] /= (double) this.rowsCount; // da li ovo ima smisla
+//            }
         }
 
+        // calculate variance for all columns
         for (DataSetRow dataSetRow : this.dataSet.getRows()) {
             double[] row = dataSetRow.toArray();
-            for (int i = 0; i < this.rowSize; i++) {
+            for (int i = 0; i < this.rowLength; i++) {
                 double delta = row[i] - this.mean[i];
-                this.var[i] += delta * delta;
+                this.variance[i] += delta * delta;
             }
         }
 
-        for (int i = 0; i < this.rowSize; i++) {
-            this.var[i] /= (double) this.rowCount;
-            this.stdDev[i] = Math.sqrt(this.var[i]);
+        // and standard deviation
+        for (int i = 0; i < this.rowLength; i++) {
+            this.variance[i] /= (double) this.rowsCount;
+            this.stdDeviation[i] = Math.sqrt(this.variance[i]);
         }
+        
+        // todo: add median, 1st and 3rd quantiles
     }
     
     /**
@@ -165,7 +154,7 @@ public class DataSetStatistics {
      * @return Array of variants by columns. 
      */
     public double[] getVar() {
-        return this.var;
+        return this.variance;
     }
 
     /**
@@ -174,7 +163,7 @@ public class DataSetStatistics {
      * @return Array of standard deviations by columns.
      */
     public double[] getStdDev() {
-        return this.stdDev;
+        return this.stdDeviation;
     }
 
     /**

@@ -17,7 +17,7 @@
 package org.neuroph.core.transfer;
 
 import java.io.Serializable;
-import org.neuroph.util.Properties;
+import org.neuroph.util.NeurophProperties;
 
 /**
  * Step neuron transfer function.
@@ -53,7 +53,7 @@ public class Step extends TransferFunction implements Serializable {
 	/**
 	 * Creates an instance of Step transfer function with specified properties
 	 */	
-	public Step(Properties properties) {
+	public Step(NeurophProperties properties) {
 		try {
 			this.yHigh = (Double)properties.getProperty("transferFunction.yHigh");
 			this.yLow = (Double)properties.getProperty("transferFunction.yLow");
@@ -108,8 +108,8 @@ public class Step extends TransferFunction implements Serializable {
 	 * Returns the properties of this function
 	 * @return properties of this function
 	 */
-	public Properties getProperties() {
-		Properties properties = new Properties();
+	public NeurophProperties getProperties() {
+		NeurophProperties properties = new NeurophProperties();
 		properties.setProperty("transferFunction.yHigh", String.valueOf(yHigh));
 		properties.setProperty("transferFunction.yLow", String.valueOf(yLow));
 		return properties;

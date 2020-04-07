@@ -2,6 +2,9 @@ package org.neuroph.core.data;
 
 import org.neuroph.util.data.norm.MaxNormalizer;
 
+/**
+ * Utility methods for dowrking with datasets
+ */
 public class DataSets {
 
     public static MaxNormalizer normalizeMax(DataSet dataSet) {

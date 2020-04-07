@@ -1,7 +1,7 @@
 package org.neuroph.nnet.learning.kmeans;
 
 /**
- * Represents feature vector used in k-means clustering algorithm
+ * Represents feature vector used in k-means clustering algorithm.
  * 
  * @author Zoran Sevarac
  * @author Uros Stojkic
@@ -14,7 +14,7 @@ public class KVector {
     private double[] values;  
     
     /**
-     * Cluster to which this vector is assigned during clustering
+     * Cluster to which this vector is assigned during clustering.
      */
     private Cluster cluster;
     
@@ -64,7 +64,7 @@ public class KVector {
     }
     
     /**
-     * Calculates and returns intensity of this vector
+     * Calculates and returns intensity of this vector (L2Norm)
      * @return intensity of this vector
      */
     public double getIntensity() {
@@ -88,7 +88,21 @@ public class KVector {
         // get values and do this in loop
         double[] otherValues = otherVector.getValues();
         
-        double distance = 0;
+        double distanceFrom = 0;
+        
+        for(int i=0; i<values.length; i++) {
+            distanceFrom += Math.pow(otherValues[i]-values[i], 2);
+        }
+        
+        distanceFrom = Math.sqrt(distanceFrom);
+        
+        return distanceFrom;        
+    }      
+    
+    public double setDistanceFrom(KVector someVector) {
+        // get values and do this in loop
+        double[] otherValues = someVector.getValues();
+        distance = 0;
         
         for(int i=0; i<values.length; i++) {
             distance += Math.pow(otherValues[i]-values[i], 2);
@@ -97,7 +111,8 @@ public class KVector {
         distance = Math.sqrt(distance);
         
         return distance;        
-    }      
+    }        
+    
     
     public int size() {
         return values.length;
@@ -119,10 +134,8 @@ public class KVector {
         return distance;
     }
 
-    public void setDistance(double distance) {
-        this.distance = distance;
-    }
-    
-    
-    
+//    public void setDistance(double distance) {
+//        this.distance = distance;
+//    }
+            
 }

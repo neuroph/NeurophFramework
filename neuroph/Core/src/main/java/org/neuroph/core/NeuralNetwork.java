@@ -41,6 +41,7 @@ import java.util.*;
  * </pre>
  *
  * @author Zoran Sevarac <sevarac@gmail.com>
+ * @param <L> Learning algorithm
  * @see Layer
  * @see LearningRule
  */
@@ -243,23 +244,21 @@ public class NeuralNetwork<L extends LearningRule> implements Serializable {
             throw new VectorSizeMismatchException("Input vector size does not match network input dimension!");
         }
 
-        // TODO: Make this more elegant
-        int i = 0;
+        int idx = 0;
         for (Neuron neuron : this.inputNeurons) {
-            neuron.setInput(inputVector[i]); // set input to the corresponding neuron
-            i++;
+            neuron.setInput(inputVector[idx]); // set input to the corresponding neuron
+            idx++;
         }
     }
 
 
     /**
-     * Returns network output vector. Output vector is an array  collection of Double
-     * values.
+     * Returns network output vector.
+     * Output vector is an array double values.
      *
      * @return network output vector
      */
     public double[] getOutput() {
-        // TODO: Make this more elegant
         int i = 0;
         for (Neuron c : outputNeurons) {
             outputBuffer[i] = c.getOutput();
@@ -269,52 +268,20 @@ public class NeuralNetwork<L extends LearningRule> implements Serializable {
         return outputBuffer;
     }
 
-//    This can be used to provid difefrent ways for leyer calculation
-//    public static interface Calculator {
-//        // default calculator
-//        public void calculate();
-//    }
-//
-//    // default calculator is sequential using foreach loop
-//    transient Calculator calculator = new Calculator() {
-//        @Override
-//        public void calculate() {
-//            for (Layer layer : getLayers()) {
-//                layer.calculate();
-//            }
-//        }
-//    };
-//
-//    public Calculator getCalculator() {
-//        return calculator;
-//    }
-//
-//    public void setCalculator(Calculator calculator) {
-//        this.calculator = calculator;
-//    }
-
-
-
     /**
      * Performs calculation on whole network (calculates all layer).
      * Fires corresponding event after calculation is performed.
      */
     public void calculate() {
-
-        layers.forEach((layer) -> {
-            layer.calculate();
-        });
-
-        fireNetworkEvent(new NeuralNetworkEvent(this, NeuralNetworkEvent.Type.CALCULATED));
+        layers.forEach((layer) -> layer.calculate());
+        fireNetworkEvent(new NeuralNetworkEvent(this, NeuralNetworkEvent.CALCULATED));
     }
 
     /**
      * Resets the activation levels for whole network
      */
     public void reset() {
-        layers.forEach((layer) -> {
-            layer.reset();
-        });
+        layers.forEach((layer) -> layer.reset());
     }
 
     /**
@@ -330,16 +297,16 @@ public class NeuralNetwork<L extends LearningRule> implements Serializable {
         learningRule.learn(trainingSet);
     }
 
-    /**
-     * Learn the specified training set, using specified learning rule
-     *
-     * @param trainingSet  set of training elements to learn
-     * @param learningRule instance of learning rule to use for learning
-     */
-    public void learn(DataSet trainingSet, L learningRule) {
-        setLearningRule(learningRule);
-        learningRule.learn(trainingSet);
-    }
+//    /**
+//     * Learn the specified training set, using specified learning rule
+//     *
+//     * @param trainingSet  set of training elements to learn
+//     * @param learningRule instance of learning rule to use for learning
+//     */
+//    public void learn(DataSet trainingSet, L learningRule) {
+//        setLearningRule(learningRule);
+//        learningRule.learn(trainingSet);
+//    }
 
 
     /**
