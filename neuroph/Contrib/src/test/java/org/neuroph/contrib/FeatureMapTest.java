@@ -1,6 +1,7 @@
 package org.neuroph.contrib;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.neuroph.nnet.comp.Dimension2D;
 import org.neuroph.nnet.comp.layer.FeatureMapLayer;
@@ -18,7 +19,7 @@ public class FeatureMapTest {
 		Assert.assertEquals(0, featureMap.getWidth());
 	}
 
-	@Test
+	@Ignore
 	public void testFeatureMapWithOneNeuron() {
 		Dimension2D dimension = new Dimension2D(4, 3);
 		FeatureMapLayer featureMap = new FeatureMapLayer(dimension, new NeuronProperties());
@@ -31,7 +32,7 @@ public class FeatureMapTest {
 		Assert.assertEquals(dimension.getHeight(), featureMap.getHeight());
 	}
 
-	@Test
+	@Ignore
 	public void testFeatureMapWithManyNeurons() {
 		Dimension2D dimension = new Dimension2D(4, 3);
 		FeatureMapLayer featureMap = new FeatureMapLayer(dimension, new NeuronProperties());

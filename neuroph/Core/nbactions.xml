@@ -7,7 +7,7 @@
             </packagings>
             <goals>
                 <goal>test-compile</goal>
-                <goal>surefire:test</goal>
+                
             </goals>
         </action>
         <action>
