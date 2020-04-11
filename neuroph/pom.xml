@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
    <modelVersion>4.0.0</modelVersion>
-   <groupId>org.neuroph</groupId>
+   <groupId>com.github.neuroph</groupId>
    <artifactId>Neuroph</artifactId>
    <version>2.98</version>
    <packaging>pom</packaging>
@@ -36,7 +36,7 @@
       <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
       <encoding>UTF-8</encoding>
       <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
-      <parent.version>2.96</parent.version>
+      <parent.version>2.98</parent.version>
    </properties>
 
     <pluginRepositories>
