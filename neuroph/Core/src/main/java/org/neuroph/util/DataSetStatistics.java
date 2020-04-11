@@ -5,14 +5,15 @@ import org.neuroph.core.data.DataSetRow;
 
 /**
  * This class calculates various statistics for a data set.
- * 
+ *
  * TODO: calculate median
+ *
  * @author Arsenovic Aleksandar <salle18@gmail.com>
  */
 public class DataSetStatistics {
 
-    private final DataSet dataSet;    
-    
+    private final DataSet dataSet;
+
     private final int rowLength;
     private final int rowsCount;
 
@@ -24,12 +25,12 @@ public class DataSetStatistics {
     private final double[] stdDeviation;
     private final double[] frequency;
 
-    public static final String MIN = "min";    
-    public static final String MAX = "max";    
+    public static final String MIN = "min";
+    public static final String MAX = "max";
     public static final String MEAN = "mean";
     public static final String SUM = "sum";
-    public static final String STD_DEV = "std dev";    
-    public static final String VAR = "var";    
+    public static final String STD_DEV = "std dev";
+    public static final String VAR = "var";
     public static final String FREQ = "freq";
 
     public DataSetStatistics(DataSet dataSet) {
@@ -80,7 +81,7 @@ public class DataSetStatistics {
                 this.max[i] = Math.max(this.max[i], row[i]);
                 this.min[i] = Math.min(this.min[i], row[i]);
                 this.sum[i] += row[i];
-               
+
                 if (columnTypes[i] == DataSetColumnType.NOMINAL) {
                     this.frequency[i] += row[i];
                 }
@@ -109,13 +110,13 @@ public class DataSetStatistics {
             this.variance[i] /= (double) this.rowsCount;
             this.stdDeviation[i] = Math.sqrt(this.variance[i]);
         }
-        
+
         // todo: add median, 1st and 3rd quantiles
     }
-    
+
     /**
      * Get original data set.
-     * 
+     *
      * @return Original dataset.
      */
     public DataSet getDataSet() {
@@ -124,7 +125,7 @@ public class DataSetStatistics {
 
     /**
      * Get mean for each data set column.
-     * 
+     *
      * @return Array of means by columns.
      */
     public double[] getMean() {
@@ -133,7 +134,7 @@ public class DataSetStatistics {
 
     /**
      * Get maximum for each data set column.
-     * 
+     *
      * @return Array of maximums by columns.
      */
     public double[] getMax() {
@@ -142,8 +143,8 @@ public class DataSetStatistics {
 
     /**
      * Get minimum for each data set column.
-     * 
-     * @return Array of minimums by columns. 
+     *
+     * @return Array of minimums by columns.
      */
     public double[] getMin() {
         return this.min;
@@ -151,8 +152,8 @@ public class DataSetStatistics {
 
     /**
      * Get variant for each data set column.
-     * 
-     * @return Array of variants by columns. 
+     *
+     * @return Array of variants by columns.
      */
     public double[] getVar() {
         return this.variance;
@@ -160,7 +161,7 @@ public class DataSetStatistics {
 
     /**
      * Get standard deviation for each data set column.
-     * 
+     *
      * @return Array of standard deviations by columns.
      */
     public double[] getStdDev() {
@@ -168,107 +169,105 @@ public class DataSetStatistics {
     }
 
     /**
-     * Get data set frequency for nominal columns.
-     * Returns -0.0 for numeric columns.
-     * 
+     * Get data set frequency for nominal columns. Returns -0.0 for numeric
+     * columns.
+     *
      * @return Array of frequencies by columns.
      */
     public double[] getFrequency() {
         return this.frequency;
     }
-    
-/////////
 
+/////////
     // samo jednu od DataSetStatistics  i DataSetStats - koristi se u normalizeru, mozda da prebacim sve u ovu jednu klasu
     // optimizovati da sve ovo vrati u jednom prolazu...
     // mislim da DataSetStatistics zavrsava posao
-  
     /**
      *
      * @return arithmetic mean for each input in data set
      */
-        @Deprecated
-	public double[] inputsMean() {
-		double[] mean = new double[dataSet.getInputSize()];
+    @Deprecated
+    public double[] inputsMean() {
+        double[] mean = new double[dataSet.getInputSize()];
 
-		for (DataSetRow row : dataSet.getRows()) {
-			double[] currentInput = row.getInput();
-			for (int i = 0; i < dataSet.getInputSize(); i++) {
-				mean[i] += currentInput[i];
-			}
-		}
-		for (int i = 0; i < dataSet.getInputSize(); i++) {
-			mean[i] /= (double)dataSet.getRows().size();
-		}
-		return mean;
-	}
+        for (DataSetRow row : dataSet.getRows()) {
+            double[] currentInput = row.getInput();
+            for (int i = 0; i < dataSet.getInputSize(); i++) {
+                mean[i] += currentInput[i];
+            }
+        }
+        for (int i = 0; i < dataSet.getInputSize(); i++) {
+            mean[i] /= (double) dataSet.getRows().size();
+        }
+        return mean;
+    }
 
     /**
      *
      * @param dataSet Neuroph dataset
      * @return maximum value for each input in data set
      */
-        @Deprecated
-	public double[] inputsMax() {
+    @Deprecated
+    public double[] inputsMax() {
 
-		int inputSize = dataSet.getInputSize();
-		double[] maxColumnElements = new double[inputSize];
+        int inputSize = dataSet.getInputSize();
+        double[] maxColumnElements = new double[inputSize];
 
-		for (int i = 0; i < inputSize; i++) {
-			maxColumnElements[i] = -Double.MAX_VALUE;
-		}
+        for (int i = 0; i < inputSize; i++) {
+            maxColumnElements[i] = -Double.MAX_VALUE;
+        }
 
-		for (DataSetRow dataSetRow : dataSet.getRows()) {
-			double[] input = dataSetRow.getInput();
-			for (int i = 0; i < inputSize; i++) {
-				maxColumnElements[i] = Math.max(maxColumnElements[i], input[i]);
-			}
-		}
+        for (DataSetRow dataSetRow : dataSet.getRows()) {
+            double[] input = dataSetRow.getInput();
+            for (int i = 0; i < inputSize; i++) {
+                maxColumnElements[i] = Math.max(maxColumnElements[i], input[i]);
+            }
+        }
 
-		return maxColumnElements;
-	}
+        return maxColumnElements;
+    }
 
     /**
      *
      * @param dataSet Neuroph dataset
      * @return minimum value for each variable in data set
      */
-        @Deprecated
-	public double[] inputsMin() {
+    @Deprecated
+    public double[] inputsMin() {
 
-		int inputSize = dataSet.getInputSize();
-		double[] minColumnElements = new double[inputSize];
+        int inputSize = dataSet.getInputSize();
+        double[] minColumnElements = new double[inputSize];
 
-		for (int i = 0; i < inputSize; i++) {
-			minColumnElements[i] = Double.MAX_VALUE;
-		}
+        for (int i = 0; i < inputSize; i++) {
+            minColumnElements[i] = Double.MAX_VALUE;
+        }
 
-		for (DataSetRow dataSetRow : dataSet.getRows()) {
-			double[] input = dataSetRow.getInput();
-			for (int i = 0; i < inputSize; i++) {
-				minColumnElements[i] = Math.min(minColumnElements[i], input[i]);
-			}
-		}
-		return minColumnElements;
-	}
+        for (DataSetRow dataSetRow : dataSet.getRows()) {
+            double[] input = dataSetRow.getInput();
+            for (int i = 0; i < inputSize; i++) {
+                minColumnElements[i] = Math.min(minColumnElements[i], input[i]);
+            }
+        }
+        return minColumnElements;
+    }
 
     @Deprecated
-    public double[] inputsStandardDeviation(double[] mean) {
-        double[] sum = new double[mean.length];
+    public double[] inputsStandardDeviation(double[] mean2) {
+        double[] sum = new double[mean2.length];
 
         for (DataSetRow dataSetRow : dataSet.getRows()) {
             double[] input = dataSetRow.getInput();
             for (int i = 0; i < input.length; i++) {
-                sum[i] = (input[i] - mean[i]) * (input[i] - mean[i]);
+                sum[i] = (input[i] - mean2[i]) * (input[i] - mean2[i]);
             }
         }
 
-        double[] std = new double[mean.length];
-        for (int i = 0; i < mean.length; i++) {
-            std[i] = Math.sqrt(sum[i] / (dataSet.size()-1));    // calculate as sample deviation not population
+        double[] std = new double[mean2.length];
+        for (int i = 0; i < mean2.length; i++) {
+            std[i] = Math.sqrt(sum[i] / (dataSet.size() - 1));    // calculate as sample deviation not population
         }
 
         return std;
-    }    
-    
+    }
+
 }
