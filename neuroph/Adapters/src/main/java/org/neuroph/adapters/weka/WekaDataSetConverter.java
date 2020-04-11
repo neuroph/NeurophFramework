@@ -92,7 +92,7 @@ public class WekaDataSetConverter {
                 }
 
                 DataSetRow row = new DataSetRow(inputs, outputs);
-                row.setLabel(instance.stringValue(instance.classIndex()));
+                //row.setLabel(instance.stringValue(instance.classIndex()));
                 neurophDataset.add(row);
             }
         }
@@ -132,7 +132,7 @@ public class WekaDataSetConverter {
 
                 // set output attribute, as String and double value of class
                 for(Map.Entry<double[], String> entry : classValues.entrySet()){
-                    if(entry.getValue().equals(row.getLabel())){
+                    if(entry.getValue().equals(row)){ // .equals(row.getLabel()))
                         instance.setValue(numInputs, entry.getValue());
                         double[] rowDouble = row.getDesiredOutput();
                         for(int i = 0; i < rowDouble.length; i++){
@@ -217,9 +217,9 @@ public class WekaDataSetConverter {
         Map<double[], String> classValues = new HashMap<double[], String>();
 
         for(DataSetRow row : neurophDataset.getRows()){
-            if(!classValues.containsValue(row.getLabel())){
-                classValues.put(row.getDesiredOutput(), row.getLabel());
-            }
+//            if(!classValues.containsValue(row.getLabel())){
+//                classValues.put(row.getDesiredOutput(), row.getLabel());
+//            }
         }
 
         return classValues;

@@ -69,7 +69,7 @@ public class WekaNeurophSample {
             if (row.getDesiredOutput().length > 0) {
                 System.out.println("outputs");
                 System.out.println(Arrays.toString(row.getDesiredOutput()));
-                System.out.println(row.getLabel());
+               // System.out.println(row.getLabel());
             }
         }
     }

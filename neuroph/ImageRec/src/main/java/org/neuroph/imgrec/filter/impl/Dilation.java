@@ -1,11 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.neuroph.imgrec.filter.impl;
-
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -16,66 +9,61 @@ import org.neuroph.imgrec.filter.ImageFilter;
 /**
  * Dilation filter is used for making lines on the image little bit wider. It convolves through whole image
  * and every black pixel replaces with 9 pixels. 
+ * 
+ * If at least one pixel in the structuring element coincides with a foreground pixel in the image underneath, then the input pixel is set to the foreground value.
+ * Most implementations of this operator expect the input image to be binary, usually with foreground pixels at pixel value 255, and background pixels at pixel value 0.
+ * 
+ * https://homepages.inf.ed.ac.uk/rbf/HIPR2/dilate.htm
+ * 
  * @author Mihailo Stupar
  */
 public class Dilation implements ImageFilter<BufferedImage>,Serializable{
-  
-    
+     
     private transient BufferedImage originalImage;
     private transient BufferedImage filteredImage;
-
-    private int width;
-    private int height;
+    private transient int width;
+    private transient int height;
+    public static final int WHITE = 255;
+    public static final int BLACK = 0;    
+    private final int radius;    
     
-    private int [][] kernel;
+    public Dilation() {
+        this.radius = 2;
+    }        
+    
+    public Dilation(int radius) {
+        this.radius = radius;
+    }    
+    
     @Override
-    public BufferedImage apply(BufferedImage image) {
-        
-        originalImage = image;
-        
+    public BufferedImage apply(BufferedImage image) {        
+        originalImage = image;        
         width = originalImage.getWidth();
-        height = originalImage.getHeight();
-        
+        height = originalImage.getHeight();        
         filteredImage = new BufferedImage(width, height, originalImage.getType());
         
-        kernel = createKernel();
-        
-        int white = 255;
-        int black = 0;
-        
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                int color = new Color(originalImage.getRGB(i, j)).getRed();
-                if (color == black) {
-                    convolve(i, j);
-                }
-                else {
-                    int alpha = new Color(originalImage.getRGB(i, j)).getAlpha();
-                    int rgb = ImageUtilities.argbToColor(alpha, white, white, white);
-                    filteredImage.setRGB(i, j, rgb);
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                int color = new Color(originalImage.getRGB(x, y)).getRed();
+                if (color == BLACK) { // ako je boja bixela crna primeni filter na toj poziciji
+                    convolve(x, y);
+                } else { // ako nije nek bude bela
+                    int alpha = new Color(originalImage.getRGB(x, y)).getAlpha();
+                    int rgb = ImageUtilities.argbToColor(alpha, WHITE, WHITE, WHITE);
+                    filteredImage.setRGB(x, y, rgb);
                 }         
             }
         }
         return filteredImage;
     }
-    
-    private int [][] createKernel () {
-        int [][] kernel = { {0,1,1,1,0},
-                            {1,1,1,1,1},
-                            {1,1,1,1,1},
-                            {1,1,1,1,1},
-                            {0,1,1,1,0}
-                          };
-        return kernel;
-    }
-    
-    private void convolve (int i, int j) {
-        for (int x = i-2; x <= i+2; x++) {
-            for (int y = j-2; y <= j+2; y++) {
+        
+    // applies convolution operator at the specified position
+    private void convolve (int xCenter, int yCenter) {
+        for (int x = xCenter-radius; x <= xCenter+radius; x++) {
+            for (int y = yCenter-radius; y <= yCenter+radius; y++) {
                 if (x>=0 && y>=0 && x<width && y<height) {
-                    int black = 0;
                     int alpha = new Color(originalImage.getRGB(x, y)).getAlpha();
-                    int rgb = ImageUtilities.argbToColor(alpha, black, black, black);
+                    int rgb = ImageUtilities.argbToColor(alpha, BLACK, BLACK, BLACK);
                     filteredImage.setRGB(x, y, rgb);
                 }
             }
@@ -86,8 +74,5 @@ public class Dilation implements ImageFilter<BufferedImage>,Serializable{
     public String toString() {
         return "Dilation";
     }
-        
-    
-    
-    
+
 }

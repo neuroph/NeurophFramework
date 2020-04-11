@@ -240,7 +240,7 @@ public class ImageUtilities {
     }
 
     /**
-     * Crops (returns subimage) of specified input image at specified points.
+     * Crops specified input image at specified points, and returns corresponding sub-image.
      *
      * @param image image to crop
      * @param x1 top left x coordinate
@@ -248,7 +248,7 @@ public class ImageUtilities {
      * @param x2 bottom right x coordinate
      * @param y2 bottom right y coordinate
      *
-     * @return image croped at specified points
+     * @return image cropped at specified points
      */
     public static BufferedImage cropImage(BufferedImage image, int x1, int y1, int x2, int y2) {
         return image.getSubimage(x1, y1, x2 - x1, y2 - y1);

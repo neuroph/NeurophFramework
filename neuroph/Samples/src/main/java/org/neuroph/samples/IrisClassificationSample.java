@@ -45,13 +45,19 @@ public class IrisClassificationSample {
         MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(4, 16, 3);
         // create training set from file
         DataSet irisDataSet = DataSet.createFromFile(inputFileName, 4, 3, ",");
-        // train the network with training set
 
-        neuralNet.getLearningRule().addListener(new LearningListener());
+        // attach learningn listener to print out info about error at each iteration
+        neuralNet.getLearningRule().addListener((event)->{
+            BackPropagation bp = (BackPropagation) event.getSource();
+            System.out.println("Current iteration: " + bp.getCurrentIteration());
+            System.out.println("Error: " + bp.getTotalNetworkError());        
+        });
+        
         neuralNet.getLearningRule().setLearningRate(0.5);
         neuralNet.getLearningRule().setMaxError(0.01);
         neuralNet.getLearningRule().setMaxIterations(30000);
 
+        // train the network with training set
         neuralNet.learn(irisDataSet);
 
         neuralNet.save("irisNet.nnet");
@@ -61,33 +67,4 @@ public class IrisClassificationSample {
     }
     
 
-    /**
-     * Prints network output for the each element from the specified training set.
-     * @param neuralNet neural network
-     * @param testSet test data set
-     */
-    public static void testNeuralNetwork(NeuralNetwork neuralNet, DataSet testSet) {
-
-        for(DataSetRow testSetRow : testSet.getRows()) {
-            neuralNet.setInput(testSetRow.getInput());
-            neuralNet.calculate();
-            double[] networkOutput = neuralNet.getOutput();
-
-            System.out.print("Input: " + Arrays.toString( testSetRow.getInput() ) );
-            System.out.println(" Output: " + Arrays.toString( networkOutput) );
-        }
-    }
-
-    static class LearningListener implements LearningEventListener {
-
-        @Override
-        public void handleLearningEvent(LearningEvent event) {
-            BackPropagation bp = (BackPropagation) event.getSource();
-            System.out.println("Current iteration: " + bp.getCurrentIteration());
-            System.out.println("Error: " + bp.getTotalNetworkError());
-        }
-
-    }
-
-    
 }

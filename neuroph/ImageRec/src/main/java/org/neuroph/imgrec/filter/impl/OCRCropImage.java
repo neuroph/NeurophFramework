@@ -2,7 +2,6 @@ package org.neuroph.imgrec.filter.impl;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import org.neuroph.imgrec.ImageUtilities;
 import org.neuroph.imgrec.filter.ImageFilter;
@@ -48,7 +47,6 @@ public class OCRCropImage implements ImageFilter<BufferedImage> {
 
         fillImage(startH, startW, endH, endW);
         
-
         return filteredImage;
     }
 

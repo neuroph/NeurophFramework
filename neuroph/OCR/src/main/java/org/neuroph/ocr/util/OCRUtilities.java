@@ -51,7 +51,7 @@ public class OCRUtilities {
      * @return list with pixel position of each row
      */
     public static List<Integer> rowPositions(BufferedImage image, int heightThresh) {
-        int[] histogram = ImageHistogram.heightHistogram(image);
+        int[] histogram = ImageHistogram.histogramByHeight(image);
         int[] gradient = ImageHistogram.gradient(histogram);
         return linePositions(gradient, heightThresh);
     }

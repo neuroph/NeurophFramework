@@ -50,7 +50,7 @@ public class TrainingSample {
         ImageFilterChain chain = new ImageFilterChain();
         chain.addFilter(new GrayscaleFilter());
         chain.addFilter(new OtsuBinarizeFilter());
-        BufferedImage binarizedImage = chain.processImage(image);
+        BufferedImage binarizedImage = chain.apply(image);
 
         
         

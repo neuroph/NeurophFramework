@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.Arrays;
-import javax.swing.JPanel;
 import org.neuroph.imgrec.ImageUtilities;
 import org.neuroph.imgrec.filter.ImageFilter;
 

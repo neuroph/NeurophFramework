@@ -1,11 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.neuroph.imgrec.filter.impl;
-
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -24,11 +17,8 @@ import org.neuroph.imgrec.filter.ImageFilter;
 //http://www.lokminglui.com/dct.pdf
 //http://www.ipol.im/pub/art/2011/ys-dct/
 public class DenoiseDCTFilter implements ImageFilter<BufferedImage>,Serializable{
-    
-    
     private transient BufferedImage originalImage;
     private transient BufferedImage filteredImage;
-    
     
     private double sigma;
     private int N;
@@ -40,12 +30,8 @@ public class DenoiseDCTFilter implements ImageFilter<BufferedImage>,Serializable
         qualityLevel = 95;
     }
 
-    
-    
-    
-     @Override
-    public BufferedImage apply(BufferedImage image) {
-		
+    @Override
+    public BufferedImage apply(BufferedImage image) {		
         int width = image.getWidth();
 	int height = image.getHeight();
 
@@ -58,19 +44,13 @@ public class DenoiseDCTFilter implements ImageFilter<BufferedImage>,Serializable
         }
         
         originalImage = resize(image, width, height);
-
         filteredImage = new BufferedImage(width, height, originalImage.getType());
     
-
         int numXpatches = width/N;
         int numYpatches = height/N;
         
         double treshold = 3*sigma;
-        
-
-        double [][] T = createT();
-        
-        
+        double [][] T = createT();     
         double [][] Tinv = null;
         
         if (N==16) {

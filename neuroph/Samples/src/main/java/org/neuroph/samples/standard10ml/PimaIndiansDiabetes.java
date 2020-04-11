@@ -15,13 +15,8 @@
  */
 package org.neuroph.samples.standard10ml;
 
-import java.util.Arrays;
-import java.util.List;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.data.DataSet;
-import org.neuroph.core.data.DataSetRow;
-import org.neuroph.core.events.LearningEvent;
-import org.neuroph.core.events.LearningEventListener;
 import org.neuroph.core.learning.error.MeanSquaredError;
 import org.neuroph.eval.ClassifierEvaluator;
 import org.neuroph.eval.ErrorEvaluator;
@@ -75,7 +70,7 @@ import org.neuroph.util.data.norm.Normalizer;
 
 
  */
-public class PimaIndiansDiabetes implements LearningEventListener {
+public class PimaIndiansDiabetes {
 
     public static void main(String[] args) {
         (new PimaIndiansDiabetes()).run();
@@ -105,11 +100,15 @@ public class PimaIndiansDiabetes implements LearningEventListener {
 
         neuralNet.setLearningRule(new MomentumBackpropagation());
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
-        learningRule.addListener(this);
+        learningRule.addListener((event) -> {
+            MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
+            System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
+        });
 
         // set learning rate and max error
         learningRule.setLearningRate(0.1);
         learningRule.setMaxError(0.03);
+        
         System.out.println("Training network...");
         // train the network with training set
         neuralNet.learn(trainingSet);
@@ -124,27 +123,8 @@ public class PimaIndiansDiabetes implements LearningEventListener {
         neuralNet.save("nn1.nnet");
 
         System.out.println("Done.");
-
-        System.out.println();
-        System.out.println("Network outputs for test set");
-        testNeuralNetwork(neuralNet, testSet);
     }
 
-    // Displays inputs, desired output (from dataset) and actual output (calculated by neural network) for every row from data set.
-    public void testNeuralNetwork(NeuralNetwork neuralNet, DataSet testSet) {
-
-        System.out.println("Showing inputs, desired output and neural network output for every row in test set.");
-
-        for (DataSetRow testSetRow : testSet.getRows()) {
-            neuralNet.setInput(testSetRow.getInput());
-            neuralNet.calculate();
-            double[] networkOutput = neuralNet.getOutput();
-
-            System.out.println("Input: " + Arrays.toString(testSetRow.getInput()));
-            System.out.println("Output: " + Arrays.toString(networkOutput));
-            System.out.println("Desired output" + Arrays.toString(testSetRow.getDesiredOutput()));
-        }
-    }
 
     // Evaluates performance of neural network.
     // Contains calculation of Confusion matrix for classification tasks or Mean Ssquared Error and Mean Absolute Error for regression tasks.
@@ -172,10 +152,5 @@ public class PimaIndiansDiabetes implements LearningEventListener {
         System.out.println(average.toString());
     }
 
-    @Override
-    public void handleLearningEvent(LearningEvent event) {
-        MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
-        System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
-    }
 
 }

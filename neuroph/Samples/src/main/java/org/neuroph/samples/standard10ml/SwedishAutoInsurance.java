@@ -16,12 +16,9 @@
 package org.neuroph.samples.standard10ml;
 
 import java.util.Arrays;
-import java.util.List;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
-import org.neuroph.core.events.LearningEvent;
-import org.neuroph.core.events.LearningEventListener;
 import org.neuroph.core.learning.error.MeanAbsoluteError;
 import org.neuroph.core.learning.error.MeanSquaredError;
 import org.neuroph.nnet.Adaline;
@@ -56,7 +53,7 @@ import org.neuroph.util.data.norm.Normalizer;
 6. Missing Values: none
 
  */
-public class SwedishAutoInsurance implements LearningEventListener {
+public class SwedishAutoInsurance {
 
     public static void main(String[] args) {
         (new SwedishAutoInsurance()).run();
@@ -84,7 +81,10 @@ public class SwedishAutoInsurance implements LearningEventListener {
         System.out.println("Creating neural network...");
         Adaline neuralNet = new Adaline(1);
         LMS learningRule = (LMS) neuralNet.getLearningRule();
-        learningRule.addListener(this);
+        learningRule.addListener((event) -> {
+            LMS bp = (LMS) event.getSource();
+            System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
+        });
 
         // train the network with training set
         System.out.println("Training network...");
@@ -141,12 +141,6 @@ public class SwedishAutoInsurance implements LearningEventListener {
 
         System.out.println("Mean squared error is: " + mse.getTotalError());
         System.out.println("Mean absolute error is: " + mae.getTotalError());
-    }
-
-    @Override
-    public void handleLearningEvent(LearningEvent event) {
-        LMS bp = (LMS) event.getSource();
-        System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
     }
 
 }

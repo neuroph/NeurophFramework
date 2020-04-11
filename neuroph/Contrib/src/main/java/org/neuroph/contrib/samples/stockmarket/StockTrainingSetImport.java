@@ -19,7 +19,6 @@ package org.neuroph.contrib.samples.stockmarket;
 import java.util.ArrayList;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
-import org.neuroph.util.TrainingSetImport;
 
 /**
  * The part of simple stock market components, easy to use
@@ -28,7 +27,7 @@ import org.neuroph.util.TrainingSetImport;
  * @author Valentin Steinhauer <valentin.steinhauer@t-online.de>
  * @author Zoran Sevarac <sevarac@gmail.com>
  */
-public class StockTrainingSetImport extends TrainingSetImport {
+public class StockTrainingSetImport {
 
     /**
      * Creates and returns training set for stock market prediction using the provided data from array

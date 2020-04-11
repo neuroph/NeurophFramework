@@ -5,7 +5,8 @@ import org.neuroph.core.data.DataSetRow;
 
 /**
  * This class calculates various statistics for a data set.
- *
+ * 
+ * TODO: calculate median
  * @author Arsenovic Aleksandar <salle18@gmail.com>
  */
 public class DataSetStatistics {
@@ -175,4 +176,99 @@ public class DataSetStatistics {
     public double[] getFrequency() {
         return this.frequency;
     }
+    
+/////////
+
+    // samo jednu od DataSetStatistics  i DataSetStats - koristi se u normalizeru, mozda da prebacim sve u ovu jednu klasu
+    // optimizovati da sve ovo vrati u jednom prolazu...
+    // mislim da DataSetStatistics zavrsava posao
+  
+    /**
+     *
+     * @return arithmetic mean for each input in data set
+     */
+        @Deprecated
+	public double[] inputsMean() {
+		double[] mean = new double[dataSet.getInputSize()];
+
+		for (DataSetRow row : dataSet.getRows()) {
+			double[] currentInput = row.getInput();
+			for (int i = 0; i < dataSet.getInputSize(); i++) {
+				mean[i] += currentInput[i];
+			}
+		}
+		for (int i = 0; i < dataSet.getInputSize(); i++) {
+			mean[i] /= (double)dataSet.getRows().size();
+		}
+		return mean;
+	}
+
+    /**
+     *
+     * @param dataSet Neuroph dataset
+     * @return maximum value for each input in data set
+     */
+        @Deprecated
+	public double[] inputsMax() {
+
+		int inputSize = dataSet.getInputSize();
+		double[] maxColumnElements = new double[inputSize];
+
+		for (int i = 0; i < inputSize; i++) {
+			maxColumnElements[i] = -Double.MAX_VALUE;
+		}
+
+		for (DataSetRow dataSetRow : dataSet.getRows()) {
+			double[] input = dataSetRow.getInput();
+			for (int i = 0; i < inputSize; i++) {
+				maxColumnElements[i] = Math.max(maxColumnElements[i], input[i]);
+			}
+		}
+
+		return maxColumnElements;
+	}
+
+    /**
+     *
+     * @param dataSet Neuroph dataset
+     * @return minimum value for each variable in data set
+     */
+        @Deprecated
+	public double[] inputsMin() {
+
+		int inputSize = dataSet.getInputSize();
+		double[] minColumnElements = new double[inputSize];
+
+		for (int i = 0; i < inputSize; i++) {
+			minColumnElements[i] = Double.MAX_VALUE;
+		}
+
+		for (DataSetRow dataSetRow : dataSet.getRows()) {
+			double[] input = dataSetRow.getInput();
+			for (int i = 0; i < inputSize; i++) {
+				minColumnElements[i] = Math.min(minColumnElements[i], input[i]);
+			}
+		}
+		return minColumnElements;
+	}
+
+    @Deprecated
+    public double[] inputsStandardDeviation(double[] mean) {
+        double[] sum = new double[mean.length];
+
+        for (DataSetRow dataSetRow : dataSet.getRows()) {
+            double[] input = dataSetRow.getInput();
+            for (int i = 0; i < input.length; i++) {
+                sum[i] = (input[i] - mean[i]) * (input[i] - mean[i]);
+            }
+        }
+
+        double[] std = new double[mean.length];
+        for (int i = 0; i < mean.length; i++) {
+            std[i] = Math.sqrt(sum[i] / (dataSet.size()-1));    // calculate as sample deviation not population
+        }
+
+        return std;
+    }    
+    
 }

@@ -42,7 +42,7 @@ public class Letter {
     public Letter(int scanQuality, BufferedImage image) {
         this.scanQuality = scanQuality;
         this.image = image;    
-        heightHistogram = ImageHistogram.heightHistogram(image);
+        heightHistogram = ImageHistogram.histogramByHeight(image);
         gradient = ImageHistogram.gradient(heightHistogram);
         calculateSmallestSizeLetter();
         List<Integer> rowHeights = OCRUtilities.rowHeights(gradient, smallestSizeLetter);

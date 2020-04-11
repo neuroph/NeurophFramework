@@ -23,15 +23,12 @@ public class HistogramEqualizationFilter implements ImageFilter<BufferedImage>,S
     @Override
     public BufferedImage apply(BufferedImage image) {
 		
-	originalImage = image;
-		
+	originalImage = image;		
 	int width = originalImage.getWidth();
-	int height = originalImage.getHeight();
-		
+	int height = originalImage.getHeight();		
 	filteredImage = new BufferedImage(width, height, originalImage.getType());
 		
-	int [] histogram = imageHistogram(originalImage);
-		
+	int [] histogram = imageHistogram(originalImage);		
 	int [] histogramCumulative = new int[histogram.length];
 		
 	histogramCumulative[0] = histogram[0];
@@ -46,14 +43,10 @@ public class HistogramEqualizationFilter implements ImageFilter<BufferedImage>,S
 	int newColor;
 		
 	for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-				
+            for (int j = 0; j < height; j++) {				
 		gray = new Color(originalImage.getRGB(i, j)).getRed();
-		alpha = new Color(originalImage.getRGB(i, j)).getAlpha();
-				
-		newColor = (G-1)*histogramCumulative[gray]/(width*height); //zaokruziti izbeci celobrojno deljenje
-
-				
+		alpha = new Color(originalImage.getRGB(i, j)).getAlpha();				
+		newColor = (G-1)*histogramCumulative[gray]/(width*height); //zaokruziti izbeci celobrojno deljenje			
 		newColor = ImageUtilities.argbToColor(alpha, newColor, newColor, newColor);
 		filteredImage.setRGB(i, j, newColor);
             }
@@ -64,9 +57,7 @@ public class HistogramEqualizationFilter implements ImageFilter<BufferedImage>,S
 	
     // ubaci u neku util klasu jer je isto kao i kod OtsuBinarizera
     private int[] imageHistogram(BufferedImage image) {
-
 	int[] histogram = new int[256]; // histogram je 256 jer tretira samo nijanse sive
-
 	for (int i = 0; i < histogram.length; i++)
             histogram[i] = 0;
 

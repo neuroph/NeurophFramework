@@ -7,19 +7,26 @@ import org.neuroph.imgrec.ImageUtilities;
 import org.neuroph.imgrec.filter.ImageFilter;
 
 /**
- *
+ * Edge detection using sobel filter
+ * 
+ * https://homepages.inf.ed.ac.uk/rbf/HIPR2/sobel.htm 
  * @author Mihailo Stupar
  */
-public class SobelEdgeDetection implements ImageFilter<BufferedImage>,Serializable{
+public class SobelEdgeDetection implements ImageFilter<BufferedImage>, Serializable{
     
     private transient BufferedImage originalImage;
     private transient BufferedImage filteredImage;
     
-    private double [][] sobelX;
-    private double [][] sobelY;
-    
-    private double threshold;
-    
+    private double [][] horizSobel;
+    private double [][] vertSobel;    
+    private double threshold;    
+    public static final int WHITE = 255;
+    public static final int BLACK = 0;       
+
+    public SobelEdgeDetection() {
+        initSobelFilters();   
+        threshold = 0.1;
+    }
     
     @Override
     public BufferedImage apply(BufferedImage image) {
@@ -27,95 +34,79 @@ public class SobelEdgeDetection implements ImageFilter<BufferedImage>,Serializab
         originalImage = image;        
         int width = image.getWidth();
         int height = image.getHeight();        
-        filteredImage = new BufferedImage(width, height, image.getType());
-        
-        threshold = 0.1;
-        generateSobelOperators();
+        filteredImage = new BufferedImage(width, height, image.getType());        
         
         double [][] gradX = new double[width][height];
         double [][] gradY = new double[width][height];
         double [][] grad = new double[width][height];
         
-        double max = 0;
+        double maxGrad = 0;
         
         for (int x = 1; x < width-1; x++) {
             for (int y = 1; y < height-1; y++) {                
-                gradX[x][y] = calculateGradient(x, y, sobelX);
-                gradY[x][y] = calculateGradient(x, y, sobelY);                
-                grad[x][y] = Math.abs(gradX[x][y]) + Math.abs(gradY[x][y]);                
-                if (grad[x][y] > max)  max = grad[x][y];
+                gradX[x][y] = applyFilter(x, y, horizSobel);
+                gradY[x][y] = applyFilter(x, y, vertSobel);                
+                grad[x][y] = Math.abs(gradX[x][y]) + Math.abs(gradY[x][y]); // aproksimacija intenziteta gradijenta               
+                if (grad[x][y] > maxGrad)  maxGrad = grad[x][y];
             }            
         }
                 
-        threshold = threshold*max;
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
+        threshold = threshold * maxGrad;
+        int newPixelColor;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {                               
+                final int alpha = new Color(originalImage.getRGB(x, y)).getAlpha();
                 
-                int newColor;
-                int alpha = new Color(originalImage.getRGB(i, j)).getAlpha();
-                
-                if (grad[i][j] > threshold)
-                    newColor = 0;
-                else
-                    newColor = 255;
+                if (grad[x][y] > threshold) newPixelColor = BLACK;  // ako je promena/gradijent veci onda crni pixel
+                    else newPixelColor = WHITE; // ako nije ond abeli pixel
                
-                int rgb = ImageUtilities.argbToColor(alpha, newColor, newColor, newColor);
-                filteredImage.setRGB(i, j, rgb);
-                
+                final int rgb = ImageUtilities.argbToColor(alpha, newPixelColor, newPixelColor, newPixelColor);
+                filteredImage.setRGB(x, y, rgb);                
             }
         }
       
         return filteredImage;
     }
     
-    protected void generateSobelOperators () {
+    private void initSobelFilters () {
+                
+        horizSobel = new double[3][3];
+        horizSobel [0][0] = -1;  horizSobel [0][1] = -2;  horizSobel [0][2] = -1;
+        horizSobel [1][0] = 0;      horizSobel [1][1] = 0;     horizSobel [1][2] = 0;
+        horizSobel [2][0] = 1;   horizSobel [2][1] = 2;   horizSobel [2][2] = 1;
         
-        sobelX = new double[3][3];
-        sobelX [0][0] = -0.25;  sobelX [0][1] = -0.5;  sobelX [0][2] = -0.25;
-        sobelX [1][0] = 0;      sobelX [1][1] = 0;     sobelX [1][2] = 0;
-        sobelX [2][0] = 0.25;   sobelX [2][1] = 0.5;   sobelX [2][2] = 0.25;
-        
-        sobelY = new double[3][3];
-        sobelY [0][0] = -0.25;  sobelY [0][1] = 0;  sobelY [0][2] = 0.25;
-        sobelY [1][0] = -0.5;   sobelY [1][1] = 0;  sobelY [1][2] = 0.5;
-        sobelY [2][0] = -0.25;  sobelY [2][1] = 0;  sobelY [2][2] = 0.25;
- 
-        
-        double one = 1;
-        double oneThird = one/3;
-        
-        
-        sobelX [0][0] = -oneThird;  sobelX [0][1] = -oneThird;  sobelX [0][2] = -oneThird;
-        sobelX [1][0] = 0;          sobelX [1][1] = 0;          sobelX [1][2] = 0;
-        sobelX [2][0] = oneThird;   sobelX [2][1] = oneThird;   sobelX [2][2] = oneThird;
-        
-        sobelY [0][0] = -oneThird;   sobelY [0][1] = 0;  sobelY [0][2] = oneThird;
-        sobelY [1][0] = -oneThird;   sobelY [1][1] = 0;  sobelY [1][2] = oneThird;
-        sobelY [2][0] = -oneThird;   sobelY [2][1] = 0;  sobelY [2][2] = oneThird;
-        
+        vertSobel = new double[3][3];
+        vertSobel [0][0] = -1;  vertSobel [0][1] = 0;  vertSobel [0][2] = 1;
+        vertSobel [1][0] = -2;   vertSobel [1][1] = 0;  vertSobel [1][2] = 2;
+        vertSobel [2][0] = -1;  vertSobel [2][1] = 0;  vertSobel [2][2] = 1;        
         
     }
     
-    protected double calculateGradient (int i, int j, double [][] sobelOperator) {           
-    	double sum = 0;
+    // applies filter at specified position - calculateGradient
+    protected double applyFilter(int xCenter, int yCenter, double[][] sobelFilter) {           
+    	double filterSum = 0;
         
-        int posX = 0;
-        for (int x = i-1; x <= i+1; x++) {            
-            int posY = 0;
-            for (int y = j-1; y <= j+1; y++) {                
-                double gray = new Color(originalImage.getRGB(x, y)).getRed();                
-                sum = sum + gray*sobelOperator[posX][posY];
-                posY++;
+        int fx = 0;
+        for (int x = xCenter-1; x <= xCenter+1; x++) {            
+            int fy = 0;
+            for (int y = yCenter-1; y <= yCenter+1; y++) {                
+                final double pixelGray = new Color(originalImage.getRGB(x, y)).getRed();                
+                filterSum = filterSum + pixelGray*sobelFilter[fx][fy];
+                fy++;
             }
-            posX++;
+            fx++;
         }
         
-        return sum;
+        return filterSum;
     } 
 
     public void setTreshold(double treshold) {
         this.threshold = treshold;
     }
+
+    public double getThreshold() {
+        return threshold;
+    }       
 
     @Override
     public String toString() {

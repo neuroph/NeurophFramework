@@ -113,7 +113,7 @@ import org.neuroph.util.data.norm.Normalizer;
  https://archive.ics.uci.edu/ml/machine-learning-databases/image/segmentation.names
 
  */
-public class SegmentChallengeSample implements LearningEventListener {
+public class SegmentChallengeSample  {
 
     //Important for evaluating network result
     public int[] count = new int[8];
@@ -159,7 +159,16 @@ public class SegmentChallengeSample implements LearningEventListener {
         MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 17, 10, outputsCount);
         //attach listener to learning rule
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
-        learningRule.addListener(this);
+        learningRule.addListener((event) -> {
+            BackPropagation bp = (BackPropagation) event.getSource();
+            if (event.getEventType().equals(LearningEvent.Type.LEARNING_STOPPED)) {
+                double error = bp.getTotalNetworkError();
+                System.out.println("Training completed in " + bp.getCurrentIteration() + " iterations, ");
+                System.out.println("With total error: " + formatDecimalNumber(error));
+            } else {
+                System.out.println("Iteration: " + bp.getCurrentIteration() + " | Network error: " + bp.getTotalNetworkError());
+            }
+        });
 
         learningRule.setLearningRate(0.01);
         learningRule.setMaxError(0.001);
@@ -214,18 +223,6 @@ public class SegmentChallengeSample implements LearningEventListener {
         this.count = new int[8];
         this.correct = new int[8];
         unpredicted = 0;
-    }
-
-    @Override
-    public void handleLearningEvent(LearningEvent event) {
-        BackPropagation bp = (BackPropagation) event.getSource();
-        if (event.getEventType().equals(LearningEvent.Type.LEARNING_STOPPED)) {
-            double error = bp.getTotalNetworkError();
-            System.out.println("Training completed in " + bp.getCurrentIteration() + " iterations, ");
-            System.out.println("With total error: " + formatDecimalNumber(error));
-        } else {
-            System.out.println("Iteration: " + bp.getCurrentIteration() + " | Network error: " + bp.getTotalNetworkError());
-        }
     }
 
     //Metod determines the maximum output. Maximum output is network prediction for one row.

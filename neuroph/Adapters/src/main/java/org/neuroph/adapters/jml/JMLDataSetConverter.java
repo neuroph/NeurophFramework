@@ -98,7 +98,7 @@ public class JMLDataSetConverter {
 
                 row = new DataSetRow(inputs, outputs);
             }
-            row.setLabel(jmlDataset.get(i).classValue().toString());
+      //      row.setLabel(jmlDataset.get(i).classValue().toString());
             neurophDataset.add(row);
         }
 
@@ -129,11 +129,11 @@ public class JMLDataSetConverter {
                 }
 
                 Instance instance = new DenseInstance(mergedIO);
-                instance.setClassValue(row.getLabel());
+                instance.setClassValue(row.getDesiredOutput());
                 jmlDataset.add(instance);
             } else {
                 Instance instance = new DenseInstance(row.getInput());
-                instance.setClassValue(row.getLabel());
+                instance.setClassValue(row.getDesiredOutput());
                 jmlDataset.add(instance);
             }
         }

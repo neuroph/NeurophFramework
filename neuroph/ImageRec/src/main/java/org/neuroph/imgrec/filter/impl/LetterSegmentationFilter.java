@@ -133,7 +133,7 @@ public class LetterSegmentationFilter implements ImageFilter<BufferedImage>{
 
     public void saveToFile(BufferedImage img, String name) throws FileNotFoundException, IOException {
         // Ovo nce raditi nikako!!!
-        File outputfile = new File("C:/Users/Mihailo/Documents/NetBeansProjects/ImagePreprocessing/Segmented_letters/" + name + ".jpg");
+        File outputfile = new File("Segmented_letters/" + name + ".jpg");
         ImageIO.write(img, "jpg", outputfile);
     }
 

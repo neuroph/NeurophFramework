@@ -19,8 +19,6 @@ import java.util.Arrays;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
-import org.neuroph.core.events.LearningEvent;
-import org.neuroph.core.events.LearningEventListener;
 import org.neuroph.core.learning.error.MeanSquaredError;
 import org.neuroph.eval.ClassifierEvaluator;
 import org.neuroph.eval.ErrorEvaluator;
@@ -30,9 +28,6 @@ import org.neuroph.eval.classification.ConfusionMatrix;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.MomentumBackpropagation;
 import org.neuroph.util.TransferFunctionType;
-import org.neuroph.util.data.norm.MaxNormalizer;
-import org.neuroph.util.data.norm.Normalizer;
-import org.neuroph.util.data.norm.RangeNormalizer;
 
 /**
  * Example of binary classification (mine or rock) using Multi Layer Perceptron on sonar signal data set.
@@ -112,22 +107,6 @@ public class Sonar {
         System.out.println("Done.");
 
         //testNeuralNetwork(neuralNet, testSet);
-    }
-
-    // Displays inputs, desired output (from dataset) and actual output (calculated by neural network) for every row from data set.
-    public void testNeuralNetwork(NeuralNetwork neuralNet, DataSet testSet) {
-
-        System.out.println("Showing inputs, desired output and neural network output for every row in test set.");
-
-        for (DataSetRow testSetRow : testSet.getRows()) {
-            neuralNet.setInput(testSetRow.getInput());
-            neuralNet.calculate();
-            double[] networkOutput = neuralNet.getOutput();
-
-            System.out.println("Input: " + Arrays.toString(testSetRow.getInput()));
-            System.out.println("Output: " + Arrays.toString(networkOutput));
-            System.out.println("Desired output" + Arrays.toString(testSetRow.getDesiredOutput()));
-        }
     }
 
     // Evaluates performance of neural network.

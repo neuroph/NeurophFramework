@@ -65,7 +65,7 @@ import org.neuroph.util.TransferFunctionType;
 6. Missing Values: None.
  */
 
-public class IrisFlowers implements LearningEventListener {
+public class IrisFlowers {
 
     public static void main(String[] args) {
         (new IrisFlowers()).run();
@@ -90,7 +90,10 @@ public class IrisFlowers implements LearningEventListener {
 
         neuralNet.setLearningRule(new MomentumBackpropagation());
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
-        learningRule.addListener(this);
+        learningRule.addListener((event)->{
+            MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
+            System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
+        });
 
         // set learning rate and max error
         learningRule.setLearningRate(0.2);
@@ -109,31 +112,6 @@ public class IrisFlowers implements LearningEventListener {
         neuralNet.save("nn1.nnet");
 
         System.out.println("Done.");
-
-        System.out.println();
-        System.out.println("Network outputs for test set");
-        testNeuralNetwork(neuralNet, testSet);
-    }
-
-    /**
-     * Displays inputs, desired output (from dataset) and actual output (calculated by neural network) for every row from data set.
-     * 
-     * @param neuralNet
-     * @param testSet
-     */
-    public void testNeuralNetwork(NeuralNetwork neuralNet, DataSet testSet) {
-
-        System.out.println("Showing inputs, desired output and neural network output for every row in test set.");
-
-        for (DataSetRow testSetRow : testSet.getRows()) {
-            neuralNet.setInput(testSetRow.getInput());
-            neuralNet.calculate();
-            double[] networkOutput = neuralNet.getOutput();
-
-            System.out.println("Input: " + Arrays.toString(testSetRow.getInput()));
-            System.out.println("Output: " + Arrays.toString(networkOutput));
-            System.out.println("Desired output" + Arrays.toString(testSetRow.getDesiredOutput()));
-        }
     }
 
     /**
@@ -165,17 +143,6 @@ public class IrisFlowers implements LearningEventListener {
             System.out.println(cm.toString() + "\r\n");
         }
         System.out.println(average.toString());
-    }
-
-    /**
-     * Prints training information.
-     *
-     * @param event
-     */
-    @Override
-    public void handleLearningEvent(LearningEvent event) {
-        MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
-        System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
     }
 
 }

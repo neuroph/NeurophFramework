@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import net.sourceforge.javaocr.ocrPlugins.CharacterExtractor;
+import net.sourceforge.javaocr.ocrPlugins.charExtractor.CharacterExtractor;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.imgrec.ColorMode;
 import org.neuroph.imgrec.image.Dimension;

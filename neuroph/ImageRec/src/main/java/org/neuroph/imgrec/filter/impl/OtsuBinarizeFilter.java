@@ -15,7 +15,9 @@ import org.neuroph.imgrec.filter.ImageFilter;
  * which is binarized is made.The image before this filter MUST be GRAYSCALE and 
  * at the end image will contain only two colors - black and white. 
  *
- * reference to: http://zerocool.is-a-geek.net/?p=376
+ * threshold - could be trainable
+ * 
+ *  Reference to: http://zerocool.is-a-geek.net/?p=376
  *  http://www.labbookpages.co.uk/software/imgProc/otsuThreshold.html
  * 
  * @author Mihailo Stupar
@@ -29,36 +31,30 @@ public class OtsuBinarizeFilter implements ImageFilter<BufferedImage>, Serializa
     private static final int WHITE_PIXEL = 255;    
     
     @Override	
-    public BufferedImage apply(BufferedImage image) {
-		
-        originalImage = image;
-		
+    public BufferedImage apply(BufferedImage image) {		
+         this.originalImage = image;		
 	int width = originalImage.getWidth();
-	int height = originalImage.getHeight();
-		
+	int height = originalImage.getHeight();		
 	filteredImage = new BufferedImage(width, height, originalImage.getType());
 		
-	int [] histogram = imageHistogram(originalImage);
-		
-	int totalNumberOfpixels = height*width;
-		
-	int treshold = calculateThreshold(histogram, totalNumberOfpixels);
-			
+	int [] histogram = imageHistogram(originalImage);		
+	int totalNumberOfpixels = width * height;		
+	int threshold = calculateThreshold(histogram, totalNumberOfpixels); // ovo moze biti adaptivni parametar - adaptivna konvoluciona binarizacija			
 	int alpha, gray, newColor;
 		
-	for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                 final Color col = new Color(originalImage.getRGB(i, j));
+	for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                 final Color col = new Color(originalImage.getRGB(x, y));
 		gray = col.getRed();
 		alpha = col.getAlpha();
 				
-		if (gray > treshold)
+		if (gray > threshold)
                     newColor = WHITE_PIXEL;
 		else
                     newColor = BLACK_PIXEL;
 				
 		newColor = ImageUtilities.argbToColor(alpha, newColor, newColor, newColor);
-		filteredImage.setRGB(i, j, newColor);
+		filteredImage.setRGB(x, y, newColor);
             }
 	}
 		
@@ -72,18 +68,12 @@ public class OtsuBinarizeFilter implements ImageFilter<BufferedImage>, Serializa
      * @return 
      */
     private int[] imageHistogram(BufferedImage image) {
-
         int[] histogram = new int[256];
-
-        // ovo je mozda nepotrebno vec su svi nule
-        for (int i = 0; i < histogram.length; i++) {
-            histogram[i] = 0;
-        }
 
         for (int x = 0; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight(); y++) {
-                // ovde bi bilo bolje da ne instanciram ovoliko objekata... nego nek atransformacija
-                int gray = new Color(image.getRGB(x, y)).getRed(); //samo crveni kanal jer se pretpostavlja da je prethodno prosla kroz grayscale filter pa su sva tri kaala ista
+                // ovde bi bilo bolje da ne instanciram ovoliko objekata... nego nek atransformacija: (getRGB() >> 16) & 0xFF to se radi u getRed()
+                int gray = (image.getRGB(x, y) >> 16) & 0xFF; // ovo je getRed() samo crveni kanal jer se pretpostavlja da je prethodno prosla kroz grayscale filter pa su sva tri kaala ista
                 histogram[gray]++; // za svaku nijansu sive povecaj odgovarajucu poziciju za 1
             }
         }

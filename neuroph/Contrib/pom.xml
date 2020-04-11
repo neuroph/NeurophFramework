@@ -5,7 +5,7 @@
    <parent>
       <groupId>org.neuroph</groupId>
       <artifactId>Neuroph</artifactId>
-      <version>2.96</version>
+      <version>2.98</version>
    </parent>
    <artifactId>neuroph-contrib</artifactId>
    <packaging>jar</packaging>
@@ -41,15 +41,15 @@
          <version>0.18</version>
       </dependency>
       <dependency>
-         <groupId>net.sourceforge</groupId>
-         <artifactId>javaocr</artifactId>
-         <version>1.0</version>
-      </dependency>
-      <dependency>
          <groupId>org.slf4j</groupId>
          <artifactId>slf4j-api</artifactId>
          <version>1.7.12</version>
          <type>jar</type>
+      </dependency>
+      <dependency>
+         <groupId>net.sourceforge.javaocr.plugins</groupId>
+         <artifactId>javaocr-plugin-awt</artifactId>
+         <version>1.0</version>
       </dependency>
    </dependencies>
 </project>

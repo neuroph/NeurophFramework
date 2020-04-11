@@ -15,12 +15,9 @@
  */
 package org.neuroph.samples.standard10ml;
 
-import java.util.Arrays;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
-import org.neuroph.core.events.LearningEvent;
-import org.neuroph.core.events.LearningEventListener;
 import org.neuroph.core.learning.error.MeanAbsoluteError;
 import org.neuroph.core.learning.error.MeanSquaredError;
 import org.neuroph.nnet.MultiLayerPerceptron;
@@ -75,7 +72,7 @@ import org.neuroph.util.data.norm.Normalizer;
 
 
  */
-public class BostonHousePrice implements LearningEventListener {
+public class BostonHousePrice {
 
     public static void main(String[] args) {
         (new BostonHousePrice()).run();
@@ -105,7 +102,10 @@ public class BostonHousePrice implements LearningEventListener {
 
         neuralNet.setLearningRule(new MomentumBackpropagation());
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
-        learningRule.addListener(this);
+        learningRule.addListener(event -> {
+            MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
+            System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
+        });
 
         System.out.println("Training network...");
         // train the network with training set
@@ -122,27 +122,6 @@ public class BostonHousePrice implements LearningEventListener {
 
         System.out.println("Done.");
 
-        System.out.println();
-        System.out.println("Network outputs for test set");
-        testNeuralNetwork(neuralNet, testSet);
-    }
-
-    // Displays inputs, desired output (from dataset) and actual output (calculated by neural network) for every row from data set.
-    public void testNeuralNetwork(NeuralNetwork neuralNet, DataSet testSet) {
-
-        System.out.println("Showing inputs, desired output and neural network output for every row in test set.");
-
-        for (DataSetRow testSetRow : testSet.getRows()) {
-
-            neuralNet.setInput(testSetRow.getInput());
-            neuralNet.calculate();
-            double[] networkOutput = neuralNet.getOutput();
-
-            System.out.println("Input: " + Arrays.toString(testSetRow.getInput()));
-            System.out.println("Output: " + networkOutput[0]);
-            System.out.println("Desired output" + Arrays.toString(networkOutput));
-
-        }
     }
 
     // Evaluates performance of neural network.
@@ -168,9 +147,4 @@ public class BostonHousePrice implements LearningEventListener {
         System.out.println("Mean absolute error is: " + mae.getTotalError());
     }
 
-    @Override
-    public void handleLearningEvent(LearningEvent event) {
-        MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
-        System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
-    }
 }

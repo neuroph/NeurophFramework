@@ -73,7 +73,7 @@ import org.neuroph.util.TransferFunctionType;
 
 
  */
-public class WheatSeeds implements LearningEventListener {
+public class WheatSeeds {
 
     public static void main(String[] args) {
         (new WheatSeeds()).run();
@@ -98,7 +98,10 @@ public class WheatSeeds implements LearningEventListener {
 
         neuralNet.setLearningRule(new MomentumBackpropagation());
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
-        learningRule.addListener(this);
+        learningRule.addListener((event)->{
+            MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
+            System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
+        });
 
         // set learning rate and max error
         learningRule.setLearningRate(0.1);
@@ -165,12 +168,6 @@ public class WheatSeeds implements LearningEventListener {
             System.out.println(cm.toString() + "\r\n");
         }
         System.out.println(average.toString());
-    }
-
-    @Override
-    public void handleLearningEvent(LearningEvent event) {
-        MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
-        System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
     }
 
 }

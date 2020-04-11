@@ -18,10 +18,10 @@ public class SimpleLearningExample {
         Dimension2D convolutionKernel = new Dimension2D(3, 3);
 
         ConvolutionalNetwork convolutionNet = new ConvolutionalNetwork.Builder()
-                .withInputLayer(5, 5, 1)
-                .withConvolutionLayer(3, 3, 2)
-                .withFullConnectedLayer(2)
-                .build();
+                                                                        .withInputLayer(5, 5, 1)
+                                                                        .withConvolutionLayer(3, 3, 2)
+                                                                        .withFullConnectedLayer(2)
+                                                                        .build();
 
 
         // CREATE DATA SET

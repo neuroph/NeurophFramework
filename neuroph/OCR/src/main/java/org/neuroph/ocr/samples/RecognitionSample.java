@@ -37,7 +37,7 @@ public class RecognitionSample {
         ImageFilterChain chain = new ImageFilterChain();
         chain.addFilter(new GrayscaleFilter());
         chain.addFilter(new OtsuBinarizeFilter());
-        BufferedImage binarizedImage = chain.processImage(image);
+        BufferedImage binarizedImage = chain.apply(image);
 
         // Information about letters and text
         Letter letterInfo = new Letter(scanQuality, binarizedImage);

@@ -30,7 +30,6 @@ public class NormalizationFilter implements ImageFilter<BufferedImage> {
     private int[][] imageMatrix;
 
     @Override
-
     public BufferedImage apply(BufferedImage image) {
 
         originalImage = image;
@@ -41,35 +40,32 @@ public class NormalizationFilter implements ImageFilter<BufferedImage> {
         filteredImage = new BufferedImage(width, height, originalImage.getType());
         imageMatrix = new int[width][height];
 
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-
-                imageMatrix[i][j] = new Color(originalImage.getRGB(i, j)).getRed();
-
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                imageMatrix[x][y] = new Color(originalImage.getRGB(x, y)).getRed();
             }
         }
 
         mean = calculateMean();
         var = calculateVariance();
 
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
                 double normalizedPixel = 0;
                 double squareError = 0;
 
-                if (imageMatrix[i][j] > mean) {
-                    squareError = (imageMatrix[i][j] - mean) * (imageMatrix[i][j] - mean);
+                if (imageMatrix[x][y] > mean) {
+                    squareError = (imageMatrix[x][y] - mean) * (imageMatrix[x][y] - mean);
                     normalizedPixel = (targetMean + Math.sqrt(((targetVariance * squareError / var))));
                 } else {
-                    squareError = (imageMatrix[i][j] - mean) * (imageMatrix[i][j] - mean);
+                    squareError = (imageMatrix[x][y] - mean) * (imageMatrix[x][y] - mean);
                     normalizedPixel = (targetMean - Math.sqrt(((targetVariance * squareError / var))));
                 }
 
-                int alpha = new Color(originalImage.getRGB(i, j)).getAlpha();
+                int alpha = new Color(originalImage.getRGB(x, y)).getAlpha();
                 int rgb = (int) -normalizedPixel;
                 int color = ImageUtilities.argbToColor(alpha, rgb, rgb, rgb);
-                filteredImage.setRGB(i, j, color);
+                filteredImage.setRGB(x, y, color);
             }
         }
 
@@ -77,7 +73,6 @@ public class NormalizationFilter implements ImageFilter<BufferedImage> {
     }
 
     public int calculateVariance() {
-
         int var = 0;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {

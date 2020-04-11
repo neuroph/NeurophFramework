@@ -24,7 +24,9 @@ import java.awt.image.BufferedImage;
  * @author Mihailo
  */
 public class ImageHistogram {
-
+    public static final int BLACK = 0;
+    
+    
     /**
      * Create and return histogram for binarized input image by height.
      * Histogram contains number of black pixels in image pixel rows.
@@ -34,18 +36,17 @@ public class ImageHistogram {
      * @param image binarized image, letters are black, background is white
      * @return image histogram
      */
-    public static int[] heightHistogram(BufferedImage image) {
-        int height = image.getHeight();
-        int width = image.getWidth();
-
-        int[] histogram = new int[height];
-        int black = 0;
+    public static int[] histogramByHeight(final BufferedImage image) {
+        final int height = image.getHeight();
+        final int width = image.getWidth();
+        final int[] histogram = new int[height];
+        
         int color;
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                color = new Color(image.getRGB(j, i)).getRed();
-                if (color == black) {
-                    histogram[i]++;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                color = new Color(image.getRGB(x, y)).getRed();
+                if (color == BLACK) {
+                    histogram[y]++;
                 }
             }
         }
@@ -58,18 +59,17 @@ public class ImageHistogram {
      * @return array which length is width of image, every element of array
      * represent count of black pixels in that column of pixels.
      */
-    public static int[] widthHistogram(BufferedImage image) {
-        int height = image.getHeight();
-        int width = image.getWidth();
+    public static int[] histogramByWidth(BufferedImage image) {
+        final int height = image.getHeight();
+        final int width = image.getWidth();
+        final int[] histogram = new int[width];
 
-        int[] histogram = new int[width];
-        int black = 0;
         int color;
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                color = new Color(image.getRGB(i, j)).getRed();
-                if (color == black) {
-                    histogram[i]++;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                color = new Color(image.getRGB(x, y)).getRed();
+                if (color == BLACK) {
+                    histogram[x]++;
                 }
             }
         }
@@ -80,9 +80,10 @@ public class ImageHistogram {
      * @param histogram histogram calculated by method
      * <b>heightHistogram(BufferedImage)</b> or
      * <b>widthHistogram(BufferedImage)</b>
-     * @return array that represents gradient Each element in array is
-     * calculated in the following way:<br/>
+     * Each element in array is calculated in the following way:<br/>
      * gradient[i] = histogram[i] - histogram[i-1]
+     * 
+     * @return array that represents gradient 
      */
     public static int[] gradient(int[] histogram) {
         int[] gradient = new int[histogram.length];
