@@ -118,10 +118,6 @@ public class Abalone {
         // train the network with training set
         neuralNet.learn(trainingSet);
         System.out.println("Training completed.");
-        System.out.println("Testing network...");
-
-        System.out.println("Network performance on the test set");
-        evaluate(neuralNet, testSet);
 
         System.out.println("Saving network");
         // save neural network to file
@@ -131,31 +127,7 @@ public class Abalone {
     }
 
 
-    // Evaluates performance of neural network.
-    // Contains calculation of Confusion matrix for classification tasks or Mean Ssquared Error and Mean Absolute Error for regression tasks.
-    // Difference in binary and multi class classification are made when adding Evaluator (MultiClass or Binary).
-    public void evaluate(NeuralNetwork neuralNet, DataSet dataSet) {
 
-        System.out.println("Calculating performance indicators for neural network.");
-        Evaluation evaluation = new Evaluation();
-        evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
-
-        String classLabels[] = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29"};
-        evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(classLabels));
-        evaluation.evaluate(neuralNet, dataSet);
-
-        ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
-        ConfusionMatrix confusionMatrix = evaluator.getResult();
-        System.out.println("Confusion matrrix:\r\n");
-        System.out.println(confusionMatrix.toString() + "\r\n\r\n");
-        System.out.println("Classification metrics\r\n");
-        ClassificationMetrics[] metrics = ClassificationMetrics.createFromMatrix(confusionMatrix);
-        ClassificationMetrics.Stats average = ClassificationMetrics.average(metrics);
-        for (ClassificationMetrics cm : metrics) {
-            System.out.println(cm.toString() + "\r\n");
-        }
-        System.out.println(average.toString());
-    }
 
 
 }
