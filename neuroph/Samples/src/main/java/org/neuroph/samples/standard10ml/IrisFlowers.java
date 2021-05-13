@@ -15,12 +15,9 @@
  */
 package org.neuroph.samples.standard10ml;
 
-import java.util.Arrays;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.data.DataSet;
-import org.neuroph.core.data.DataSetRow;
 import org.neuroph.core.events.LearningEvent;
-import org.neuroph.core.events.LearningEventListener;
 import org.neuroph.core.learning.error.MeanSquaredError;
 import org.neuroph.eval.ClassifierEvaluator;
 import org.neuroph.eval.ErrorEvaluator;
@@ -86,18 +83,22 @@ public class IrisFlowers {
         DataSet testSet = trainTestSplit[1];
 
         System.out.println("Creating neural network...");
-        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(TransferFunctionType.TANH, inputsCount, 2, outputsCount);
+        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(TransferFunctionType.TANH, inputsCount, 12, outputsCount);
 
         neuralNet.setLearningRule(new MomentumBackpropagation());
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
         learningRule.addListener((event)->{
-            MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
-            System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
+            if (event.getEventType() != LearningEvent.LEARNING_STOPPED) {
+                MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
+                System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
+            }
         });
 
         // set learning rate and max error
         learningRule.setLearningRate(0.2);
         learningRule.setMaxError(0.03);
+        learningRule.setMaxIterations(10000);
+        
         System.out.println("Training network...");
         // train the network with training set
         neuralNet.learn(trainingSet);
