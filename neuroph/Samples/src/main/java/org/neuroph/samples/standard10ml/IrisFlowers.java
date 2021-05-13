@@ -95,7 +95,8 @@ public class IrisFlowers {
         });
 
         // set learning rate and max error
-        learningRule.setLearningRate(0.2);
+        learningRule.setLearningRate(0.5);
+        learningRule.setMomentum(0.9);
         learningRule.setMaxError(0.03);
         learningRule.setMaxIterations(10000);
         
@@ -120,18 +121,18 @@ public class IrisFlowers {
      * Contains calculation of Confusion matrix for classification tasks or Mean Ssquared Error and Mean Absolute Error for regression tasks.
      *
      * @param neuralNet
-     * @param dataSet
+     * @param testSet
      */
-    public void evaluate(NeuralNetwork neuralNet, DataSet dataSet) {
+    public void evaluate(NeuralNetwork neuralNet, DataSet testSet) {
 
         System.out.println("Calculating performance indicators for neural network.");
 
         Evaluation evaluation = new Evaluation();
         evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
 
-        String[] classLabels = new String[]{"Virginica", "Setosa", "Versicolor"};
+        String[] classLabels = new String[]{"Setosa", "Virginica",  "Versicolor"};
         evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(classLabels));
-        evaluation.evaluate(neuralNet, dataSet);
+        evaluation.evaluate(neuralNet, testSet);
 
         ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
         ConfusionMatrix confusionMatrix = evaluator.getResult();

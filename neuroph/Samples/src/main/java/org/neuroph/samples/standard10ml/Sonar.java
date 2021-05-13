@@ -81,7 +81,7 @@ public class Sonar {
         DataSet testSet = trainTestSplit[1];
 
         // create neural network
-        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(TransferFunctionType.TANH, numInputs, 35, 15, numOutputs);
+        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(TransferFunctionType.TANH, numInputs, 65, 65, numOutputs);
 
         // set learning rule and add listener
         neuralNet.setLearningRule(new MomentumBackpropagation());
@@ -106,7 +106,6 @@ public class Sonar {
 
         System.out.println("Done.");
 
-        //testNeuralNetwork(neuralNet, testSet);
     }
 
     // Evaluates performance of neural network.

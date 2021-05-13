@@ -80,7 +80,7 @@ public class SwedishAutoInsurance {
 
         System.out.println("Creating neural network...");
         Adaline neuralNet = new Adaline(1);
-        LMS learningRule = (LMS) neuralNet.getLearningRule();
+        LMS learningRule = neuralNet.getLearningRule();
         learningRule.addListener((event) -> {
             LMS bp = (LMS) event.getSource();
             System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
