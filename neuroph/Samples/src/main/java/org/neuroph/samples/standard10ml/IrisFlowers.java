@@ -83,7 +83,7 @@ public class IrisFlowers {
         DataSet testSet = trainTestSplit[1];
 
         System.out.println("Creating neural network...");
-        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(TransferFunctionType.TANH, inputsCount, 12, outputsCount);
+        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(TransferFunctionType.TANH, inputsCount, 16, outputsCount);
 
         neuralNet.setLearningRule(new MomentumBackpropagation());
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
@@ -95,10 +95,10 @@ public class IrisFlowers {
         });
 
         // set learning rate and max error
-        learningRule.setLearningRate(0.5);
+        learningRule.setLearningRate(0.7);
         learningRule.setMomentum(0.9);
         learningRule.setMaxError(0.03);
-        learningRule.setMaxIterations(10000);
+    //    learningRule.setMaxIterations(10000);
         
         System.out.println("Training network...");
         // train the network with training set

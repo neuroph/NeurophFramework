@@ -76,12 +76,12 @@ public class Sonar {
         DataSet dataSet = DataSet.createFromFile(dataSetFile, numInputs, numOutputs, ",");
 
         // split data into train and test set
-        DataSet[] trainTestSplit = dataSet.split(0.6, 0.4);
+        DataSet[] trainTestSplit = dataSet.split(0.8, 0.2);
         DataSet trainingSet = trainTestSplit[0];
         DataSet testSet = trainTestSplit[1];
 
         // create neural network
-        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(TransferFunctionType.TANH, numInputs, 65, 65, numOutputs);
+        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(TransferFunctionType.TANH, numInputs, 10, numOutputs);
 
         // set learning rule and add listener
         neuralNet.setLearningRule(new MomentumBackpropagation());
@@ -94,6 +94,9 @@ public class Sonar {
         // set learning rate and max error
         learningRule.setLearningRate(0.01);
         learningRule.setMaxError(0.01);
+        
+        learningRule.setMaxIterations(10000);
+        learningRule.setMomentum(0.5);
 
         // train the network with training set
         neuralNet.learn(trainingSet);
