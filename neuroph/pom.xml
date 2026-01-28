@@ -11,7 +11,7 @@
    <modules>
       <module>Core</module>
        <!-- Temporarily disabled due to missing neuroph-contrib artifact -->
-<!--      <module>Samples</module>-->
+      <module>Samples</module>
       <module>ImageRec</module>
       <module>OCR</module>
       <module>Contrib</module>
